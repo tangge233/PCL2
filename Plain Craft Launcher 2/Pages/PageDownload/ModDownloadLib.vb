@@ -682,9 +682,9 @@ Retry:
         '建立控件
         Dim NewItem As New MyListItem With {
             .Title = Entry.NameDisplay, .SnapsToDevicePixels = True, .Height = 42, .Type = MyListItem.CheckType.Clickable, .Tag = Entry,
-            .Info = If(Entry.IsPreview, GetLang("LangDownloadPreviewOptiFine"), GetLang("LangDownloadStable")) &
+            .Info = If(Entry.IsPreview, GetLang("LangDownloadOptiFinePreview"), GetLang("LangDownloadStable")) &
                     If(Entry.ReleaseTime = "", "", "，" & GetLang("LangDownloadReleaseOn") & " " & Entry.ReleaseTime) &
-                    If(Entry.RequiredForgeVersion Is Nothing, "，" & GetLang("LangDownloadForgeIncompatible"), If(Entry.RequiredForgeVersion = "", "", "，" & GetLang("LangDownloadRecommendForge") & Entry.RequiredForgeVersion)),
+                    If(Entry.RequiredForgeVersion Is Nothing, "，" & GetLang("LangDownloadForgeIncompatible"), If(Entry.RequiredForgeVersion = "", "", "，" & GetLang("LangDownloadForgeRecommend") & Entry.RequiredForgeVersion)),
             .Logo = PathImage & "Blocks/GrassPath.png"
         }
         AddHandler NewItem.Click, OnClick
@@ -901,7 +901,7 @@ Retry:
         '建立控件
         Dim NewItem As New MyListItem With {
             .Title = Entry.Inherit, .SnapsToDevicePixels = True, .Height = 42, .Type = MyListItem.CheckType.Clickable, .Tag = Entry,
-            .Info = If(Entry.IsPreview, GetLang("LangDownloadPreviewLiteLoader"), GetLang("LangDownloadStable")) & If(Entry.ReleaseTime = "", "", "，" & GetLang("LangDownloadReleaseOn") & " " & Entry.ReleaseTime),
+            .Info = If(Entry.IsPreview, GetLang("LangDownloadLiteLoaderSnapshot"), GetLang("LangDownloadStable")) & If(Entry.ReleaseTime = "", "", "，" & GetLang("LangDownloadReleaseOn") & " " & Entry.ReleaseTime),
             .Logo = PathImage & "Blocks/Egg.png"
         }
         AddHandler NewItem.Click, OnClick
@@ -1257,7 +1257,7 @@ Retry:
         If IsNeoForge OrElse LoaderVersion.Before(".") >= 20 Then
             Log($"[Download] 检测为{If(IsNeoForge, " Neo", "新版 ")}Forge：" & LoaderVersion)
             Dim Libs As List(Of McLibToken) = Nothing
-            Loaders.Add(New LoaderTask(Of String, List(Of NetFile))(GetLang("LangPageSpeedRightAnalyseModLoaderSupportLibrary", LoaderName),
+            Loaders.Add(New LoaderTask(Of String, List(Of NetFile))(GetLang("LangPageSpeedRightAnalyzeModLoaderSupportLibrary", LoaderName),
             Sub(Task As LoaderTask(Of String, List(Of NetFile)))
                 Task.Output = New List(Of NetFile)
                 Dim Installer As ZipArchive = Nothing
@@ -1650,7 +1650,7 @@ Retry:
         End If
         If FreshBetaVersion IsNot Nothing Then
             Dim Fresh = NeoForgeDownloadListItem(FreshBetaVersion, OnClick, IsSaveOnly)
-            Fresh.Info = If(Fresh.Info = "", GetLang("LangDownloadNewTest"), GetLang("LangDownloadNewTest"))
+            Fresh.Info = If(Fresh.Info = "", GetLang("LangDownloadNewBet"), GetLang("LangDownloadNewBet"))
             Stack.Children.Add(Fresh)
         End If
         '添加间隔
@@ -1660,7 +1660,7 @@ Retry:
         '建立控件
         Dim NewItem As New MyListItem With {
             .Title = Info.VersionName, .SnapsToDevicePixels = True, .Height = 42, .Type = MyListItem.CheckType.Clickable, .Tag = Info,
-            .Info = If(Info.IsBeta, GetLang("LangDownloadTest"), GetLang("LangDownloadStable")),
+            .Info = If(Info.IsBeta, GetLang("LangDownloadBeta"), GetLang("LangDownloadStable")),
             .Logo = PathImage & "Blocks/NeoForge.png"
         }
         AddHandler NewItem.Click, OnClick
@@ -1807,7 +1807,7 @@ Retry:
         '建立控件
         Dim NewItem As New MyListItem With {
             .Title = Entry("version").ToString.Replace("+build", ""), .SnapsToDevicePixels = True, .Height = 42, .Type = MyListItem.CheckType.Clickable, .Tag = Entry,
-            .Info = If(Entry("stable").ToObject(Of Boolean), GetLang("LangDownloadStable"), GetLang("LangDownloadTest")),
+            .Info = If(Entry("stable").ToObject(Of Boolean), GetLang("LangDownloadStable"), GetLang("LangDownloadBeta")),
             .Logo = PathImage & "Blocks/Fabric.png"
         }
         AddHandler NewItem.Click, OnClick

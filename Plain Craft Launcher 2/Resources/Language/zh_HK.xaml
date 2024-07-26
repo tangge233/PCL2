@@ -7,7 +7,7 @@
     <s:String x:Key="LangTitleDownload">下載</s:String>
     <s:String x:Key="LangTitleHome">啟動</s:String>
     <s:String x:Key="LangTitleSetup">設置</s:String>
-    <s:String x:Key="LangTitleLink">聯機</s:String>
+    <s:String x:Key="LangTitleHosting">聯機</s:String>
     <s:String x:Key="LangTitleOther">更多</s:String>
     <s:String x:Key="LangToolTipBackToTop">返回頂部</s:String>
     <s:String x:Key="LangToolTipDownload">下載管理</s:String>
@@ -24,7 +24,7 @@
     <s:String x:Key="LangDialogBtnPolicyContent">查看用戶協議與免責聲明</s:String>
     <s:String x:Key="LangHintDebugWarning">[調試模式] PCL 正以調試模式運行，這可能會導致性能下降，若無必要請不要開啟！</s:String>
     <s:String x:Key="LangDialogTitleTip">提示</s:String>
-    <s:String x:Key="LangDialogHardcoreFanTheme">你已經使用了 99 次 PCL 啦，感謝你長期以來的支持！&#x000D;隱藏主題 鐵杆粉 已解鎖！</s:String>
+    <s:String x:Key="LangDialogHardcoreFansTheme">你已經使用了 99 次 PCL 啦，感謝你長期以來的支持！&#x000D;隱藏主題 鐵杆粉 已解鎖！</s:String>
     <s:String x:Key="LangDialogCloseOnDownloading">還有下載任務尚未完成，是否確定退出？</s:String>
     <s:String x:Key="LangHintHideModeOn">功能隱藏設置已重新開啟！</s:String>
     <s:String x:Key="LangHintHideModeOff">功能隱藏設置已暫時關閉！</s:String>
@@ -32,8 +32,8 @@
     <s:String x:Key="LangHintAuthlibUrlIncorrect">輸入的 Authlib 驗證服務器不符合網址格式 ({0})！</s:String>
     <s:String x:Key="LangHintAuthlibDownloadGame">請先下載遊戲，再設置第三方登錄！</s:String>
     <s:String x:Key="LangDialogAuthlibEnableLittleSkin">是否要在版本 {0} 中開啟 LittleSkin 登錄？&#x000D;你可以在 版本設置 → 設置 → 服務器選項 中修改登錄方式。</s:String>
-    <s:String x:Key="LangDialogTitleAuthlibEnableLittleSkin">第三方登錄開啟確認</s:String>
-    <s:String x:Key="LangDialogAuthlibEnableLittleSkinServer">是否要在版本 {0} 中開啟 LittleSkin 登錄？&#x000D;登錄服務器：{1}&#x000D;&#x000D;你可以在 版本設置 → 設置 → 服務器選項 中修改登錄方式。</s:String>
+    <s:String x:Key="LangDialogTitleAuthlibEnable">第三方登錄開啟確認</s:String>
+    <s:String x:Key="LangDialogAuthlibEnableThirdPartyServer">是否要在版本 {0} 中開啟第三方登錄？&#x000D;登錄服務器：{1}&#x000D;&#x000D;你可以在 版本設置 → 設置 → 服務器選項 中修改登錄方式。</s:String>
     <s:String x:Key="LangHintWindowDropExtract">請將文件解壓後再拖入！</s:String>
     <s:String x:Key="LangHintWindowDropFolder">請拖入一個文件，而非文件夾！</s:String>
     <s:String x:Key="LangHintWindowDropFileNotFound">拖入的文件不存在：{0}</s:String>
@@ -56,11 +56,11 @@
     <s:String x:Key="LangHintCloseMinecraftFailed">強制關閉所有 Minecraft 失敗</s:String>
     <s:String x:Key="LangHintBackToTopFailed">無法返回頂部，未找到合適的 RealScroll</s:String>
     <s:String x:Key="LangDialogFailedToChangePage">無法切換到子頁面（ID {0}）</s:String>
-    <s:String x:Key="LangPageNameVersionChoose">版本選擇</s:String>
+    <s:String x:Key="LangPageNameInstanceChoose">版本選擇</s:String>
     <s:String x:Key="LangPageNameDownloadManagement">下載管理</s:String>
     <s:String x:Key="LangPageNameVersionConfiguration">版本設置</s:String>
     <s:String x:Key="LangPageNameVersionConfigurationUnknownVersion">未知版本</s:String>
-    <s:String x:Key="LangPageNameModDownload">模組下載</s:String>
+    <s:String x:Key="LangPageNameModsDownload">模組下載</s:String>
     <s:String x:Key="LangPageNameModpacksDownload">整合包下載</s:String>
     <s:String x:Key="LangPageNameResourcePacksDownload">資源包下載</s:String>
 
@@ -77,14 +77,14 @@
     <s:String x:Key="LangHintThemeSetInitFail">初始化個性化設置失敗</s:String>
     <s:String x:Key="LangBackgroundPic">背景圖片</s:String>
     <s:String x:Key="LangBackgroundPicCount">背景圖片 （{0} 張）</s:String>
-    <s:String x:Key="LangDialogDeleteAllBackgroundPicCntent">即將刪除背景圖片文件夾中的所有文件。&#x000D;此操作不可撤銷，是否確定？</s:String>
+    <s:String x:Key="LangDialogDeleteAllBackgroundPicContent">即將刪除背景圖片文件夾中的所有文件。&#x000D;此操作不可撤銷，是否確定？</s:String>
     <s:String x:Key="LangDialogTitleWarning">警告</s:String>
     <s:String x:Key="LangHintBackgroundPicDeleted">背景圖片已清空！</s:String>
     <s:String x:Key="LangHintBackgroundPicNotFound">未檢測到可用背景圖片！</s:String>
     <s:String x:Key="LangHintBackgroundPicRefreshed">背景圖片已刷新：</s:String>
     <s:String x:Key="LangDialogBackgroundPicRefreshFailA">刷新背景圖片失敗，該圖片文件可能並非標準格式。&#x000D;你可以嘗試使用畫圖打開該文件並重新保存，這會讓圖片變為標準格式。&#x000D;文件：</s:String>
     <s:String x:Key="LangDialogBackgroundPicRefreshFailB">刷新背景圖片失敗（ {0} ）</s:String>
-    <s:String x:Key="LangDialogBackgroundPicRefreshFailUnknwon">刷新背景圖片時出現未知錯誤</s:String>
+    <s:String x:Key="LangDialogBackgroundPicRefreshFailUnknown">刷新背景圖片時出現未知錯誤</s:String>
     <s:String x:Key="LangDialogTitlePicChangeFailA">改變標題欄圖片失敗，該圖片文件可能並非標準格式。&#x000D;你可以嘗試使用畫圖打開該文件並重新保存，這會讓圖片變為標準格式。</s:String>
     <s:String x:Key="LangDialogTitlePicChangeFailB">設置標題欄圖片失敗</s:String>
     <s:String x:Key="LangDialogTitlePicChangeFailC">調整標題欄圖片失敗，該圖片文件可能並非標準格式。&#x000D;你可以嘗試使用畫圖打開該文件並重新保存，這會讓圖片變為標準格式。</s:String>
@@ -110,7 +110,7 @@
     <s:String x:Key="LangThemeBackUnlock">隱藏主題 玄素黑 已解鎖！</s:String>
     <s:String x:Key="LangDialogThemeUnlockGameContent">1. 不爬取或攻擊相關服務或網站，不盜取相關賬號，沒有謎題可以或需要以此來解決。&#x000D;2. 不得篡改或損毀相關公開信息，請儘量讓它們保持原狀。&#x000D;3. 在你感到迷茫的時候，看看回聲洞可能會給你帶來驚喜。&#x000D;&#x000D;若違規，可能會被從任意相關群中踢出！</s:String>
     <s:String x:Key="LangDialogThemeUnlockGameTitle">解密遊戲的基本規則</s:String>
-    <s:String x:Key="LangDialogThemeUnlockGameAccrpt">我知道了</s:String>
+    <s:String x:Key="LangDialogThemeUnlockGameAccept">我知道了</s:String>
     <s:String x:Key="LangDialogThemeUnlockGameDeny">恕我拒絕</s:String>
     <s:String x:Key="LangDialogThemeUnlockGameFirstClueContent">你需要用自己的智慧來找到下一步的線索……初始線索：</s:String>
     <s:String x:Key="LangDialogThemeUnlockGameFirstClueTitle">解密遊戲</s:String>
@@ -118,10 +118,10 @@
     <s:String x:Key="LangOtherAbout">關於</s:String>
     <s:String x:Key="LangOtherTool">百寶箱</s:String>
     <s:String x:Key="LangOtherMore">更多</s:String>
-    <s:String x:Key="LangHiddenModeTitleA">功能隱藏（已暫時關閉，按 F12 以重新啟用）</s:String>
-    <s:String x:Key="LangHiddenModeTitleB">功能隱藏</s:String>
-    <s:String x:Key="LangHiddenModeFail">刷新功能隱藏項目失敗</s:String>
-    <s:String x:Key="LangHintHiddenModeTip">按 F12 即可暫時關閉功能隱藏設置。千萬別忘了，要不然設置就改不回來了……</s:String>
+    <s:String x:Key="LangHidingModeTitleA">功能隱藏（已暫時關閉，按 F12 以重新啟用）</s:String>
+    <s:String x:Key="LangHidingModeTitleB">功能隱藏</s:String>
+    <s:String x:Key="LangHidingModeFail">刷新功能隱藏項目失敗</s:String>
+    <s:String x:Key="LangHintHidingModeTip">按 F12 即可暫時關閉功能隱藏設置。千萬別忘了，要不然設置就改不回來了……</s:String>
     <s:String x:Key="LangSetTheme">基礎</s:String>
     <s:String x:Key="LangSetThemeOpacity">不透明度</s:String>
     <s:String x:Key="LangSetThemeHue">色調</s:String>
@@ -138,7 +138,7 @@
     <s:String x:Key="LangSetThemeNameBlack">玄素黑</s:String>
     <s:String x:Key="LangSetThemeNameGreyToolTip">灰色是個謊言</s:String>
     <s:String x:Key="LangSetThemeNameFunny">滑稽樹上滑稽果，滑稽樹下你和我，滑稽之日搞事情，歡樂多又多</s:String>
-    <s:String x:Key="LangSetThemeNameHardcoreFan">99 次重逢的喜悅</s:String>
+    <s:String x:Key="LangSetThemeNameHardcoreFans">99 次重逢的喜悅</s:String>
     <s:String x:Key="LangSetThemeNameLucky">這就是傳說中的歐皇了吧</s:String>
     <s:String x:Key="LangSetThemeNameMojang">進行一次正版登錄，支持正版遊戲！</s:String>
     <s:String x:Key="LangSetThemeNameGeekToolTip">右鍵打開解密遊戲入口</s:String>
@@ -194,8 +194,8 @@
     <s:String x:Key="LangSetHomePageLocalTip">內容見 ModSetup</s:String>
     <s:String x:Key="LangSetHomePageOnline">聯網更新</s:String>
     <s:String x:Key="LangSetHomePageRefresh">刷新主頁</s:String>
-    <s:String x:Key="LangSetHomePageReleaseTeachFile">生成教學文件</s:String>
-    <s:String x:Key="LangSetHomePageSeeDoc">查看教程</s:String>
+    <s:String x:Key="LangSetHomePageGenerateDoc">生成教學文件</s:String>
+    <s:String x:Key="LangSetHomePageSeeTutorials">查看教程</s:String>
     <s:String x:Key="LangSetHomePageDownload">下載地址</s:String>
     <s:String x:Key="LangSetHomePagePresetPage">主頁預設</s:String>
     <s:String x:Key="LangSetHomePagePresetPageA">你知道嗎？</s:String>
@@ -204,30 +204,30 @@
     <s:String x:Key="LangSetHomePagePresetPageD">簡單主頁（作者：MFn233）</s:String>
     <s:String x:Key="LangSetHomePagePresetPageE">每日整合包推薦（作者：wkea）</s:String>
     <s:String x:Key="LangSetHomePagePresetPageF">Minecraft 皮膚推薦（作者：wkea）</s:String>
-    <s:String x:Key="LangSetFuncHidden">功能隱藏</s:String>
-    <s:String x:Key="LangSetFuncHiddenToolTip">你可以隱藏不需要的頁面或關閉特定功能。在任意界面按 F12 可以暫時顯示被隱藏的功能。</s:String>
-    <s:String x:Key="LangSetFuncHiddenLaunch">主頁面</s:String>
-    <s:String x:Key="LangSetFuncHiddenDownload">下載</s:String>
-    <s:String x:Key="LangSetFuncHiddenLink">聯機</s:String>
-    <s:String x:Key="LangSetFuncHiddenSettings">設置</s:String>
-    <s:String x:Key="LangSetFuncHiddenMore">更多</s:String>
-    <s:String x:Key="LangSetFuncHiddenSettingsSubPage">設置 子頁面</s:String>
-    <s:String x:Key="LangSetFuncHiddenSettingsGame">遊戲</s:String>
-    <s:String x:Key="LangSetFuncHiddenSettingsPersonalize">個性化</s:String>
-    <s:String x:Key="LangSetFuncHiddenSettingsLaunch">啟動器</s:String>
-    <s:String x:Key="LangSetFuncHiddenSettingsLink">聯機</s:String>
-    <s:String x:Key="LangSetFuncHiddenMoreSubPage">更多 子頁面</s:String>
-    <s:String x:Key="LangSetFuncHiddenMoreHelp">幫助</s:String>
-    <s:String x:Key="LangSetFuncHiddenMoreAbout">關於與鳴謝</s:String>
-    <s:String x:Key="LangSetFuncHiddenMoreTool">百寶箱</s:String>
-    <s:String x:Key="LangSetFuncHiddenMoreFeedback">反饋</s:String>
-    <s:String x:Key="LangSetFuncHiddenMoreVote">新功能投票</s:String>
-    <s:String x:Key="LangSetFuncHiddenSpecial">特定功能</s:String>
-    <s:String x:Key="LangSetFuncHiddenSpecialEmail">郵箱隱藏</s:String>
-    <s:String x:Key="LangSetFuncHiddenSpecialEmailToolTip">隱藏第三方登錄的賬號郵箱顯示，並儘量將郵箱打碼，以避免隱私泄露。&#xa;此選項的更改將在重啟啟動器後生效。</s:String>
-    <s:String x:Key="LangSetFuncHiddenSpecialVersionChoose">版本選擇</s:String>
-    <s:String x:Key="LangSetFuncHiddenSpecialFuncHidden">功能隱藏</s:String>
-    <s:String x:Key="LangSetFuncHiddenSpecialFuncHiddenToolTip">僅隱藏本選項卡，設置的禁用內容依然有效。&#xa;可以在保留個性化設置頁面的情況下避免隱藏設置被修改。</s:String>
+    <s:String x:Key="LangSetFuncHiding">功能隱藏</s:String>
+    <s:String x:Key="LangSetFuncHidingToolTip">你可以隱藏不需要的頁面或關閉特定功能。在任意界面按 F12 可以暫時顯示被隱藏的功能。</s:String>
+    <s:String x:Key="LangSetFuncHidingLaunch">主頁面</s:String>
+    <s:String x:Key="LangSetFuncHidingDownload">下載</s:String>
+    <s:String x:Key="LangSetFuncHidingHosting">聯機</s:String>
+    <s:String x:Key="LangSetFuncHidingSettings">設置</s:String>
+    <s:String x:Key="LangSetFuncHidingMore">更多</s:String>
+    <s:String x:Key="LangSetFuncHidingSettingsSubPage">設置 子頁面</s:String>
+    <s:String x:Key="LangSetFuncHidingSettingsGame">遊戲</s:String>
+    <s:String x:Key="LangSetFuncHidingSettingsPersonalization">個性化</s:String>
+    <s:String x:Key="LangSetFuncHidingSettingsLauncher">啟動器</s:String>
+    <s:String x:Key="LangSetFuncHidingSettingsHosting">聯機</s:String>
+    <s:String x:Key="LangSetFuncHidingMoreSubPage">更多 子頁面</s:String>
+    <s:String x:Key="LangSetFuncHidingMoreHelp">幫助</s:String>
+    <s:String x:Key="LangSetFuncHidingMoreCredits">關於與鳴謝</s:String>
+    <s:String x:Key="LangSetFuncHidingMoreUtilities">百寶箱</s:String>
+    <s:String x:Key="LangSetFuncHidingMoreFeedback">反饋</s:String>
+    <s:String x:Key="LangSetFuncHidingMoreVote">新功能投票</s:String>
+    <s:String x:Key="LangSetFuncHidingSpecial">特定功能</s:String>
+    <s:String x:Key="LangSetFuncHidingSpecialEmail">郵箱隱藏</s:String>
+    <s:String x:Key="LangSetFuncHidingSpecialEmailToolTip">隱藏第三方登錄的賬號郵箱顯示，並儘量將郵箱打碼，以避免隱私泄露。&#xa;此選項的更改將在重啟啟動器後生效。</s:String>
+    <s:String x:Key="LangSetFuncHidingSpecialInstanceChoose">版本選擇</s:String>
+    <s:String x:Key="LangSetFuncHidingSpecialFuncHidden">功能隱藏</s:String>
+    <s:String x:Key="LangSetFuncHidingSpecialFuncHiddenToolTip">僅隱藏本選項卡，設置的禁用內容依然有效。&#xa;可以在保留個性化設置頁面的情況下避免隱藏設置被修改。</s:String>
 
     <!--PageSelectLeft-->
     <s:String x:Key="LangSelectFolderList">文件夾列表</s:String>
@@ -243,8 +243,8 @@
     <s:String x:Key="LangSelectCreateFolderToolTip">在 PCL 當前所在文件夾下創建新的 .minecraft 文件夾</s:String>
     <s:String x:Key="LangSelectAddExistFolder">添加已有文件夾</s:String>
     <s:String x:Key="LangSelectAddExistFolderToolTip">將一個已有的 Minecraft 文件夾添加到列表</s:String>
-    <s:String x:Key="LangSelectAddModpackages">導入整合包</s:String>
-    <s:String x:Key="LangSelectAddModpackagesToolTip">在當前選擇的 Minecraft 文件夾下安裝整合包</s:String>
+    <s:String x:Key="LangSelectAddModpacks">導入整合包</s:String>
+    <s:String x:Key="LangSelectAddModpacksToolTip">在當前選擇的 Minecraft 文件夾下安裝整合包</s:String>
     <s:String x:Key="LangSelectNoMCFolder">沒有可用的 Minecraft 文件夾</s:String>
     <s:String x:Key="LangSelectUIError">構建 Minecraft 文件夾列表 UI 出錯</s:String>
     <s:String x:Key="LangSelectDownloadingTaskExistsNoAdd">在下載任務進行時，無法添加遊戲文件夾！</s:String>
@@ -278,37 +278,37 @@
     <s:String x:Key="LangSelectDownloadingTaskExistsNoChange">在下載任務進行時，無法切換遊戲文件夾！</s:String>
 
     <!--PageSelectRight-->
-    <s:String x:Key="LangSelectNoAvailableVersion">無可用版本</s:String>
-    <s:String x:Key="LangSelectNoAvailableVersionTip">未找到任何版本的遊戲，請先下載任意版本的遊戲。&#xa;若有已存在的遊戲，請在左邊的列表中選擇「添加文件夾」，選擇 .minecraft 文件夾將其導入。</s:String>
-    <s:String x:Key="LangSelectNoAvailableVersionDownloadGame">下載遊戲</s:String>
+    <s:String x:Key="LangSelectNoAvailableInstance">無可用版本</s:String>
+    <s:String x:Key="LangSelectNoAvailableInstanceTip">未找到任何版本的遊戲，請先下載任意版本的遊戲。&#xa;若有已存在的遊戲，請在左邊的列表中選擇「添加文件夾」，選擇 .minecraft 文件夾將其導入。</s:String>
+    <s:String x:Key="LangSelectNoAvailableInstanceDownloadGame">下載遊戲</s:String>
     <s:String x:Key="LangSelectGettingVersion">正在獲取版本列表</s:String>
-    <s:String x:Key="LangSelectVersionTypeRegular">常規版本</s:String>
-    <s:String x:Key="LangSelectVersionTypeModAbility">可安裝 Mod</s:String>
-    <s:String x:Key="LangSelectVersionTypeForge">Forge 版本</s:String>
-    <s:String x:Key="LangSelectVersionTypeLiteloader">LiteLoader 版本</s:String>
-    <s:String x:Key="LangSelectVersionTypeFabric">Fabric 版本</s:String>
-    <s:String x:Key="LangSelectVersionTypeError">錯誤的版本</s:String>
-    <s:String x:Key="LangSelectVersionTypeHidden">隱藏的版本</s:String>
-    <s:String x:Key="LangSelectVersionTypeNotCommonlyUsed">不常用版本</s:String>
-    <s:String x:Key="LangSelectVersionTypeFavorites">收藏夾</s:String>
-    <s:String x:Key="LangSelectVersionTypeAprilFool">愚人節版本</s:String>
-    <s:String x:Key="LangSelectVersionTypeUnknown">未知的卡片種類</s:String>
-    <s:String x:Key="LangSelectVersionNoHidden">無隱藏版本</s:String>
-    <s:String x:Key="LangSelectVersionNoHiddenTip">沒有版本被隱藏，你可以在版本設置的版本分類選項中隱藏版本。&#xa;再次按下 F11 即可退出隱藏版本查看模式。</s:String>
-    <s:String x:Key="LangSelectVersionListLoadFail">將版本列錶轉換顯示時失敗</s:String>
-    <s:String x:Key="LangSelectVersionListLoadIconFail">加載版本圖標失敗</s:String>
+    <s:String x:Key="LangSelectInstanceTypeRegular">常規版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeModAbility">可安裝 Mod</s:String>
+    <s:String x:Key="LangSelectInstanceTypeForge">Forge 版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeLiteloader">LiteLoader 版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeFabric">Fabric 版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeError">錯誤的版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeHidden">隱藏的版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeNotCommonlyUsed">不常用版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeFavorites">收藏夾</s:String>
+    <s:String x:Key="LangSelectInstanceTypeAprilFool">愚人節版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeUnknown">未知的卡片種類</s:String>
+    <s:String x:Key="LangSelectInstanceNoHidden">無隱藏版本</s:String>
+    <s:String x:Key="LangSelectInstanceNoHiddenTip">沒有版本被隱藏，你可以在版本設置的版本分類選項中隱藏版本。&#xa;再次按下 F11 即可退出隱藏版本查看模式。</s:String>
+    <s:String x:Key="LangSelectInstanceListLoadFail">將版本列錶轉換顯示時失敗</s:String>
+    <s:String x:Key="LangSelectInstanceListLoadIconFail">加載版本圖標失敗</s:String>
     <s:String x:Key="LangSelectBtnFavorite">收藏</s:String>
     <s:String x:Key="LangSelectBtnCancelFavorite">取消收藏</s:String>
     <s:String x:Key="LangSelectBtnSet">設置</s:String>
     <s:String x:Key="LangSelectBtnOpenFolder">打開文件夾</s:String>
-    <s:String x:Key="LangSelectDeleteVersionTitle">版本刪除確認</s:String>
-    <s:String x:Key="LangSelectDeleteVersionContentA">你確定要刪除版本 {Version.Name} 嗎？</s:String>
-    <s:String x:Key="LangSelectDeleteVersionContentB">你確定要永久地刪除版本 {Version.Name} 嗎？</s:String>
-    <s:String x:Key="LangSelectDeleteVersionContentC">由於該版本開啟了版本隔離，刪除版本時該版本對應的存檔、資源包、Mod 等文件也將被一併刪除！</s:String>
-    <s:String x:Key="LangSelectVersionDeletedA">版本 {0} 已永久刪除！</s:String>
-    <s:String x:Key="LangSelectVersionDeletedB">版本 {0} 已刪除到回收站！</s:String>
-    <s:String x:Key="LangSelectVersionDeleteCancelled">刪除版本 {0} 被主動取消</s:String>
-    <s:String x:Key="LangSelectVersionDeleteFail">刪除版本 {0} 失敗</s:String>
+    <s:String x:Key="LangSelectDeleteInstanceTitle">版本刪除確認</s:String>
+    <s:String x:Key="LangSelectDeleteInstanceContentA">你確定要刪除版本 {Version.Name} 嗎？</s:String>
+    <s:String x:Key="LangSelectDeleteInstanceContentB">你確定要永久地刪除版本 {Version.Name} 嗎？</s:String>
+    <s:String x:Key="LangSelectDeleteInstanceContentC">由於該版本開啟了版本隔離，刪除版本時該版本對應的存檔、資源包、Mod 等文件也將被一併刪除！</s:String>
+    <s:String x:Key="LangSelectInstanceDeletedA">版本 {0} 已永久刪除！</s:String>
+    <s:String x:Key="LangSelectInstanceDeletedB">版本 {0} 已刪除到回收站！</s:String>
+    <s:String x:Key="LangSelectInstanceDeleteCancelled">刪除版本 {0} 被主動取消</s:String>
+    <s:String x:Key="LangSelectInstanceDeleteFail">刪除版本 {0} 失敗</s:String>
 
     <!--PageSpeedLeft-->
     <s:String x:Key="LangSpeedTotalProgress">總進度</s:String>
@@ -330,7 +330,7 @@
     <s:String x:Key="LangPageSpeedRightInstallForgeMethodA">安裝 Forge（方式 A）</s:String>
     <s:String x:Key="LangPageSpeedRightInstallNeoForge">安裝 NeoForge</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadModLoaderMainFile">下載 {0} 主文件</s:String>
-    <s:String x:Key="LangPageSpeedRightAnalyseModLoaderSupportLibrary">分析 {0} 支持庫文件</s:String>
+    <s:String x:Key="LangPageSpeedRightAnalyzeModLoaderSupportLibrary">分析 {0} 支持庫文件</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadModLoaderSupportLibrary">下載 {0} 支持庫文件</s:String>
     <s:String x:Key="LangPageSpeedRightGetOptiFineDownloadAddress">獲取 OptiFine 下載地址</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadOptiFineMainFile">下載 OptiFine 主文件</s:String>
@@ -340,27 +340,27 @@
     <!--PageDownloadClient-->
     <s:String x:Key="LangDownloadClientLoadingList">正在獲取版本列表</s:String>
     <s:String x:Key="LangDownloadClientReleaseReleaseOn">最新正式版，發布於</s:String>
-    <s:String x:Key="LangDownloadClientBetaReleaseOn">最新開發版，發布於</s:String>
+    <s:String x:Key="LangDownloadClientDevReleaseOn">最新開發版，發布於</s:String>
 
     <!--PageDownload-->
     <s:String x:Key="LangDownloadLatest">最新版本</s:String>
     <s:String x:Key="LangDownloadRelease">正式版</s:String>
-    <s:String x:Key="LangDownloadBeta">開發版</s:String>
-    <s:String x:Key="LangDownloadAncientVersion">遠古版</s:String>
-    <s:String x:Key="LangDownloadAprilFool">愚人節版</s:String>
+    <s:String x:Key="LangDownloadDev">開發版</s:String>
+    <s:String x:Key="LangDownloadBeforeRelease">遠古版</s:String>
+    <s:String x:Key="LangDownloadAprilFools">愚人節版</s:String>
     <s:String x:Key="LangDownloadStable">穩定版</s:String>
     <s:String x:Key="LangDownloadNewStable">最新穩定版</s:String>
-    <s:String x:Key="LangDownloadNewTest">最新測試版</s:String>
-    <s:String x:Key="LangDownloadTest">測試版</s:String>
-    <s:String x:Key="LangDownloadPreviewOptiFine">預覽版</s:String>
-    <s:String x:Key="LangDownloadPreviewLiteLoader">測試版</s:String>
+    <s:String x:Key="LangDownloadNewBet">最新測試版</s:String>
+    <s:String x:Key="LangDownloadBeta">測試版</s:String>
+    <s:String x:Key="LangDownloadOptiFinePreview">預覽版</s:String>
+    <s:String x:Key="LangDownloadLiteLoaderSnapshot">測試版</s:String>
     <s:String x:Key="LangDownloadRecommend">推薦版本</s:String>
     <s:String x:Key="LangDownloadPCLProvided">PCL 特供下載</s:String>
     <s:String x:Key="LangDownloadChangelog">更新日誌</s:String>
     <s:String x:Key="LangDownloadSaveAs">另存為</s:String>
     <s:String x:Key="LangDownloadReleaseOn">發布於</s:String>
     <s:String x:Key="LangDownloadForgeIncompatible">不兼容 Forge</s:String>
-    <s:String x:Key="LangDownloadRecommendForge">推薦 Forge 版本：</s:String>
+    <s:String x:Key="LangDownloadForgeRecommend">推薦 Forge 版本：</s:String>
     <s:String x:Key="LangDownloadShowAll">查看全部版本</s:String>
     <s:String x:Key="LangDownloadSaveInstaller">保存安裝器</s:String>
     <s:String x:Key="LangDownloadAll">全部版本</s:String>
@@ -411,8 +411,8 @@
     <s:String x:Key="LangDownloadInstallOptiFineNeed">需要 OptiFine</s:String>
     <s:String x:Key="LangDownloadInstallOptiFineFabricNeed">需要 OptiFine 與 Fabric</s:String>
     <s:String x:Key="LangDownloadInstallOrHigherVersion">或更高版本</s:String>
-    <s:String x:Key="LangDownloadInstallNoAvailabeVersion">沒有可用版本</s:String>
-    <s:String x:Key="LangDownloadInstallFailGetListUnknwonStatus">獲取版本列表失敗：未知錯誤，狀態為</s:String>
+    <s:String x:Key="LangDownloadInstallNoAvailableVersion">沒有可用版本</s:String>
+    <s:String x:Key="LangDownloadInstallFailGetListUnknownStatus">獲取版本列表失敗：未知錯誤，狀態為</s:String>
     <s:String x:Key="LangDownloadInstallFailGetList">獲取版本列表失敗：</s:String>
     <s:String x:Key="LangDownloadInstallNoAutoInstall">該版本不支持自動安裝</s:String>
     <s:String x:Key="LangDownloadInstallDialogIndieTitle">版本隔離提示</s:String>
@@ -433,7 +433,7 @@
     <s:String x:Key="LangDownloadPageManualInstallFold">手動安裝包</s:String>
     <s:String x:Key="LangDownloadPageResource">資源</s:String>
     <s:String x:Key="LangDownloadPageMods">Mod</s:String>
-    <s:String x:Key="LangDownloadPageModpackages">整合包</s:String>
+    <s:String x:Key="LangDownloadPageModpacks">整合包</s:String>
 
     <!--PageDownloadLiteLoader-->
     <s:String x:Key="LangDownloadLiteloaderDescTitle">LiteLoader 簡介</s:String>
@@ -495,41 +495,41 @@
     <s:String x:Key="LangDownloadOptiFineGettingList">正在獲取 OptiFine 列表</s:String>
 
     <!--PageDownloadPack-->
-    <s:String x:Key="LangDownloadModpackSearchTitle">搜索整合包</s:String>
-    <s:String x:Key="LangDownloadModpackSearchName">名稱</s:String>
-    <s:String x:Key="LangDownloadModpackSearchSource">來源</s:String>
-    <s:String x:Key="LangDownloadModpackSearchSourceAll">全部</s:String>
-    <s:String x:Key="LangDownloadModpackSearchVersion">版本</s:String>
-    <s:String x:Key="LangDownloadModpackSearchVersionAll">全部 (也可自行輸入)</s:String>
-    <s:String x:Key="LangDownloadModpackSearch">搜索</s:String>
-    <s:String x:Key="LangDownloadModpackReset">重置條件</s:String>
-    <s:String x:Key="LangDownloadModpackGettingList">正在獲取整合包列表</s:String>
-    <s:String x:Key="LangDownloadModpackInstallFromLocal">安裝已有整合包</s:String>
-    <s:String x:Key="LangDownloadModpackInstallFromLocalToolTip">在當前選擇的 Minecraft 文件夾下安裝整合包</s:String>
-    <s:String x:Key="LangDownloadModpackType">類型</s:String>
-    <s:String x:Key="LangDownloadModpackTypeAll">全部</s:String>
-    <s:String x:Key="LangDownloadModpackTypeMulti">多人</s:String>
-    <s:String x:Key="LangDownloadModpackTypeOptimization">性能優化</s:String>
-    <s:String x:Key="LangDownloadModpackTypeChallenging">硬核</s:String>
-    <s:String x:Key="LangDownloadModpackTypeCombat">戰鬥</s:String>
-    <s:String x:Key="LangDownloadModpackTypeQuests">任務</s:String>
-    <s:String x:Key="LangDownloadModpackTypeTech">科技</s:String>
-    <s:String x:Key="LangDownloadModpackTypeMagic">魔法</s:String>
-    <s:String x:Key="LangDownloadModpackTypeAdventure">冒險</s:String>
-    <s:String x:Key="LangDownloadModpackTypeCook">烹飪</s:String>
-    <s:String x:Key="LangDownloadModpackTypeExplore">探索</s:String>
-    <s:String x:Key="LangDownloadModpackTypeGame">小遊戲</s:String>
-    <s:String x:Key="LangDownloadModpackTypeScienceFiction">科幻</s:String>
-    <s:String x:Key="LangDownloadModpackTypeSkyland">空島</s:String>
-    <s:String x:Key="LangDownloadModpackTypeImprove">原版改良</s:String>
-    <s:String x:Key="LangDownloadModpackTypeFTB">FTB</s:String>
-    <s:String x:Key="LangDownloadModpackTypeFTBToolTip">由 FTB 官方發布</s:String>
-    <s:String x:Key="LangDownloadModpackTypeMapBased">基於地圖</s:String>
-    <s:String x:Key="LangDownloadModpackTypeLightWeight">輕量整合</s:String>
-    <s:String x:Key="LangDownloadModpackTypeHeavyWeight">大型整合</s:String>
-    <s:String x:Key="LangDownloadModpackTypeMisc">雜項</s:String>
-    <s:String x:Key="LangDownloadModpackConnectModrinthFail">無法連接到 Modrinth，所以目前僅顯示了來自 CurseForge 的內容，結果可能不全。&#xa;請嘗試使用 VPN 或加速器以改善網絡。</s:String>
-    <s:String x:Key="LangDownloadModpackConnectCurseForge">無法連接到 CurseForge，所以目前僅顯示了來自 Modrinth 的內容，結果可能不全。&#xa;請嘗試使用 VPN 或加速器以改善網絡。</s:String>
+    <s:String x:Key="LangDownloadModpacksSearchTitle">搜索整合包</s:String>
+    <s:String x:Key="LangDownloadModpacksSearchName">名稱</s:String>
+    <s:String x:Key="LangDownloadModpacksSearchSource">來源</s:String>
+    <s:String x:Key="LangDownloadModpacksSearchSourceAll">全部</s:String>
+    <s:String x:Key="LangDownloadModpacksSearchVersion">版本</s:String>
+    <s:String x:Key="LangDownloadModpacksSearchVersionAll">全部 (也可自行輸入)</s:String>
+    <s:String x:Key="LangDownloadModpacksSearch">搜索</s:String>
+    <s:String x:Key="LangDownloadModpacksReset">重置條件</s:String>
+    <s:String x:Key="LangDownloadModpacksGettingList">正在獲取整合包列表</s:String>
+    <s:String x:Key="LangDownloadModpacksInstallFromLocal">安裝已有整合包</s:String>
+    <s:String x:Key="LangDownloadModpacksInstallFromLocalToolTip">在當前選擇的 Minecraft 文件夾下安裝整合包</s:String>
+    <s:String x:Key="LangDownloadModpacksType">類型</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeAll">全部</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeMulti">多人</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeOptimization">性能優化</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeChallenging">硬核</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeCombat">戰鬥</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeQuests">任務</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeTech">科技</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeMagic">魔法</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeAdventure">冒險</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeCook">烹飪</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeExplore">探索</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeGame">小遊戲</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeScienceFiction">科幻</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeSkyland">空島</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeImprove">原版改良</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeFTB">FTB</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeFTBToolTip">由 FTB 官方發布</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeMapBased">基於地圖</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeLightWeight">輕量整合</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeHeavyWeight">大型整合</s:String>
+    <s:String x:Key="LangDownloadModpacksTypeMisc">雜項</s:String>
+    <s:String x:Key="LangDownloadModpacksConnectModrinthFail">無法連接到 Modrinth，所以目前僅顯示了來自 CurseForge 的內容，結果可能不全。&#xa;請嘗試使用 VPN 或加速器以改善網絡。</s:String>
+    <s:String x:Key="LangDownloadModpacksConnectCurseForge">無法連接到 CurseForge，所以目前僅顯示了來自 Modrinth 的內容，結果可能不全。&#xa;請嘗試使用 VPN 或加速器以改善網絡。</s:String>
 
     <!--MySkin-->
     <s:String x:Key="LangMySkinSave">另存為</s:String>
@@ -575,7 +575,7 @@
     <s:String x:Key="LangLoginOAuthLoading">正在加載登錄頁面</s:String>
     <s:String x:Key="LangLoginOAuthLoadingTipA">如果網絡環境不佳，加載可能非常緩慢甚至一直加載不出來</s:String>
     <s:String x:Key="LangLoginOAuthLoadingTipB">此時請嘗試使用 VPN 或加速器，然後重試</s:String>
-    <s:String x:Key="LangLoginOAuthToBrower">如果遇到問題，可以點擊這裡使用系統瀏覽器登錄</s:String>
+    <s:String x:Key="LangLoginOAuthToBrowser">如果遇到問題，可以點擊這裡使用系統瀏覽器登錄</s:String>
     <s:String x:Key="LangLoginOAuthNoGithubLogin">PCL 不支持使用 GitHub 登錄微軟賬號！</s:String>
     <s:String x:Key="LangLoginOAuthWindowTitle">Microsoft 賬戶登錄</s:String>
 
@@ -596,7 +596,7 @@
     <s:String x:Key="LangLaunchLeftStageDownload">下載速度</s:String>
     <s:String x:Key="LangLaunchLeftTip">你知道嗎</s:String>
     <s:String x:Key="LangLaunchLeftInit">初始化</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">聯機離線登錄</s:String>
+    <s:String x:Key="LangLaunchLeftAccountHostingOfflineLogin">聯機離線登錄</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">離線登錄</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">正版登錄</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">統一通行證登錄</s:String>
@@ -635,7 +635,7 @@
     <s:String x:Key="LangPageLoginAuthSkinLoading">加載中</s:String>
     <s:String x:Key="LangPageLoginAuthSkinChangeRole">更換角色</s:String>
     <s:String x:Key="LangPageLoginAuthSkinLogout">退出登錄</s:String>
-    <s:String x:Key="LangPageLoginAuthSkinLogining">正在登錄中，請稍後再更換角色！</s:String>
+    <s:String x:Key="LangPageLoginAuthSkinLogging">正在登錄中，請稍後再更換角色！</s:String>
     <s:String x:Key="LangPageLoginAuthSkinChanging">正在嘗試更換，請稍候！</s:String>
     <s:String x:Key="LangPageLoginAuthSkinChangeFail">更換角色失敗</s:String>
 
@@ -686,7 +686,7 @@
 
     <!--PageLoginNideSkin-->
     <s:String x:Key="LangPageLoginNideSkinLoading">加載中</s:String>
-    <s:String x:Key="LangPageLoginNideSkinChangePassword">更改密碼</s:String>
+    <s:String x:Key="LangPageLoginNideSkinEditPassword">更改密碼</s:String>
     <s:String x:Key="LangPageLoginNideSkinLogout">退出登錄</s:String>
 
     <!--PageOtherLeft-->
@@ -796,7 +796,7 @@
     <s:String x:Key="LangPageSetupLaunchLaunchWindowSizeSameWithLaunch">與啟動器尺寸一致</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchWindowSizeCustom">自定義尺寸</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchWindowSizeCustomToolTip">Forge 1.12.2 等個別版本存在 Bug，會導致高度設定無效</s:String>
-    <s:String x:Key="LangPageSetupLaunchLaunchWindowSizeMaxium">最大化</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchWindowSizeMaximize">最大化</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchJava">遊戲 Java</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchJavaToolTip">若將 Java 放在遊戲文件夾或 PCL 文件夾，在進行自動選擇時 PCL 會儘量優先選擇它</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchJavaLoading">加載中……</s:String>
@@ -830,10 +830,10 @@
     <s:String x:Key="LangPageSetupLaunchSkinChangeFail">改變離線皮膚失敗</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinEmptied">離線皮膚已清空！</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinEmptyFail">清空離線皮膚失敗</s:String>
-    <s:String x:Key="LangPageSetupLaunchMemAvailabe">可用</s:String>
+    <s:String x:Key="LangPageSetupLaunchMemAvailable">可用</s:String>
     <s:String x:Key="LangPageSetupLaunchJavaAutoChoice">自動選擇合適的 Java</s:String>
     <s:String x:Key="LangPageSetupLaunchJavaUpdateListFail">更新設置 Java 下拉框失敗</s:String>
-    <s:String x:Key="LangPageSetupLaunchJavaNoAvailabeJava">未找到可用的 Java</s:String>
+    <s:String x:Key="LangPageSetupLaunchJavaNoAvailableJava">未找到可用的 Java</s:String>
     <s:String x:Key="LangPageSetupLaunchJavaSearchingJava">正在搜索 Java，請稍候！</s:String>
     <s:String x:Key="LangPageSetupLaunchJavaAddedJava">已將該 Java 加入 Java 列表！</s:String>
     <s:String x:Key="LangPageSetupLaunchJavaIncorrectJava">該 Java 存在異常，無法使用</s:String>
@@ -845,14 +845,14 @@
 
     <!--PageSetupLeft-->
     <s:String x:Key="LangPageSetupLeftGame">遊戲</s:String>
-    <s:String x:Key="LangPageSetupLeftPersonalize">個性化</s:String>
-    <s:String x:Key="LangPageSetupLeftLaunch">啟動器</s:String>
-    <s:String x:Key="LangPageSetupLeftLink">聯機</s:String>
+    <s:String x:Key="LangPageSetupLeftPersonalization">個性化</s:String>
+    <s:String x:Key="LangPageSetupLeftLauncher">啟動器</s:String>
+    <s:String x:Key="LangPageSetupLeftHosting">聯機</s:String>
     <s:String x:Key="LangPageSetupLeftReset">初始化本頁設置</s:String>
     <s:String x:Key="LangPageSetupLeftDialogResetGameConfirmContent">是否要初始化遊戲頁的所有設置？該操作不可撤銷。</s:String>
     <s:String x:Key="LangPageSetupLeftDialogResetLaunchConfirmContent">是否要初始化啟動器頁的所有設置？該操作不可撤銷。</s:String>
-    <s:String x:Key="LangPageSetupLeftDialogResetPersonalizeConfirmContent">是否要初始化個性化頁的所有設置？該操作不可撤銷。&#xa;（背景圖片與音樂、自定義主頁等外部文件不會被刪除）</s:String>
-    <s:String x:Key="LangPageSetupLeftDialogResetLinkConfirmContent">是否要初始化聯機頁的所有設置？該操作不可撤銷。</s:String>
+    <s:String x:Key="LangPageSetupLeftDialogResetPersonalizationConfirmContent">是否要初始化個性化頁的所有設置？該操作不可撤銷。&#xa;（背景圖片與音樂、自定義主頁等外部文件不會被刪除）</s:String>
+    <s:String x:Key="LangPageSetupLeftDialogResetHostingConfirmContent">是否要初始化聯機頁的所有設置？該操作不可撤銷。</s:String>
     <s:String x:Key="LangPageSetupLeftDialogBtnResetConfirm">初始化確認</s:String>
 
     <!--PageSetupSystem-->
@@ -873,16 +873,16 @@
     <s:String x:Key="LangPageSetupSystemDownloadSpeedLimitToolTip">設置下載的速度上限，以避免在下載時導致其他需要聯網的程序卡死</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadTargetFolder">目標文件夾</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadTargetFolderToolTip">請在 啟動 → 版本選擇 → 文件夾列表 中更改下載目標文件夾。&#xa;在某個文件夾或遊戲版本上右鍵，即可選擇打開對應文件夾。</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadKeepModpackArchive">安裝整合包時保留原始壓縮包</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadKeepModpackArchiveToolTip">安裝整合包時，在版本文件夾下保留用於安裝的原始整合包壓縮包文件</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadKeepModpackFile">安裝整合包時保留原始壓縮包</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadKeepModpackFileToolTip">安裝整合包時，在版本文件夾下保留用於安裝的原始整合包壓縮包文件</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadSimplifyModLoaderDisplay">簡化 Mod 加載器顯示</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadSimplifyModLoaderDisplayToolTip">下載 Mod 時，若該 Mod 支持 Forge 和 Fabric，則顯示為支持任意 Mod 加載器。&#xa;例如，開啟時 JEI 顯示支持全版本，關閉後 JEI 就會顯示僅支持 Forge / Fabric 全版本。</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadSSL">驗證 SSL 證書</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadSSLToolTip">驗證證書會提高安全性，但疑似有概率導致正版登錄失敗（#3018）。&#xa;如果在正版登錄時因為 [根據驗證過程，遠程證書無效] 失敗，可以嘗試關閉此項。</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibility">輔助功能</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdate">遊戲更新提示</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateBeta">測試版更新提示</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateBetaToolTip">在 Minecraft 測試版（快照、預發布版）更新時彈窗提示</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateDevelopment">測試版更新提示</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateDevelopmentToolTip">在 Minecraft 測試版（快照、預發布版）更新時彈窗提示</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateRelease">正式版更新提示</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateReleaseToolTip">在 Minecraft 正式版更新時彈窗提示</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibilitySetGameLanguage">遊戲語言</s:String>
@@ -893,11 +893,11 @@
     <s:String x:Key="LangPageSetupSystemSystemLaunchUpdateB">在有新版本時顯示提示</s:String>
     <s:String x:Key="LangPageSetupSystemSystemLaunchUpdateC">僅在有重大漏洞更新時顯示提示</s:String>
     <s:String x:Key="LangPageSetupSystemSystemLaunchUpdateD">關閉更新提示</s:String>
-    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncemnet">啟動器公告</s:String>
-    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncemnetA">顯示所有公告</s:String>
-    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncemnetAToolTip">顯示包括啟動器功能調查、活動等在內的全部公告</s:String>
-    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncemnetB">僅在有重要通知時顯示公告</s:String>
-    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncemnetC">關閉所有公告</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncement">啟動器公告</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncementA">顯示所有公告</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncementAToolTip">顯示包括啟動器功能調查、活動等在內的全部公告</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncementB">僅在有重要通知時顯示公告</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemLaunchAnnouncementC">關閉所有公告</s:String>
     <s:String x:Key="LangPageSetupSystemSystemCacheFolder">緩存文件夾</s:String>
     <s:String x:Key="LangPageSetupSystemSystemCacheFolderToolTip">PCL 的下載、皮膚等緩存文件的存儲位置。&#xa;不推薦路徑中帶有空格。&#xa;留空即為默認值，重啟 PCL 後生效。</s:String>
     <s:String x:Key="LangPageSetupSystemSystemCheckUpdate">檢查更新</s:String>
@@ -928,9 +928,9 @@
     <!--PageVersionLeft-->
     <s:String x:Key="LangPageVersionLeftOverview">概覽</s:String>
     <s:String x:Key="LangPageVersionLeftSetting">設置</s:String>
-    <s:String x:Key="LangPageVersionLeftModMangment">Mod 管理</s:String>
-    <s:String x:Key="LangPageVersionLeftModMangmentRefresh">刷新</s:String>
-    <s:String x:Key="LangPageVersionLeftModMangmentRefreshing">正在刷新……</s:String>
+    <s:String x:Key="LangPageVersionLeftModManagement">Mod 管理</s:String>
+    <s:String x:Key="LangPageVersionLeftModManagementRefresh">刷新</s:String>
+    <s:String x:Key="LangPageVersionLeftModManagementRefreshing">正在刷新……</s:String>
     <s:String x:Key="LangPageVersionLeftSettingDialogIndependentSetContent">是否要初始化該版本的版本獨立設置？該操作不可撤銷。</s:String>
     <s:String x:Key="LangPageVersionLeftSettingDialogIndependentSetTitle">初始化確認</s:String>
 
@@ -983,7 +983,7 @@
     <s:String x:Key="LangPageVersionModDisabledBtnSelectInstance">版本選擇</s:String>
 
     <!--PageVersionOverall-->
-    <s:String x:Key="LangPageVersionOverallPersonalize">個性化</s:String>
+    <s:String x:Key="LangPageVersionOverallPersonalization">個性化</s:String>
     <s:String x:Key="LangPageVersionOverallIcon">圖標</s:String>
     <s:String x:Key="LangPageVersionOverallIconAuto">自動</s:String>
     <s:String x:Key="LangPageVersionOverallIconCustom">自定義...</s:String>
@@ -1114,7 +1114,7 @@
 
     <!--ModMinecraft-->
     <s:String x:Key="LangModMinecraftCurrentFolder">當前文件夾</s:String>
-    <s:String x:Key="LangModMinecraftOfficalFolder">官方啟動器文件夾</s:String>
+    <s:String x:Key="LangModMinecraftOfficialFolder">官方啟動器文件夾</s:String>
     <s:String x:Key="LangModMinecraftCheckStatusInstanceNotFound">未找到版本</s:String>
     <s:String x:Key="LangModMinecraftCheckStatusNoPermission">PCL 沒有對該文件夾的訪問權限，請右鍵以管理員身份運行 PCL</s:String>
     <s:String x:Key="LangModMinecraftCheckStatusNeedDependency">需要安裝前置版本：</s:String>

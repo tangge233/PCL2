@@ -156,13 +156,13 @@
                     ItemUI.Checked = True
                 End If
             Case FormMain.PageSubType.SetupSystem
-                If MyMsgBox(GetLang("LangPageSetupLeftDialogResetPersonalizeConfirmContent"), GetLang("LangPageSetupLeftDialogBtnResetConfirm"),, GetLang("LangDialogBtnCancel"), IsWarn:=True) = 1 Then
+                If MyMsgBox(GetLang("LangPageSetupLeftDialogResetPersonalizationConfirmContent"), GetLang("LangPageSetupLeftDialogBtnResetConfirm"),, GetLang("LangDialogBtnCancel"), IsWarn:=True) = 1 Then
                     If IsNothing(FrmSetupSystem) Then FrmSetupSystem = New PageSetupSystem
                     FrmSetupSystem.Reset()
                     ItemSystem.Checked = True
                 End If
             Case FormMain.PageSubType.SetupLink
-                If MyMsgBox(GetLang("LangPageSetupLeftDialogResetLinkConfirmContent"), GetLang("LangPageSetupLeftDialogBtnResetConfirm"),, GetLang("LangDialogBtnCancel"), IsWarn:=True) = 1 Then
+                If MyMsgBox(GetLang("LangPageSetupLeftDialogResetHostingConfirmContent"), GetLang("LangPageSetupLeftDialogBtnResetConfirm"),, GetLang("LangDialogBtnCancel"), IsWarn:=True) = 1 Then
                     If IsNothing(FrmSetupLink) Then FrmSetupLink = New PageSetupLink
                     FrmSetupLink.Reset()
                     ItemLink.Checked = True

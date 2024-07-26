@@ -35,7 +35,7 @@
                 Dim CardName As String = ""
                 Select Case Card.Key
                     Case McVersionCardType.OriginalLike
-                        CardName = GetLang("LangSelectVersionTypeRegular")
+                        CardName = GetLang("LangSelectInstanceTypeRegular")
                     Case McVersionCardType.API
                         Dim IsForgeExists As Boolean = False
                         Dim IsNeoForgeExists As Boolean = False
@@ -48,32 +48,32 @@
                             If Version.Version.HasNeoForge Then IsNeoForgeExists = True
                         Next
                         If If(IsLiteExists, 1, 0) + If(IsForgeExists, 1, 0) + If(IsFabricExists, 1, 0) + If(IsNeoForgeExists, 1, 0) > 1 Then
-                            CardName = GetLang("LangSelectVersionTypeModAbility")
+                            CardName = GetLang("LangSelectInstanceTypeModAbility")
                         ElseIf IsForgeExists Then
-                            CardName = GetLang("LangSelectVersionTypeForge")
+                            CardName = GetLang("LangSelectInstanceTypeForge")
                         ElseIf IsNeoForgeExists Then
                             CardName = "NeoForge 版本"
                         ElseIf IsLiteExists Then
-                            CardName = GetLang("LangSelectVersionTypeLiteloader")
+                            CardName = GetLang("LangSelectInstanceTypeLiteloader")
                         Else
-                            CardName = GetLang("LangSelectVersionTypeFabric")
+                            CardName = GetLang("LangSelectInstanceTypeFabric")
                         End If
                     Case McVersionCardType.Error
-                        CardName = GetLang("LangSelectVersionTypeError")
+                        CardName = GetLang("LangSelectInstanceTypeError")
                     Case McVersionCardType.Hidden
-                        CardName = GetLang("LangSelectVersionTypeHidden")
+                        CardName = GetLang("LangSelectInstanceTypeHidden")
                     Case McVersionCardType.Rubbish
-                        CardName = GetLang("LangSelectVersionTypeNotCommonlyUsed")
+                        CardName = GetLang("LangSelectInstanceTypeNotCommonlyUsed")
                     Case McVersionCardType.Star
-                        CardName = GetLang("LangSelectVersionTypeFavorites")
+                        CardName = GetLang("LangSelectInstanceTypeFavorites")
                     Case McVersionCardType.Fool
-                        CardName = GetLang("LangSelectVersionTypeAprilFool")
+                        CardName = GetLang("LangSelectInstanceTypeAprilFool")
                     Case Else
-                        Throw New ArgumentException(GetLang("LangSelectVersionTypeUnknown") & "（" & Card.Key & "）")
+                        Throw New ArgumentException(GetLang("LangSelectInstanceTypeUnknown") & "（" & Card.Key & "）")
                 End Select
 #End Region
                 '建立控件
-                Dim CardTitle As String = CardName & If(CardName = GetLang("LangSelectVersionTypeFavorites"), "", " (" & Card.Value.Count & ")")
+                Dim CardTitle As String = CardName & If(CardName = GetLang("LangSelectInstanceTypeFavorites"), "", " (" & Card.Value.Count & ")")
                 Dim NewCard As New MyCard With {.Title = CardTitle, .Margin = New Thickness(0, 0, 0, 15), .SwapType = 0}
                 Dim NewStack As New StackPanel With {.Margin = New Thickness(20, MyCard.SwapedHeight, 18, 0), .VerticalAlignment = VerticalAlignment.Top, .RenderTransform = New TranslateTransform(0, 0), .Tag = Card.Value}
                 NewCard.Children.Add(NewStack)
@@ -97,12 +97,12 @@
                 PanEmpty.Visibility = Visibility.Visible
                 PanBack.Visibility = Visibility.Collapsed
                 If ShowHidden Then
-                    LabEmptyTitle.Text = GetLang("LangSelectVersionNoHidden")
-                    LabEmptyContent.Text = GetLang("LangSelectVersionNoHiddenTip")
+                    LabEmptyTitle.Text = GetLang("LangSelectInstanceNoHidden")
+                    LabEmptyContent.Text = GetLang("LangSelectInstanceNoHiddenTip")
                     BtnEmptyDownload.Visibility = Visibility.Collapsed
                 Else
-                    LabEmptyTitle.Text = GetLang("LangSelectNoAvailableVersion")
-                    LabEmptyContent.Text = GetLang("LangSelectNoAvailableVersionTip")
+                    LabEmptyTitle.Text = GetLang("LangSelectNoAvailableInstance")
+                    LabEmptyContent.Text = GetLang("LangSelectNoAvailableInstanceTip")
                     BtnEmptyDownload.Visibility = If(Setup.Get("UiHiddenPageDownload") AndAlso Not PageSetupUI.HiddenForceShow, Visibility.Collapsed, Visibility.Visible)
                 End If
             Else
@@ -111,7 +111,7 @@
             End If
 
         Catch ex As Exception
-            Log(ex, GetLang("LangSelectVersionListLoadFail"), LogLevel.Feedback)
+            Log(ex, GetLang("LangSelectInstanceListLoadFail"), LogLevel.Feedback)
         End Try
     End Sub
     Public Shared Function McVersionListItem(Version As McVersion) As MyListItem
@@ -123,7 +123,7 @@
                 NewItem.Logo = Version.Logo
             End If
         Catch ex As Exception
-            Log(ex, GetLang("LangSelectVersionListLoadIconFail"), LogLevel.Hint)
+            Log(ex, GetLang("LangSelectInstanceListLoadIconFail"), LogLevel.Hint)
             NewItem.Logo = "pack://application:,,,/images/Blocks/RedstoneBlock.png"
         End Try
         NewItem.ContentHandler = AddressOf McVersionListContent
@@ -219,17 +219,17 @@
         Try
             Dim IsShiftPressed As Boolean = My.Computer.Keyboard.ShiftKeyDown
             Dim IsHintIndie As Boolean = Version.State <> McVersionState.Error AndAlso Version.PathIndie <> PathMcFolder
-            Dim MsgBoxContent As String = If(IsShiftPressed, GetLang("LangSelectDeleteVersionContentB", Version.Name), GetLang("LangSelectDeleteVersionContentA", Version.Name)) & If(IsHintIndie, vbCrLf & GetLang("LangSelectDeleteVersionContentC"), "")
-            Select Case MyMsgBox(MsgBoxContent, GetLang("LangSelectDeleteVersionTitle"), GetLang("LangDialogBtnContinue"), GetLang("LangDialogBtnCancel"),, True)
+            Dim MsgBoxContent As String = If(IsShiftPressed, GetLang("LangSelectDeleteInstanceContentB", Version.Name), GetLang("LangSelectDeleteInstanceContentA", Version.Name)) & If(IsHintIndie, vbCrLf & GetLang("LangSelectDeleteInstanceContentC"), "")
+            Select Case MyMsgBox(MsgBoxContent, GetLang("LangSelectDeleteInstanceTitle"), GetLang("LangDialogBtnContinue"), GetLang("LangDialogBtnCancel"),, True)
 
                 Case 1
                     IniClearCache(Version.Path & "PCL\Setup.ini")
                     If IsShiftPressed Then
                         DeleteDirectory(Version.Path)
-                        Hint(GetLang("LangSelectVersionDeletedA", Version.Name), HintType.Finish)
+                        Hint(GetLang("LangSelectInstanceDeletedA", Version.Name), HintType.Finish)
                     Else
                         FileIO.FileSystem.DeleteDirectory(Version.Path, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                        Hint(GetLang("LangSelectVersionDeletedB", Version.Name), HintType.Finish)
+                        Hint(GetLang("LangSelectInstanceDeletedB", Version.Name), HintType.Finish)
                     End If
                 Case 2
                     Exit Sub
@@ -259,9 +259,9 @@
                 LoaderFolderRun(McVersionListLoader, PathMcFolder, LoaderFolderRunType.ForceRun, MaxDepth:=1, ExtraPath:="versions\")
             End If
         Catch ex As OperationCanceledException
-            Log(ex, GetLang("LangSelectVersionDeleteCancelled", Version.Name))
+            Log(ex, GetLang("LangSelectInstanceDeleteCancelled", Version.Name))
         Catch ex As Exception
-            Log(ex, GetLang("LangSelectVersionDeleteFail"), LogLevel.Msgbox)
+            Log(ex, GetLang("LangSelectInstanceDeleteFail"), LogLevel.Msgbox)
         End Try
     End Sub
 

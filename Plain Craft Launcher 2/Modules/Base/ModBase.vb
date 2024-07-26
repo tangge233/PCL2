@@ -2277,11 +2277,11 @@ Retry:
             Case "正式版"
                 Return GetLang("LangDownloadRelease")
             Case "预览版", "快照版本"
-                Return GetLang("LangDownloadBeta")
+                Return GetLang("LangDownloadDev")
             Case "远古版", "远古版本"
-                Return GetLang("LangDownloadAncientVersion")
+                Return GetLang("LangDownloadBeforeRelease")
             Case "愚人节版"
-                Return GetLang("LangDownloadAprilFool")
+                Return GetLang("LangDownloadAprilFools")
             Case "未知版本"
                 Return GetLang("LangDownloadUnknown")
             Case Else

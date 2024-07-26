@@ -209,7 +209,7 @@
         CardBackground.TriggerForceResize()
     End Sub
     Private Sub BtnBackgroundClear_Click(sender As Object, e As EventArgs) Handles BtnBackgroundClear.Click
-        If MyMsgBox(GetLang("LangDialogDeleteAllBackgroundPicCntent"), GetLang("LangDialogTitleWarning"),, GetLang("LangDialogBtnCancel"), IsWarn:=True) = 1 Then
+        If MyMsgBox(GetLang("LangDialogDeleteAllBackgroundPicContent"), GetLang("LangDialogTitleWarning"),, GetLang("LangDialogBtnCancel"), IsWarn:=True) = 1 Then
             DeleteDirectory(Path & "PCL\Pictures")
             BackgroundRefresh(False, True)
             Hint(GetLang("LangHintBackgroundPicDeleted"), HintType.Finish)
@@ -263,7 +263,7 @@
             End If
 
         Catch ex As Exception
-            Log(ex, GetLang("LangDialogBackgroundPicRefreshFailUnknwon"), LogLevel.Feedback)
+            Log(ex, GetLang("LangDialogBackgroundPicRefreshFailUnknown"), LogLevel.Feedback)
         End Try
     End Sub
 
@@ -431,7 +431,7 @@ Refresh:
     Private Sub LabLauncherTheme11Click_MouseLeftButtonUp() Handles LabLauncherTheme11Click.MouseLeftButtonUp, RadioLauncherTheme11.MouseRightButtonUp
         If LabLauncherTheme11Click.Visibility = Visibility.Collapsed OrElse If(LabLauncherTheme11Click.ToolTip, "").ToString.Contains("点击") Then
             If MyMsgBox(GetLang("LangDialogThemeUnlockGameContent"),
-                GetLang("LangDialogThemeUnlockGameTitle"), GetLang("LangDialogThemeUnlockGameAccrpt"), GetLang("LangDialogThemeUnlockGameDeny")) = 1 Then
+                GetLang("LangDialogThemeUnlockGameTitle"), GetLang("LangDialogThemeUnlockGameAccept"), GetLang("LangDialogThemeUnlockGameDeny")) = 1 Then
                 MyMsgBox(GetLang("LangDialogThemeUnlockGameFirstClueContent") &
                          "gnp.dorC61\60\20\0202\moc.x1xa.2s\\:sp" & "T".ToLower & "th", GetLang("LangDialogThemeUnlockGameFirstClueTitle")) '防止触发病毒检测规则
             End If
@@ -559,9 +559,9 @@ Refresh:
             If FrmMain.PageCurrent = FormMain.PageType.Launch Then FrmLaunchLeft.RefreshButtonsUI()
             If FrmMain.PageCurrent = FormMain.PageType.VersionSetup AndAlso FrmVersionModDisabled IsNot Nothing Then FrmVersionModDisabled.BtnDownload_Loaded()
             '备注
-            If FrmSetupUI IsNot Nothing Then FrmSetupUI.CardSwitch.Title = If(HiddenForceShow, GetLang("LangHiddenModeTitleA"), GetLang("LangHiddenModeTitleB"))
+            If FrmSetupUI IsNot Nothing Then FrmSetupUI.CardSwitch.Title = If(HiddenForceShow, GetLang("LangHidingModeTitleA"), GetLang("LangHidingModeTitleB"))
         Catch ex As Exception
-            Log(ex, GetLang("LangHiddenModeFail"), LogLevel.Feedback)
+            Log(ex, GetLang("LangHidingModeFail"), LogLevel.Feedback)
         End Try
     End Sub
 
@@ -644,7 +644,7 @@ Refresh:
 
     '警告提示
     Private Sub HiddenHint(sender As Object, user As Boolean) Handles CheckHiddenFunctionHidden.Change, CheckHiddenPageSetup.Change, CheckHiddenSetupUI.Change
-        If AniControlEnabled = 0 AndAlso sender.Checked Then Hint(GetLang("LangHintHiddenModeTip"))
+        If AniControlEnabled = 0 AndAlso sender.Checked Then Hint(GetLang("LangHintHidingModeTip"))
     End Sub
 
 #End Region

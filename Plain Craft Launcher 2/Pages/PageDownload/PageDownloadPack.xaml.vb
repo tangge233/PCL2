@@ -15,7 +15,7 @@
         If FrmDownloadPack IsNot Nothing Then
             With Request
                 .SearchText = FrmDownloadPack.TextSearchName.Text
-                .GameVersion = If(FrmDownloadPack.TextSearchVersion.Text = GetLang("LangDownloadModpackSearchVersionAll"), Nothing,
+                .GameVersion = If(FrmDownloadPack.TextSearchVersion.Text = GetLang("LangDownloadModpacksSearchVersionAll"), Nothing,
                     If(FrmDownloadPack.TextSearchVersion.Text.Contains(".") OrElse FrmDownloadPack.TextSearchVersion.Text.Contains("w"), FrmDownloadPack.TextSearchVersion.Text, Nothing))
                 .Tag = FrmDownloadPack.ComboSearchTag.SelectedItem.Tag
                 .Source = CType(Val(FrmDownloadPack.ComboSearchSource.SelectedItem.Tag), CompSourceType)
@@ -116,7 +116,7 @@
     '重置按钮
     Private Sub BtnSearchReset_Click(sender As Object, e As EventArgs) Handles BtnSearchReset.Click
         TextSearchName.Text = ""
-        TextSearchVersion.Text = GetLang("LangDownloadModpackSearchVersionAll")
+        TextSearchVersion.Text = GetLang("LangDownloadModpacksSearchVersionAll")
         TextSearchVersion.SelectedIndex = 0
         ComboSearchSource.SelectedIndex = 0
         ComboSearchTag.SelectedIndex = 0

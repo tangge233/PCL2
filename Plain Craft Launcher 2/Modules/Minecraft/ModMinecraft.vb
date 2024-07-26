@@ -57,7 +57,7 @@ Public Module ModMinecraft
             Dim MojangPath As String = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\.minecraft\"
             If (Not CacheMcFolderList.Any OrElse MojangPath <> CacheMcFolderList(0).Path) AndAlso '当前文件夹不是官启文件夹
                 Directory.Exists(MojangPath & "versions\") Then '具有权限且存在 versions 文件夹
-                CacheMcFolderList.Add(New McFolder With {.Name = GetLang("LangModMinecraftOfficalFolder"), .Path = MojangPath, .Type = McFolderType.Original})
+                CacheMcFolderList.Add(New McFolder With {.Name = GetLang("LangModMinecraftOfficialFolder"), .Path = MojangPath, .Type = McFolderType.Original})
             End If
 
 #End Region

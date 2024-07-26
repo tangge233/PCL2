@@ -103,7 +103,7 @@
         Select Case Setup.Get("LoginType")
             Case McLoginType.Legacy
                 If PageLinkHiper.HiperState = LoadState.Finished Then
-                    LabLaunchingMethod.Text = GetLang("LangLaunchLeftAccountOfflineLinkLogin")
+                    LabLaunchingMethod.Text = GetLang("LangLaunchLeftAccountHostingOfflineLogin")
                 Else
                     LabLaunchingMethod.Text = GetLang("LangLaunchLeftAccountOfflineLogin")
                 End If

@@ -58,7 +58,7 @@
                             <local:MyRadioBox Grid.Column="1" Grid.Row="1" Text="？？？" x:Name="RadioLauncherTheme5Gray" IsEnabled="False" Opacity="1" />
                             <TextBlock Grid.Column="1" Grid.Row="1" x:Name="LabLauncherTheme5Unlock" Background="{StaticResource ColorBrushSemiTransparent}" ToolTip="{DynamicResource LangSetThemeNameGreyToolTip}" ToolTipService.Placement="Bottom" />
                             <local:MyRadioBox Grid.Column="2" Grid.Row="1" Text="？？？" x:Name="RadioLauncherTheme12" Tag="UiLauncherTheme/12" IsEnabled="False" ToolTip="{DynamicResource LangSetThemeNameFunny}" ToolTipService.ShowOnDisabled="True" ToolTipService.Placement="Bottom" />
-                            <local:MyRadioBox Grid.Column="3" Grid.Row="1" Text="？？？" x:Name="RadioLauncherTheme6" Tag="UiLauncherTheme/6" IsEnabled="False" ToolTip="{DynamicResource LangSetThemeNameHardcoreFan}" ToolTipService.ShowOnDisabled="True" ToolTipService.Placement="Bottom" />
+                            <local:MyRadioBox Grid.Column="3" Grid.Row="1" Text="？？？" x:Name="RadioLauncherTheme6" Tag="UiLauncherTheme/6" IsEnabled="False" ToolTip="{DynamicResource LangSetThemeNameHardcoreFans}" ToolTipService.ShowOnDisabled="True" ToolTipService.Placement="Bottom" />
                             <local:MyRadioBox Grid.Column="4" Grid.Row="1" Text="？？？" x:Name="RadioLauncherTheme7" Tag="UiLauncherTheme/7" IsEnabled="False" ToolTip="072 101 108 112 032 068 101 118 032 048 046 052 046 052" ToolTipService.ShowOnDisabled="True" ToolTipService.Placement="Bottom" />
                             <local:MyRadioBox Grid.Column="5" Grid.Row="1" Text="？？？" x:Name="RadioLauncherTheme13" Tag="UiLauncherTheme/13" IsEnabled="False" ToolTip="{DynamicResource LangSetThemeNameLucky}" ToolTipService.ShowOnDisabled="True" ToolTipService.Placement="Bottom" />
                             <local:MyRadioBox Grid.Column="1" Grid.Row="2" Text="？？？" x:Name="RadioLauncherTheme8" Tag="UiLauncherTheme/8" IsEnabled="False" ToolTipService.Placement="Bottom" />
@@ -214,8 +214,8 @@
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
                         </Grid.ColumnDefinitions>
                         <local:MyButton x:Name="BtnCustomRefresh" Grid.Column="0" MinWidth="140" Text="{DynamicResource LangSetHomePageRefresh}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" ColorType="Highlight" />
-                        <local:MyButton x:Name="BtnCustomFile" Grid.Column="1" MinWidth="140" Text="{DynamicResource LangSetHomePageReleaseTeachFile}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" />
-                        <local:MyButton x:Name="BtnCustomTutorial" Grid.Column="2" MinWidth="140" Text="{DynamicResource LangSetHomePageSeeDoc}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" />
+                        <local:MyButton x:Name="BtnCustomFile" Grid.Column="1" MinWidth="140" Text="{DynamicResource LangSetHomePageGenerateDoc}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" />
+                        <local:MyButton x:Name="BtnCustomTutorial" Grid.Column="2" MinWidth="140" Text="{DynamicResource LangSetHomePageSeeTutorials}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" />
                     </Grid>
                     <Grid x:Name="PanCustomNet" Visibility="Collapsed" Margin="0,10,0,5">
                         <Grid.ColumnDefinitions>
@@ -246,9 +246,9 @@
                     </Grid>
                 </StackPanel>
             </local:MyCard>
-            <local:MyCard x:Name="CardSwitch" Margin="0,0,0,15" Title="{DynamicResource LangSetFuncHidden}">
+            <local:MyCard x:Name="CardSwitch" Margin="0,0,0,15" Title="{DynamicResource LangSetFuncHiding}">
                 <StackPanel Margin="25,38,15,15">
-                    <TextBlock Margin="0,1,0,1" Text="{DynamicResource LangSetFuncHiddenToolTip}" TextWrapping="Wrap" />
+                    <TextBlock Margin="0,1,0,1" Text="{DynamicResource LangSetFuncHidingToolTip}" TextWrapping="Wrap" />
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -267,26 +267,26 @@
                             <RowDefinition Height="30" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource LangSetFuncHiddenLaunch}" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" Text="{DynamicResource LangSetFuncHiddenDownload}" x:Name="CheckHiddenPageDownload" Tag="UiHiddenPageDownload" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3" Visibility="Collapsed" Text="{DynamicResource LangSetFuncHiddenLink}" x:Name="CheckHiddenPageLink" Tag="UiHiddenPageLink" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3" Text="{DynamicResource LangSetFuncHiddenSettings}" x:Name="CheckHiddenPageSetup" Tag="UiHiddenPageSetup" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4" Text="{DynamicResource LangSetFuncHiddenMore}" x:Name="CheckHiddenPageOther" Tag="UiHiddenPageOther" />
-                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource LangSetFuncHiddenSettingsSubPage}" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="2" Grid.Column="2" Text="{DynamicResource LangSetFuncHiddenSettingsGame}" x:Name="CheckHiddenSetupLaunch" Tag="UiHiddenSetupLaunch" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="2" Grid.Column="3" Text="{DynamicResource LangSetFuncHiddenSettingsPersonalize}" x:Name="CheckHiddenSetupUI" Tag="UiHiddenSetupUi" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Text="{DynamicResource LangSetFuncHiddenSettingsLaunch}" x:Name="CheckHiddenSetupSystem" Tag="UiHiddenSetupSystem" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="2" Grid.Column="5" Text="{DynamicResource LangSetFuncHiddenSettingsLink}" x:Name="CheckHiddenSetupLink" Tag="UiHiddenSetupLink" Visibility="Collapsed" />
-                        <TextBlock Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource LangSetFuncHiddenMoreSubPage}" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Text="{DynamicResource LangSetFuncHiddenMoreHelp}" x:Name="CheckHiddenOtherHelp" Tag="UiHiddenOtherHelp" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="3" Text="{DynamicResource LangSetFuncHiddenMoreAbout}" x:Name="CheckHiddenOtherAbout" Tag="UiHiddenOtherAbout" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="4" Text="{DynamicResource LangSetFuncHiddenMoreTool}" x:Name="CheckHiddenOtherTest" Tag="UiHiddenOtherTest" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="5" Text="{DynamicResource LangSetFuncHiddenMoreFeedback}" x:Name="CheckHiddenOtherFeedback" Tag="UiHiddenOtherFeedback" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="6" Text="{DynamicResource LangSetFuncHiddenMoreVote}" x:Name="CheckHiddenOtherVote" Tag="UiHiddenOtherVote" />
-                        <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource LangSetFuncHiddenSpecial}" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="4" Grid.Column="2" Text="{DynamicResource LangSetFuncHiddenSpecialEmail}" x:Name="CheckLauncherEmail" Tag="UiLauncherEmail" ToolTip="{DynamicResource LangSetFuncHiddenSpecialEmailToolTip}" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="4" Grid.Column="3" Text="{DynamicResource LangSetFuncHiddenSpecialVersionChoose}" x:Name="CheckHiddenFunctionSelect" Tag="UiHiddenFunctionSelect" />
-                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="4" Grid.Column="4" Text="{DynamicResource LangSetFuncHiddenSpecialFuncHidden}" x:Name="CheckHiddenFunctionHidden" Tag="UiHiddenFunctionHidden" ToolTip="{DynamicResource LangSetFuncHiddenSpecialFuncHiddenToolTip}" />
+                        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource LangSetFuncHidingLaunch}" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" Text="{DynamicResource LangSetFuncHidingDownload}" x:Name="CheckHiddenPageDownload" Tag="UiHiddenPageDownload" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3" Visibility="Collapsed" Text="{DynamicResource LangSetFuncHidingHosting}" x:Name="CheckHiddenPageLink" Tag="UiHiddenPageLink" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3" Text="{DynamicResource LangSetFuncHidingSettings}" x:Name="CheckHiddenPageSetup" Tag="UiHiddenPageSetup" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4" Text="{DynamicResource LangSetFuncHidingMore}" x:Name="CheckHiddenPageOther" Tag="UiHiddenPageOther" />
+                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource LangSetFuncHidingSettingsSubPage}" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="2" Grid.Column="2" Text="{DynamicResource LangSetFuncHidingSettingsGame}" x:Name="CheckHiddenSetupLaunch" Tag="UiHiddenSetupLaunch" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="2" Grid.Column="3" Text="{DynamicResource LangSetFuncHidingSettingsPersonalization}" x:Name="CheckHiddenSetupUI" Tag="UiHiddenSetupUi" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Text="{DynamicResource LangSetFuncHidingSettingsLauncher}" x:Name="CheckHiddenSetupSystem" Tag="UiHiddenSetupSystem" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="2" Grid.Column="5" Text="{DynamicResource LangSetFuncHidingSettingsHosting}" x:Name="CheckHiddenSetupLink" Tag="UiHiddenSetupLink" Visibility="Collapsed" />
+                        <TextBlock Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource LangSetFuncHidingMoreSubPage}" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Text="{DynamicResource LangSetFuncHidingMoreHelp}" x:Name="CheckHiddenOtherHelp" Tag="UiHiddenOtherHelp" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="3" Text="{DynamicResource LangSetFuncHidingMoreCredits}" x:Name="CheckHiddenOtherAbout" Tag="UiHiddenOtherAbout" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="4" Text="{DynamicResource LangSetFuncHidingMoreUtilities}" x:Name="CheckHiddenOtherTest" Tag="UiHiddenOtherTest" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="5" Text="{DynamicResource LangSetFuncHidingMoreFeedback}" x:Name="CheckHiddenOtherFeedback" Tag="UiHiddenOtherFeedback" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="3" Grid.Column="6" Text="{DynamicResource LangSetFuncHidingMoreVote}" x:Name="CheckHiddenOtherVote" Tag="UiHiddenOtherVote" />
+                        <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource LangSetFuncHidingSpecial}" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="4" Grid.Column="2" Text="{DynamicResource LangSetFuncHidingSpecialEmail}" x:Name="CheckLauncherEmail" Tag="UiLauncherEmail" ToolTip="{DynamicResource LangSetFuncHidingSpecialEmailToolTip}" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="4" Grid.Column="3" Text="{DynamicResource LangSetFuncHidingSpecialInstanceChoose}" x:Name="CheckHiddenFunctionSelect" Tag="UiHiddenFunctionSelect" />
+                        <local:MyCheckBox Height="22" VerticalAlignment="Center" Grid.Row="4" Grid.Column="4" Text="{DynamicResource LangSetFuncHidingSpecialFuncHidden}" x:Name="CheckHiddenFunctionHidden" Tag="UiHiddenFunctionHidden" ToolTip="{DynamicResource LangSetFuncHidingSpecialFuncHiddenToolTip}" />
                     </Grid>
                 </StackPanel>
             </local:MyCard>

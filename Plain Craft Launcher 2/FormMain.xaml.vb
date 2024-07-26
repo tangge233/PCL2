@@ -472,7 +472,7 @@ Public Class FormMain
         End Select
         If Setup.Get("SystemCount") >= 99 Then
             If ThemeUnlock(6, False) Then
-                MyMsgBox(GetLang("LangDialogHardcoreFanTheme"), GetLang("LangDialogTitleTip"))
+                MyMsgBox(GetLang("LangDialogHardcoreFansTheme"), GetLang("LangDialogTitleTip"))
             End If
         End If
 #End If
@@ -777,7 +777,7 @@ Public Class FormMain
                         End If
                         If AuthlibServer = "https://littleskin.cn/api/yggdrasil" Then
                             'LittleSkin
-                            If MyMsgBox(GetLang("LangDialogAuthlibEnableLittleSkin", TargetVersion.Name), GetLang("LangDialogTitleAuthlibEnableLittleSkin"), GetLang("LangDialogBtnOK"), GetLang("LangDialogBtnCancel")) = 2 Then
+                            If MyMsgBox(GetLang("LangDialogAuthlibEnableLittleSkin", TargetVersion.Name), GetLang("LangDialogTitleAuthlibEnable"), GetLang("LangDialogBtnOK"), GetLang("LangDialogBtnCancel")) = 2 Then
                                 Exit Sub
                             End If
                             Setup.Set("VersionServerLogin", 4, Version:=TargetVersion)
@@ -786,7 +786,7 @@ Public Class FormMain
                             Setup.Set("VersionServerAuthName", "LittleSkin 登录", Version:=TargetVersion)
                         Else
                             '第三方 Authlib 服务器
-                            If MyMsgBox(GetLang("LangDialogAuthlibEnableLittleSkinServer", TargetVersion.Name, AuthlibServer), GetLang("LangDialogTitleAuthlibEnableLittleSkin"), GetLang("LangDialogBtnOK"), GetLang("LangDialogBtnCancel")) = 2 Then
+                            If MyMsgBox(GetLang("LangDialogAuthlibEnableThirdPartyServer", TargetVersion.Name, AuthlibServer), GetLang("LangDialogTitleAuthlibEnable"), GetLang("LangDialogBtnOK"), GetLang("LangDialogBtnCancel")) = 2 Then
                                 Exit Sub
                             End If
                             Setup.Set("VersionServerLogin", 4, Version:=TargetVersion)
@@ -1084,7 +1084,7 @@ Install:
     Private Function PageNameGet(Stack As PageStackData) As String
         Select Case Stack.Page
             Case PageType.VersionSelect
-                Return GetLang("LangPageNameVersionChoose")
+                Return GetLang("LangPageNameInstanceChoose")
             Case PageType.DownloadManager
                 Return GetLang("LangPageNameDownloadManagement")
             Case PageType.VersionSetup
@@ -1093,7 +1093,7 @@ Install:
                 Dim Project As CompProject = Stack.Additional(0)
                 Select Case Project.Type
                     Case CompType.Mod
-                        Return GetLang("LangPageNameModDownload") & " - " & Project.TranslatedName
+                        Return GetLang("LangPageNameModsDownload") & " - " & Project.TranslatedName
                     Case CompType.ModPack
                         Return GetLang("LangPageNameModpacksDownload") & " - " & Project.TranslatedName
                     Case Else 'CompType.ResourcePack
