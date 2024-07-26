@@ -387,7 +387,7 @@ Press &quot;F11&quot; again to exit the hidden instance viewing mode.</s:String>
     <s:String x:Key="LangDownloadAprilFools">April Fools'</s:String>
     <s:String x:Key="LangDownloadStable">Stable</s:String>
     <s:String x:Key="LangDownloadNewStable">Latest Stable</s:String>
-    <s:String x:Key="LangDownloadNewBet">Latest Beta</s:String>
+    <s:String x:Key="LangDownloadNewBeta">Latest Beta</s:String>
     <s:String x:Key="LangDownloadBeta">Beta</s:String>
     <s:String x:Key="LangDownloadOptiFinePreview">Preview</s:String>
     <s:String x:Key="LangDownloadLiteLoaderSnapshot">Snapshot</s:String>

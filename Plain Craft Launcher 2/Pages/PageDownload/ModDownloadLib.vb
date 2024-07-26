@@ -1650,7 +1650,7 @@ Retry:
         End If
         If FreshBetaVersion IsNot Nothing Then
             Dim Fresh = NeoForgeDownloadListItem(FreshBetaVersion, OnClick, IsSaveOnly)
-            Fresh.Info = If(Fresh.Info = "", GetLang("LangDownloadNewBet"), GetLang("LangDownloadNewBet"))
+            Fresh.Info = If(Fresh.Info = "", GetLang("LangDownloadNewBeta"), GetLang("LangDownloadNewBeta"))
             Stack.Children.Add(Fresh)
         End If
         '添加间隔

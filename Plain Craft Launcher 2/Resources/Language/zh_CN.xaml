@@ -351,7 +351,7 @@
     <s:String x:Key="LangDownloadAprilFools">愚人节版</s:String>
     <s:String x:Key="LangDownloadStable">稳定版</s:String>
     <s:String x:Key="LangDownloadNewStable">最新稳定版</s:String>
-    <s:String x:Key="LangDownloadNewBet">最新测试版</s:String>
+    <s:String x:Key="LangDownloadNewBeta">最新测试版</s:String>
     <s:String x:Key="LangDownloadBeta">测试版</s:String>
     <s:String x:Key="LangDownloadOptiFinePreview">预览版</s:String>
     <s:String x:Key="LangDownloadLiteLoaderSnapshot">测试版</s:String>
