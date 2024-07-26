@@ -320,6 +320,7 @@ If there is an existing instance, click the &quot;Add Existing Folders&quot; on 
     <s:String x:Key="LangSelectInstanceTypeRegular">Regular Instance</s:String>
     <s:String x:Key="LangSelectInstanceTypeModAbility">Mods Installable</s:String>
     <s:String x:Key="LangSelectInstanceTypeForge">Forge Instance</s:String>
+    <s:String x:Key="LangSelectInstanceTypeNeoForge">NeoForge Instance</s:String>
     <s:String x:Key="LangSelectInstanceTypeLiteloader">LiteLoader Instance</s:String>
     <s:String x:Key="LangSelectInstanceTypeFabric">Fabric Instance</s:String>
     <s:String x:Key="LangSelectInstanceTypeError">Error Instance</s:String>

@@ -52,7 +52,7 @@
                         ElseIf IsForgeExists Then
                             CardName = GetLang("LangSelectInstanceTypeForge")
                         ElseIf IsNeoForgeExists Then
-                            CardName = "NeoForge 版本"
+                            CardName = GetLang("LangSelectInstanceTypeNeoForge")
                         ElseIf IsLiteExists Then
                             CardName = GetLang("LangSelectInstanceTypeLiteloader")
                         Else

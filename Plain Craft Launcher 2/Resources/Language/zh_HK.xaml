@@ -285,6 +285,7 @@
     <s:String x:Key="LangSelectInstanceTypeRegular">常規版本</s:String>
     <s:String x:Key="LangSelectInstanceTypeModAbility">可安裝 Mod</s:String>
     <s:String x:Key="LangSelectInstanceTypeForge">Forge 版本</s:String>
+    <s:String x:Key="LangSelectInstanceTypeNeoForge">NeoForge 版本</s:String>
     <s:String x:Key="LangSelectInstanceTypeLiteloader">LiteLoader 版本</s:String>
     <s:String x:Key="LangSelectInstanceTypeFabric">Fabric 版本</s:String>
     <s:String x:Key="LangSelectInstanceTypeError">錯誤的版本</s:String>
