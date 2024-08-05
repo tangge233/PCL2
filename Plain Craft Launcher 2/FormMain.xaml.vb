@@ -1095,7 +1095,7 @@ Install:
                     Case CompType.Mod
                         Return GetLang("LangPageNameModDownload") & " - " & GetProjectLocalName(Project)
                     Case CompType.ModPack
-                        Return GetLang("LangPageNameModpacksDownload") & " - " & GetProjectLocalName(Project)
+                        Return GetLang("LangPageNameModpackDownload") & " - " & GetProjectLocalName(Project)
                     Case Else 'CompType.ResourcePack
                         Return GetLang("LangPageNameResourcePacksDownload") & " - " & GetProjectLocalName(Project)
                 End Select

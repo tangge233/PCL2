@@ -69,8 +69,8 @@ You can modify the login method in &quot;Instance Properties → Settings → Se
     <s:String x:Key="LangPageNameDownloadManagement">Downloads</s:String>
     <s:String x:Key="LangPageNameVersionConfiguration">Properties</s:String>
     <s:String x:Key="LangPageNameVersionConfigurationUnknownVersion">Unknown Instance</s:String>
-    <s:String x:Key="LangPageNameModsDownload">Mods Download</s:String>
-    <s:String x:Key="LangPageNameModpacksDownload">Modpacks Download</s:String>
+    <s:String x:Key="LangPageNameModDownload">Mods Download</s:String>
+    <s:String x:Key="LangPageNameModpackDownload">Modpacks Download</s:String>
     <s:String x:Key="LangPageNameResourcePacksDownload">Resource Packs Download</s:String>
 
     <!--PageSetupUI-->
@@ -273,8 +273,8 @@ Avoid &quot;Feature Hiding&quot; be changed while keeping the &quot;Personalizat
     <s:String x:Key="LangSelectCreateFolderToolTip">Create a new &quot;.minecraft&quot; folder at the location of PCL.</s:String>
     <s:String x:Key="LangSelectAddExistFolder">Add Existing Folders</s:String>
     <s:String x:Key="LangSelectAddExistFolderToolTip">Add an existing Minecraft folder to the list.</s:String>
-    <s:String x:Key="LangSelectAddModpacks">Import Modpacks</s:String>
-    <s:String x:Key="LangSelectAddModpacksToolTip">Install the modpack under the currently selected Minecraft folder.</s:String>
+    <s:String x:Key="LangSelectAddModpack">Import Modpacks</s:String>
+    <s:String x:Key="LangSelectAddModpackToolTip">Install the modpack under the currently selected Minecraft folder.</s:String>
     <s:String x:Key="LangSelectNoMCFolder">No Minecraft Folders Available</s:String>
     <s:String x:Key="LangSelectUIError">Error occur while building Minecraft folder list UI.</s:String>
     <s:String x:Key="LangSelectDownloadingTaskExistsNoAdd">The game folder cannot be added while the download task is in progress!</s:String>
@@ -484,7 +484,7 @@ Select Minecraft version first on the &quot;Installation&quot; page, then choose
     <s:String x:Key="LangDownloadPageManualInstallFold">Packages</s:String>
     <s:String x:Key="LangDownloadPageResource">Resources</s:String>
     <s:String x:Key="LangDownloadPageMods">Mods</s:String>
-    <s:String x:Key="LangDownloadPageModpacks">Modpacks</s:String>
+    <s:String x:Key="LangDownloadPageModpack">Modpacks</s:String>
 
     <!--PageDownloadLiteLoader-->
     <s:String x:Key="LangDownloadLiteloaderDescTitle">Introduction of LiteLoader</s:String>
@@ -1015,7 +1015,7 @@ Leave blank as default, require to restart the launcher to apply.</s:String>
     <s:String x:Key="LangPageSetupSystemSystemCheckUpdate">Check for Updates</s:String>
     <s:String x:Key="LangPageSetupSystemLang">Language</s:String>
     <s:String x:Key="LangPageSetupSystemLangLaunchLang">Language</s:String>
-    <s:String x:Key="LangPageSetupSystemLangWarn">Language translations may not be 100% accurate, need to restart the launcher after the modification.</s:String>
+    <s:String x:Key="LangPageSetupSystemLangWarn">Language translations may not be 100% accurate. Need to restart the launcher after the modification.</s:String>
     <s:String x:Key="LangPageSetupSystemDebug">Debug</s:String>
     <s:String x:Key="LangPageSetupSystemDebugAnimSpeed">Animation Speed</s:String>
     <s:String x:Key="LangPageSetupSystemDebugNotCopyExistFileWhenDownload">Prevent to copy existing files on download</s:String>
@@ -1229,8 +1229,10 @@ You can return to default settings by clicking the initialize button on the left
     <s:String x:Key="LangPageVersionSetupJVMTail">Text fields will be joined directly at the end of the launch parameter.
 For example, typing &quot;--demo&quot; will launch the game in demo mode.
 If left as blank, the value of the global setting is used.</s:String>
-    <s:String x:Key="LangPageVersionSetupCommand">This option does not override global settings: Executes the specific command or program before Minecraft is launched.
-The syntax is same as the batch script.
+    <s:String x:Key="LangPageVersionSetupCommand">This option does not override global settings:
+When launching the game, the commands in the global settings will be executed first, and then the commands in the instance settings will be executed.
+
+Executes the specific command or program before Minecraft is launched. The syntax is same as the batch script.
 
 Relative paths can be implemented with the following alternate tags (paths end with &quot;\&quot; ):
  · {path}: The folder where the PCL is located;

@@ -64,8 +64,8 @@
     <s:String x:Key="LangPageNameDownloadManagement">下载管理</s:String>
     <s:String x:Key="LangPageNameVersionConfiguration">版本设置</s:String>
     <s:String x:Key="LangPageNameVersionConfigurationUnknownVersion">未知版本</s:String>
-    <s:String x:Key="LangPageNameModsDownload">模组下载</s:String>
-    <s:String x:Key="LangPageNameModpacksDownload">整合包下载</s:String>
+    <s:String x:Key="LangPageNameModDownload">模组下载</s:String>
+    <s:String x:Key="LangPageNameModpackDownload">整合包下载</s:String>
     <s:String x:Key="LangPageNameResourcePacksDownload">资源包下载</s:String>
 
     <!--PageSetupUI-->
@@ -87,7 +87,7 @@
     <s:String x:Key="LangHintBackgroundPicNotFound">未检测到可用背景图片！</s:String>
     <s:String x:Key="LangHintBackgroundPicRefreshed">背景图片已刷新：</s:String>
     <s:String x:Key="LangDialogBackgroundPicRefreshFailA">刷新背景图片失败，该图片文件可能并非标准格式。&#x000D;你可以尝试使用画图打开该文件并重新保存，这会让图片变为标准格式。&#x000D;文件：</s:String>
-    <s:String x:Key="LangDialogBackgroundPicRefreshFailB">刷新背景图片失败（ {0} ）</s:String>
+    <s:String x:Key="LangDialogBackgroundPicRefreshFailB">刷新背景图片失败（{0}）</s:String>
     <s:String x:Key="LangDialogBackgroundPicRefreshFailUnknown">刷新背景图片时出现未知错误</s:String>
     <s:String x:Key="LangDialogTitlePicChangeFailA">改变标题栏图片失败，该图片文件可能并非标准格式。&#x000D;你可以尝试使用画图打开该文件并重新保存，这会让图片变为标准格式。</s:String>
     <s:String x:Key="LangDialogTitlePicChangeFailB">设置标题栏图片失败</s:String>
@@ -97,7 +97,7 @@
     <s:String x:Key="LangDialogTitlePicChangeFailF">复制标题栏图片失败</s:String>
     <s:String x:Key="LangHintTitlePicEmptied">标题栏图片已清空！</s:String>
     <s:String x:Key="LangDialogTitlePicEmptyFail">清空标题栏图片失败</s:String>
-    <s:String x:Key="LangBackgroundMusicCount">背景音乐（ {0} 首）</s:String>
+    <s:String x:Key="LangBackgroundMusicCount">背景音乐（{0} 首）</s:String>
     <s:String x:Key="LangBackgroundMusic">背景音乐</s:String>
     <s:String x:Key="LangDialogBackgroundMusicDeleteContent">即将删除背景音乐文件夹中的所有文件。&#x000D;此操作不可撤销，是否确定？</s:String>
     <s:String x:Key="LangHintBackgroundMusicDeleting">正在删除背景音乐……</s:String>
@@ -247,8 +247,8 @@
     <s:String x:Key="LangSelectCreateFolderToolTip">在 PCL 当前所在文件夹下创建新的 .minecraft 文件夹</s:String>
     <s:String x:Key="LangSelectAddExistFolder">添加已有文件夹</s:String>
     <s:String x:Key="LangSelectAddExistFolderToolTip">将一个已有的 Minecraft 文件夹添加到列表</s:String>
-    <s:String x:Key="LangSelectAddModpacks">导入整合包</s:String>
-    <s:String x:Key="LangSelectAddModpacksToolTip">在当前选择的 Minecraft 文件夹下安装整合包</s:String>
+    <s:String x:Key="LangSelectAddModpack">导入整合包</s:String>
+    <s:String x:Key="LangSelectAddModpackToolTip">在当前选择的 Minecraft 文件夹下安装整合包</s:String>
     <s:String x:Key="LangSelectNoMCFolder">没有可用的 Minecraft 文件夹</s:String>
     <s:String x:Key="LangSelectUIError">构建 Minecraft 文件夹列表 UI 出错</s:String>
     <s:String x:Key="LangSelectDownloadingTaskExistsNoAdd">在下载任务进行时，无法添加游戏文件夹！</s:String>
@@ -444,7 +444,7 @@
     <s:String x:Key="LangDownloadPageManualInstallFold">手动安装包</s:String>
     <s:String x:Key="LangDownloadPageResource">资源</s:String>
     <s:String x:Key="LangDownloadPageMods">Mod</s:String>
-    <s:String x:Key="LangDownloadPageModpacks">整合包</s:String>
+    <s:String x:Key="LangDownloadPageModpack">整合包</s:String>
 
     <!--PageDownloadLiteLoader-->
     <s:String x:Key="LangDownloadLiteloaderDescTitle">LiteLoader 简介</s:String>
@@ -891,8 +891,8 @@
     <s:String x:Key="LangPageSetupSystemDownloadSSLToolTip">验证证书会提高安全性，但疑似有概率导致正版登录失败（#3018）。&#xa;如果在正版登录时因为 [根据验证过程，远程证书无效] 失败，可以尝试关闭此项。</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibility">辅助功能</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdate">游戏更新提示</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateDevelopment">测试版更新提示</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateDevelopmentToolTip">在 Minecraft 测试版（快照、预发布版）更新时弹窗提示</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateDevelopment">开发版更新提示</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateDevelopmentToolTip">在 Minecraft 开发版（快照、预发布版）更新时弹窗提示</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateRelease">正式版更新提示</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibilityRemindGameUpdateReleaseToolTip">在 Minecraft 正式版更新时弹窗提示</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibilitySetGameLanguage">游戏语言</s:String>
@@ -913,7 +913,7 @@
     <s:String x:Key="LangPageSetupSystemSystemCheckUpdate">检查更新</s:String>
     <s:String x:Key="LangPageSetupSystemLang">语言</s:String>
     <s:String x:Key="LangPageSetupSystemLangLaunchLang">启动器语言</s:String>
-    <s:String x:Key="LangPageSetupSystemLangWarn">翻译不保证 100% 准确，修改语言后需要重启 PCL</s:String>
+    <s:String x:Key="LangPageSetupSystemLangWarn">翻译不保证 100% 准确。修改语言后需要重启 PCL</s:String>
     <s:String x:Key="LangPageSetupSystemDebug">调试选项</s:String>
     <s:String x:Key="LangPageSetupSystemDebugAnimSpeed">动画速度</s:String>
     <s:String x:Key="LangPageSetupSystemDebugNotCopyExistFileWhenDownload">禁止在下载时复制已存在的文件</s:String>
@@ -1131,10 +1131,10 @@
     <s:String x:Key="LangModMinecraftSkinSizeErrorA">皮肤图片大小应为 64x32 像素或 64x64 像素！</s:String>
     <s:String x:Key="LangModMinecraftSkinSizeErrorB">皮肤文件大小需小于 24 KB，而所选文件大小为</s:String>
     <s:String x:Key="LangModMinecraftSkinErrorFile">皮肤文件存在错误</s:String>
-    <s:String x:Key="LangModMinecraftSkinDialogSkinTypeContent">此皮肤为 Steve 模型（粗手臂）还是 Alex 模型（细手臂）？</s:String>
+    <s:String x:Key="LangModMinecraftSkinDialogSkinTypeContent">此皮肤为宽型（粗手臂）还是纤细（细手臂）？</s:String>
     <s:String x:Key="LangModMinecraftSkinDialogSkinTypeTitle">选择皮肤种类</s:String>
-    <s:String x:Key="LangModMinecraftSkinDialogSkinTypeSteve">Steve 模型</s:String>
-    <s:String x:Key="LangModMinecraftSkinDialogSkinTypeAlex">Alex 模型</s:String>
+    <s:String x:Key="LangModMinecraftSkinDialogSkinTypeSteve">宽型（粗手臂）</s:String>
+    <s:String x:Key="LangModMinecraftSkinDialogSkinTypeAlex">纤细（细手臂）</s:String>
     <s:String x:Key="LangModMinecraftSkinDialogSkinTypeIDK">我不知道</s:String>
     <s:String x:Key="LangModMinecraftSkinSkinTypeIDK">请在皮肤下载页面确认皮肤种类后再使用此皮肤！</s:String>
     <s:String x:Key="LangModMinecraftDialogNewVersionContentA">新版本：</s:String>
@@ -1157,7 +1157,7 @@
     <s:String x:Key="LangModCompModAlternateVersion">可选版本</s:String>
     <s:String x:Key="LangModCompModStatusDescRelease">正式版</s:String>
     <s:String x:Key="LangModCompModStatusDescBeta">测试版</s:String>
-    <s:String x:Key="LangModCompModStatusDescAlpha">测试版</s:String>
+    <s:String x:Key="LangModCompModStatusDescAlpha">预览版</s:String>
     <s:String x:Key="LangModCompModMilion">万</s:String>
     <s:String x:Key="LangModCompModBilion">亿</s:String>
 
