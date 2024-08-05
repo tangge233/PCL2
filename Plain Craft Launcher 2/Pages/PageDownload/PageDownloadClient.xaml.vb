@@ -44,6 +44,14 @@
                                 Version("type") = "special"
                                 Version.Add("lore", GetMcFoolName(Version("id")))
                         End Select
+                        '所有4月1日发布的版本可视为愚人节版，但不改动版本描述
+                        Select Case Version("releaseTime").Value(Of Date).ToString("MM'/'dd")
+                            Case "04/01"
+                                If Not Version("type") = "special" Then
+                                    Type = "愚人节版"
+                                    Version("type") = "special"
+                                End If
+                        End Select
                     Case "special"
                         '已被处理的愚人节版
                         Type = "愚人节版"
@@ -64,11 +72,11 @@
             Dim CardInfo As New MyCard With {.Title = GetLang("LangDownloadLatest"), .Margin = New Thickness(0, 0, 0, 15), .SwapType = 2}
             Dim TopestVersions As New List(Of JObject)
             Dim Release As JObject = Dict("正式版")(0).DeepClone()
-            Release("lore") = GetLang("LangDownloadClientReleaseReleaseOn") & " " & Release("releaseTime").Value(Of Date).ToString("yyyy'/'MM'/'dd HH':'mm")
+            Release("lore") = GetLang("LangDownloadClientReleaseReleaseOn") & " " & GetLocalTimeFormat(Release("releaseTime").Value(Of Date))
             TopestVersions.Add(Release)
             If Dict("正式版")(0)("releaseTime").Value(Of Date) < Dict("预览版")(0)("releaseTime").Value(Of Date) Then
                 Dim Snapshot As JObject = Dict("预览版")(0).DeepClone()
-                Snapshot("lore") = GetLang("LangDownloadClientDevReleaseOn") & " " & Snapshot("releaseTime").Value(Of Date).ToString("yyyy'/'MM'/'dd HH':'mm")
+                Snapshot("lore") = GetLang("LangDownloadClientBetaReleaseOn") & " " & GetLocalTimeFormat(Snapshot("releaseTime").Value(Of Date))
                 TopestVersions.Add(Snapshot)
             End If
             Dim PanInfo As New StackPanel With {.Margin = New Thickness(20, MyCard.SwapedHeight, 18, 0), .VerticalAlignment = VerticalAlignment.Top, .RenderTransform = New TranslateTransform(0, 0), .Tag = TopestVersions}

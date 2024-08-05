@@ -200,6 +200,7 @@
         ''' </summary>
         Public ReadOnly Property TranslatedName As String
             Get
+                If Not Lang.Equals("zh_CN") Then Return RawName
                 Return If(DatabaseEntry Is Nothing OrElse DatabaseEntry.ChineseName = "", RawName, DatabaseEntry.ChineseName)
             End Get
         End Property
@@ -305,26 +306,26 @@
                             Case 5191 : Tags.Add(GetLang("LangDownloadModTypeUtility"))
                             Case 421 : Tags.Add(GetLang("LangDownloadModTypeLib"))
                         '整合包
-                            Case 4484 : Tags.Add(GetLang("LangDownloadModpacksTypeMulti"))
-                            Case 4479 : Tags.Add(GetLang("LangDownloadModpacksTypeChallenging"))
-                            Case 4483 : Tags.Add(GetLang("LangDownloadModpacksTypeCombat"))
-                            Case 4478 : Tags.Add(GetLang("LangDownloadModpacksTypeQuests"))
-                            Case 4472 : Tags.Add(GetLang("LangDownloadModpacksTypeTech"))
-                            Case 4473 : Tags.Add(GetLang("LangDownloadModpacksTypeMagic"))
-                            Case 4475 : Tags.Add(GetLang("LangDownloadModpacksTypeAdventure"))
-                            Case 4476 : Tags.Add(GetLang("LangDownloadModpacksTypeExplore"))
-                            Case 4477 : Tags.Add(GetLang("LangDownloadModpacksTypeGame"))
-                            Case 4471 : Tags.Add(GetLang("LangDownloadModpacksTypeScienceFiction"))
-                            Case 4736 : Tags.Add(GetLang("LangDownloadModpacksTypeSkyland"))
-                            Case 5128 : Tags.Add(GetLang("LangDownloadModpacksTypeImprove"))
-                            Case 4487 : Tags.Add(GetLang("LangDownloadModpacksTypeFTB"))
-                            Case 4480 : Tags.Add(GetLang("LangDownloadModpacksTypeMapBased"))
-                            Case 4481 : Tags.Add(GetLang("LangDownloadModpacksTypeLightWeight"))
-                            Case 4482 : Tags.Add(GetLang("LangDownloadModpacksTypeHeavyWeight"))
+                            Case 4484 : Tags.Add(GetLang("LangDownloadModpackTypeMulti"))
+                            Case 4479 : Tags.Add(GetLang("LangDownloadModpackTypeChallenging"))
+                            Case 4483 : Tags.Add(GetLang("LangDownloadModpackTypeCombat"))
+                            Case 4478 : Tags.Add(GetLang("LangDownloadModpackTypeQuests"))
+                            Case 4472 : Tags.Add(GetLang("LangDownloadModpackTypeTech"))
+                            Case 4473 : Tags.Add(GetLang("LangDownloadModpackTypeMagic"))
+                            Case 4475 : Tags.Add(GetLang("LangDownloadModpackTypeAdventure"))
+                            Case 4476 : Tags.Add(GetLang("LangDownloadModpackTypeExplore"))
+                            Case 4477 : Tags.Add(GetLang("LangDownloadModpackTypeGame"))
+                            Case 4471 : Tags.Add(GetLang("LangDownloadModpackTypeScienceFiction"))
+                            Case 4736 : Tags.Add(GetLang("LangDownloadModpackTypeSkyland"))
+                            Case 5128 : Tags.Add(GetLang("LangDownloadModpackTypeImprove"))
+                            Case 4487 : Tags.Add(GetLang("LangDownloadModpackTypeFTB"))
+                            Case 4480 : Tags.Add(GetLang("LangDownloadModpackTypeMapBased"))
+                            Case 4481 : Tags.Add(GetLang("LangDownloadModpackTypeLightWeight"))
+                            Case 4482 : Tags.Add(GetLang("LangDownloadModpackTypeHeavyWeight"))
                                 'FUTURE: Res
                         End Select
                     Next
-                    If Not Tags.Any() Then Tags.Add(GetLang("LangDownloadModpacksTypeMisc"))
+                    If Not Tags.Any() Then Tags.Add(GetLang("LangDownloadModpackTypeMisc"))
 #End Region
                 Else
 #Region "Modrinth"
@@ -377,20 +378,20 @@
                             Case "utility" : Tags.Add(GetLang("LangDownloadModTypeUtility"))
                             Case "library" : Tags.Add(GetLang("LangDownloadModTypeLib"))
                             '整合包
-                            Case "multiplayer" : Tags.Add(GetLang("LangDownloadModpacksTypeMulti"))
-                            Case "optimization" : Tags.Add(GetLang("LangDownloadModpacksTypeOptimization"))
-                            Case "challenging" : Tags.Add(GetLang("LangDownloadModpacksTypeChallenging"))
-                            Case "combat" : Tags.Add(GetLang("LangDownloadModpacksTypeCombat"))
-                            Case "quests" : Tags.Add(GetLang("LangDownloadModpacksTypeQuests"))
-                            Case "technology" : Tags.Add(GetLang("LangDownloadModpacksTypeTech"))
-                            Case "magic" : Tags.Add(GetLang("LangDownloadModpacksTypeMagic"))
-                            Case "adventure" : Tags.Add(GetLang("LangDownloadModpacksTypeAdventure"))
-                            Case "kitchen-sink" : Tags.Add(GetLang("LangDownloadModpacksTypeCook"))
-                            Case "lightweight" : Tags.Add(GetLang("LangDownloadModpacksTypeLightWeight"))
+                            Case "multiplayer" : Tags.Add(GetLang("LangDownloadModpackTypeMulti"))
+                            Case "optimization" : Tags.Add(GetLang("LangDownloadModpackTypeOptimization"))
+                            Case "challenging" : Tags.Add(GetLang("LangDownloadModpackTypeChallenging"))
+                            Case "combat" : Tags.Add(GetLang("LangDownloadModpackTypeCombat"))
+                            Case "quests" : Tags.Add(GetLang("LangDownloadModpackTypeQuests"))
+                            Case "technology" : Tags.Add(GetLang("LangDownloadModpackTypeTech"))
+                            Case "magic" : Tags.Add(GetLang("LangDownloadModpackTypeMagic"))
+                            Case "adventure" : Tags.Add(GetLang("LangDownloadModpackTypeAdventure"))
+                            Case "kitchen-sink" : Tags.Add(GetLang("LangDownloadModpackTypeCook"))
+                            Case "lightweight" : Tags.Add(GetLang("LangDownloadModpackTypeLightWeight"))
                                 'FUTURE: Res
                         End Select
                     Next
-                    If Not Tags.Any() Then Tags.Add(GetLang("LangDownloadModpacksTypeMisc"))
+                    If Not Tags.Any() Then Tags.Add(GetLang("LangDownloadModpackTypeMisc"))
                     Tags.Sort()
                     ModLoaders.Sort()
 #End Region
@@ -530,8 +531,8 @@
                 NewItem.ColumnTime3.Width = New GridLength(0)
             End If
             NewItem.LabDownload.Text =
-                If(DownloadCount > 100000000, Math.Round(DownloadCount / 100000000, 2) & " 亿",
-                    If(DownloadCount > 100000, Math.Floor(DownloadCount / 10000) & " 万", DownloadCount))
+                If(DownloadCount > 100000000, Math.Round(DownloadCount / 100000000, 2) & " " & GetLang("LangModCompModBilion"),
+                    If(DownloadCount > 100000, Math.Floor(DownloadCount / 10000) & " " & GetLang("LangModCompModMilion"), DownloadCount))
             Return NewItem
         End Function
         Public Function GetControlLogo() As String
@@ -1027,9 +1028,9 @@ Retry:
             ElseIf [Error] IsNot Nothing Then
                 '有结果但是有错误
                 If CurseForgeFailed Then
-                    Storage.ErrorMessage = GetLang("LangDownloadModpacksConnectCurseForge")
+                    Storage.ErrorMessage = GetLang("LangDownloadModpackConnectCurseForge")
                 Else
-                    Storage.ErrorMessage = GetLang("LangDownloadModpacksConnectModrinthFail")
+                    Storage.ErrorMessage = GetLang("LangDownloadModpackConnectModrinthFail")
                 End If
             End If
 

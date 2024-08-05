@@ -2,6 +2,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:s="clr-namespace:System;assembly=mscorlib"
     xml:space="preserve">
+    
+    <!--Common-->
+    <s:String x:Key="LangTaskAbort">Canceled!</s:String>
+    <s:String x:Key="LangDialogBtnOK">OK</s:String>
+    <s:String x:Key="LangDialogBtnCancel">Cancel</s:String>
+    <s:String x:Key="LangResourcePackage">Resource Package</s:String>
 
     <!--FormMain-->
     <s:String x:Key="LangTitleDownload">Download</s:String>
@@ -13,8 +19,6 @@
     <s:String x:Key="LangToolTipDownload">Download Management</s:String>
     <s:String x:Key="LangToolTipSurrender">Surrender</s:String>
     <s:String x:Key="LangToolTipCloseMinecraft">Close Minecraft</s:String>
-    <s:String x:Key="LangDialogBtnOK">OK</s:String>
-    <s:String x:Key="LangDialogBtnCancel">Cancel</s:String>
     <s:String x:Key="LangDialogBtnUpdateFullLog">Full Change Log</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL {0} Updated</s:String>
     <s:String x:Key="LangDialogPolicyContent">Before using PCL, please agree to the Term of Service and Disclaimer of PCL.</s:String>
@@ -422,6 +426,12 @@ This page provides Fabric installer downloads. After downloading, you need to ma
     <s:String x:Key="LangDownloadFabricWebsite">Official Website</s:String>
     <s:String x:Key="LangDownloadFabricVersionList">Version List</s:String>
     <s:String x:Key="LangDownloadFabricGettingList">Getting Fabric List...</s:String>
+    <s:String x:Key="LangDownloadCompDownloadModpack">Download Modpack:</s:String>  
+    <s:String x:Key="LangDownloadCompInputInstanceName">Enter Version Name</s:String>  
+    <s:String x:Key="LangDownloadCompTaskDownloadModpackFile">Download Modpack File</s:String>  
+    <s:String x:Key="LangDownloadCompTaskPrepareInstallModpack">Prepare to Install Modpack</s:String>  
+    <s:String x:Key="LangDownloadCompTaskDownloadFile">Download File</s:String>  
+    <s:String x:Key="LangDownloadCompTaskDownloadFileDetail">Downloading:</s:String>
 
     <!--PageDownloadForge-->
     <s:String x:Key="LangDownloadForgeDescTitle">Introduction of Forge</s:String>
@@ -538,42 +548,42 @@ This page provides download of NeoForge installer. After downloading, you need t
     <s:String x:Key="LangDownloadOptiFineGettingList">Getting OptiFine List...</s:String>
 
     <!--PageDownloadPack-->
-    <s:String x:Key="LangDownloadModpacksSearchTitle">Search Modpacks</s:String>
-    <s:String x:Key="LangDownloadModpacksSearchName">Name</s:String>
-    <s:String x:Key="LangDownloadModpacksSearchSource">Source</s:String>
-    <s:String x:Key="LangDownloadModpacksSearchSourceAll">All</s:String>
-    <s:String x:Key="LangDownloadModpacksSearchVersion">Version</s:String>
-    <s:String x:Key="LangDownloadModpacksSearchVersionAll">All (Input Available)</s:String>
-    <s:String x:Key="LangDownloadModpacksSearch">Search</s:String>
-    <s:String x:Key="LangDownloadModpacksReset">Reset</s:String>
-    <s:String x:Key="LangDownloadModpacksGettingList">Getting Modpack List...</s:String>
-    <s:String x:Key="LangDownloadModpacksInstallFromLocal">Install from Files</s:String>
-    <s:String x:Key="LangDownloadModpacksInstallFromLocalToolTip">Install the modpack under the currently selected Minecraft folder.</s:String>
-    <s:String x:Key="LangDownloadModpacksType">Type</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeAll">All</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeMulti">Multiplayer</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeOptimization">Optimization</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeChallenging">Hardcore &amp; Challenging</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeCombat">Combat &amp; PvP</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeQuests">Quests</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeTech">Technology</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeMagic">Magic</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeAdventure">Adventure</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeCook">Kitchen Sink</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeExplore">Exploration</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeGame">Mini Games</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeScienceFiction">Sci-Fi</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeSkyland">Skyblock</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeImprove">Vanilla+</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeFTB">FTB</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeFTBToolTip">Published by FTB.</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeMapBased">Map Based</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeLightWeight">Small &amp; Light</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeHeavyWeight">Extra Large</s:String>
-    <s:String x:Key="LangDownloadModpacksTypeMisc">Misc</s:String>
-    <s:String x:Key="LangDownloadModpacksConnectModrinthFail">Could not connect to Modrinth, so currently only content from CurseForge is displayed, the results may be incomplete.
+    <s:String x:Key="LangDownloadModpackSearchTitle">Search Modpacks</s:String>
+    <s:String x:Key="LangDownloadModpackSearchName">Name</s:String>
+    <s:String x:Key="LangDownloadModpackSearchSource">Source</s:String>
+    <s:String x:Key="LangDownloadModpackSearchSourceAll">All</s:String>
+    <s:String x:Key="LangDownloadModpackSearchVersion">Version</s:String>
+    <s:String x:Key="LangDownloadModpackSearchVersionAll">All (Input Available)</s:String>
+    <s:String x:Key="LangDownloadModpackSearch">Search</s:String>
+    <s:String x:Key="LangDownloadModpackReset">Reset</s:String>
+    <s:String x:Key="LangDownloadModpackGettingList">Getting Modpack List...</s:String>
+    <s:String x:Key="LangDownloadModpackInstallFromLocal">Install from Files</s:String>
+    <s:String x:Key="LangDownloadModpackInstallFromLocalToolTip">Install the modpack under the currently selected Minecraft folder.</s:String>
+    <s:String x:Key="LangDownloadModpackType">Type</s:String>
+    <s:String x:Key="LangDownloadModpackTypeAll">All</s:String>
+    <s:String x:Key="LangDownloadModpackTypeMulti">Multiplayer</s:String>
+    <s:String x:Key="LangDownloadModpackTypeOptimization">Optimization</s:String>
+    <s:String x:Key="LangDownloadModpackTypeChallenging">Hardcore &amp; Challenging</s:String>
+    <s:String x:Key="LangDownloadModpackTypeCombat">Combat &amp; PvP</s:String>
+    <s:String x:Key="LangDownloadModpackTypeQuests">Quests</s:String>
+    <s:String x:Key="LangDownloadModpackTypeTech">Technology</s:String>
+    <s:String x:Key="LangDownloadModpackTypeMagic">Magic</s:String>
+    <s:String x:Key="LangDownloadModpackTypeAdventure">Adventure</s:String>
+    <s:String x:Key="LangDownloadModpackTypeCook">Kitchen Sink</s:String>
+    <s:String x:Key="LangDownloadModpackTypeExplore">Exploration</s:String>
+    <s:String x:Key="LangDownloadModpackTypeGame">Mini Games</s:String>
+    <s:String x:Key="LangDownloadModpackTypeScienceFiction">Sci-Fi</s:String>
+    <s:String x:Key="LangDownloadModpackTypeSkyland">Skyblock</s:String>
+    <s:String x:Key="LangDownloadModpackTypeImprove">Vanilla+</s:String>
+    <s:String x:Key="LangDownloadModpackTypeFTB">FTB</s:String>
+    <s:String x:Key="LangDownloadModpackTypeFTBToolTip">Published by FTB.</s:String>
+    <s:String x:Key="LangDownloadModpackTypeMapBased">Map Based</s:String>
+    <s:String x:Key="LangDownloadModpackTypeLightWeight">Small &amp; Light</s:String>
+    <s:String x:Key="LangDownloadModpackTypeHeavyWeight">Extra Large</s:String>
+    <s:String x:Key="LangDownloadModpackTypeMisc">Misc</s:String>
+    <s:String x:Key="LangDownloadModpackConnectModrinthFail">Could not connect to Modrinth, so currently only content from CurseForge is displayed, the results may be incomplete.
 Please check the internet then try again.</s:String>
-    <s:String x:Key="LangDownloadModpacksConnectCurseForge">Could not connect to CurseForge, so currently only content from Modrinth is displayed, the results may be incomplete.
+    <s:String x:Key="LangDownloadModpackConnectCurseForge">Could not connect to CurseForge, so currently only content from Modrinth is displayed, the results may be incomplete.
 Please check the internet then try again.</s:String>
     <!--MySkin-->
     <s:String x:Key="LangMySkinSave">Save as</s:String>
@@ -957,7 +967,8 @@ To automatically grant, right-click PCL and open &quot;Properties → Compatibil
     <s:String x:Key="LangPageSetupSystemDownloadVersionListSourceB">Balanced (Switch to mirror when official source load slowly)</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadVersionListSourceC">Official (Versions are newest)</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadModFileName">Mod Naming</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadModFileNameToolTip">Determine the location and the style of the Simplified Chinese Translation for the mod that will be downloaded.</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadModFileNameToolTip">Determine the location and the style of the Simplified Chinese Translation for the mod that will be downloaded.
+This option is only valid when the language is set to Simplified Chinese.</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadModFileNameA">Front: [遗物] relics-0.1.14</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadModFileNameB">Front: 遗物-relics-0.1.14</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadModFileNameC">Back: relics-0.1.14-遗物</s:String>
@@ -1168,7 +1179,6 @@ Hereafter, hidden instances are only visible while the F11 is pressed in the pag
     <s:String x:Key="LangPageVersionOverallCompleteFileInTask">Processing, please wait!</s:String>
     <s:String x:Key="LangPageVersionOverallCompleteFileSuccess">Success!</s:String>
     <s:String x:Key="LangPageVersionOverallCompleteFileFail">Failed: </s:String>
-    <s:String x:Key="LangPageVersionOverallCompleteFileAbort">Canceled!</s:String>
     <s:String x:Key="LangPageVersionOverallDialogDeleteA">Are you sure you want to permanently delete the instance {0}?
 Since &quot;Instance Isolation&quot; is enabled for this instance, when you delete the instance, the saves, resource packs, mods, and other files corresponding to the instance will also be deleted!</s:String>
     <s:String x:Key="LangPageVersionOverallDialogDeleteB">Are you sure you want to delete the instance {0}?</s:String>
@@ -1313,12 +1323,13 @@ Please check whether the event type is filled correctly, whether the PCL is the 
     <s:String x:Key="LangModMinecraftDialogNewVersionTitle">Minecraft Update Hint</s:String>
     <s:String x:Key="LangModMinecraftDialogNewVersionBtnDownload">Download</s:String>
     <s:String x:Key="LangModMinecraftDialogNewVersionBtnLog">View Change Log</s:String>
+    <s:String x:Key="LangModMinecraftVersionVanilla">Vanilla</s:String>
 
     <!--ModComp-->
     <s:String x:Key="LangModCompModSuitFor">Available for</s:String>
     <s:String x:Key="LangModCompModDependentCount">dependencies, </s:String>
-    <s:String x:Key="LangModCompModDownload">downloads, </s:String>
-    <s:String x:Key="LangModCompModDownloadMillion">downloads in 10k, </s:String>
+    <s:String x:Key="LangModCompModDownload">downloads</s:String>
+    <s:String x:Key="LangModCompModDownloadMillion">downloads in 10k</s:String>
     <s:String x:Key="LangModCompModGameVersion">Game version</s:String>
     <s:String x:Key="LangModCompModUpdateTime">Updated {0}</s:String>
     <s:String x:Key="LangModCompModSaveAs">Save as</s:String>
@@ -1327,6 +1338,8 @@ Please check whether the event type is filled correctly, whether the PCL is the 
     <s:String x:Key="LangModCompModStatusDescRelease">Release</s:String>
     <s:String x:Key="LangModCompModStatusDescBeta">Beta</s:String>
     <s:String x:Key="LangModCompModStatusDescAlpha">Alpha</s:String>
+    <s:String x:Key="LangModCompModMilion">Milion</s:String>
+    <s:String x:Key="LangModCompModBilion">Bilion</s:String>
 
     <!--ModBase-->
     <s:String x:Key="LangModBaseDateYear">year(s)</s:String>
@@ -1336,8 +1349,8 @@ Please check whether the event type is filled correctly, whether the PCL is the 
     <s:String x:Key="LangModBaseDateHour">hour(s)</s:String>
     <s:String x:Key="LangModBaseDateMinute">minute(s)</s:String>
     <s:String x:Key="LangModBaseDateSecond">second(s)</s:String>
-    <s:String x:Key="LangModBaseDateAgo">ago.</s:String>
-    <s:String x:Key="LangModBaseDateLater">later.</s:String>
+    <s:String x:Key="LangModBaseDateAgo">ago</s:String>
+    <s:String x:Key="LangModBaseDateLater">later</s:String>
     <s:String x:Key="LangModBaseDialogWebOpenFailContent">PCL cannot open the webpage since the browser may not be configured correctly.
 The URL has been copied to the clipboard, paste to access manually.
 URL: {0}</s:String>
@@ -1355,6 +1368,11 @@ Game crashes are not related to the launcher commonly. Please do not submit feed
     <s:String x:Key="LangModBaseDialogUpdateBeforeFeedbackContent">Your PCL is not the latest version, feedback submittal is unsupportable.
 Please update the launcher in &quot;Settings → Launcher&quot; first, then submit feedback if the problem still exists in the latest version.</s:String>
     <s:String x:Key="LangModBaseDialogUpdateBeforeFeedbackTitle">Unable to Submit</s:String>
+    <s:String x:Key="LangModBaseExceptionBadEnvironment">There is a problem with the PCL's operating environment. Please try reinstalling .NET Framework 4.6.2 and then try again.</s:String>  
+    <s:String x:Key="LangModBaseExceptionUnauthorizedAccessException">PCL does not have sufficient permissions. Please try right-clicking on PCL and select 'Run as administrator'.</s:String>  
+    <s:String x:Key="LangModBaseExceptionOutOfMemoryException">Your computer's RAM is insufficient, causing PCL to be unable to continue running. Please close some unnecessary programs and try again.</s:String>  
+    <s:String x:Key="LangModBaseExceptionCOMException">An error occurred due to issues with the operating system or graphics card. Please try restarting PCL.</s:String>  
+    <s:String x:Key="LangModBaseExceptionBadNetwork">Your network environment is poor, resulting in difficulty connecting to the server. Please check your network, try again multiple times, or attempt to use a VPN.</s:String>
 
     <!--ModLaunch-->
     <s:String x:Key="LangModLaunchStartStageGetJava">Obtain Java</s:String>
@@ -1385,4 +1403,10 @@ Please update the launcher in &quot;Settings → Launcher&quot; first, then subm
     <s:String x:Key="LangModValidateNumInt">Please enter an integer!</s:String>
     <s:String x:Key="LangModValidateNumNoGreater">Cannot be greater than {0}!</s:String>
     <s:String x:Key="LangModValidateNumNoLess">Cannot be less than {0}!</s:String>
+
+    <!--MyLocalModItem-->
+    <s:String x:Key="LangMyLocalModItemToolTipModUpdate">Current Version: {0} ({1})&#xa;Latest Version: {2} ({3})&#xa;Click to update, right-click to view update logs.</s:String>
+    <s:String x:Key="LangMyLocalModItemDialogContentOpenChangelog">Which website would you like to visit to view the changelog?</s:String>  
+    <s:String x:Key="LangMyLocalModItemDialogTitleOpenChangelog">View changelog</s:String>  
+    <s:String x:Key="LangMyLocalModItemFailGetModInfo">An error occurred and information could not be retrieved.</s:String>
 </ResourceDictionary>
