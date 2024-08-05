@@ -51,7 +51,7 @@
                 Hint(GetLang("LangPageLoginAuthSkinChanging"))
                 Exit Sub
             Else
-                Hint(GetLang("LangPageLoginAuthSkinLogining"), HintType.Critical)
+                Hint(GetLang("LangPageLoginAuthSkinLogging"), HintType.Critical)
                 Exit Sub
             End If
         End If

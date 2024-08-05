@@ -10,7 +10,7 @@
             <local:MyCard Margin="0,15" Title="">
                 <Grid Margin="10,7" Name="PanDisplayItem" />
             </local:MyCard>
-            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource LangPageVersionOverallPersonalize}" x:Name="PanDisplay">
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource LangPageVersionOverallPersonalization}" x:Name="PanDisplay">
                 <StackPanel Margin="25,40,25,15">
                     <Grid x:Name="PanDisplayIcon" HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
