@@ -1104,12 +1104,12 @@ Install:
         OtherTest = 2
         VersionOverall = 0
         VersionSetup = 1
-        VersionWorld = 2
-        VersionScreenshot = 3
-        VersionMod = 4
-        VersionModDisabled = 5
+        VersionMod = 2
+        VersionModDisabled = 3
+        VersionWorld = 5
         VersionResourcePack = 6
         VersionShader = 7
+        VersionScreenshot = 8
     End Enum
     ''' <summary>
     ''' 获取次级页面的名称。若并非次级页面则返回空字符串，故可以以此判断是否为次级页面。
