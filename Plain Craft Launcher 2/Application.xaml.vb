@@ -20,17 +20,18 @@ Public Class Application
     '开始
     Private Sub Application_Startup(sender As Object, e As StartupEventArgs) Handles Me.Startup
         '刷新语言
-        WriteReg("Lang", Lang)
         Try
             Application.Current.Resources.MergedDictionaries(1) = New ResourceDictionary With {.Source = New Uri("pack://application:,,,/Resources/Language/" & Lang & ".xaml", UriKind.RelativeOrAbsolute)}
         Catch ex As Exception
             MsgBox("无法找到语言资源：" & Lang & vbCrLf & "Language resource cannot be found:" & Lang, MsgBoxStyle.Critical)
+            Lang = GetDefaultLang()
+            WriteReg("Lang", Lang)
         End Try
 
         '依照选择语言切换字体
         Dim LaunchFont As FontFamily
         Select Case Lang
-            Case "zh_TW", "zh_HK", "lzh"
+            Case "zh_TW", "zh_HK", "lzh", "zh_MARS"
                 LaunchFont = New FontFamily(New Uri("pack://application:,,,/"), "./Resources/#PCL English, Segoe UI, Microsoft JhengHei UI")
             Case "ja_JP"
                 LaunchFont = New FontFamily(New Uri("pack://application:,,,/"), "./Resources/#PCL English, Segoe UI, Yu Gothic UI, Microsoft YaHei UI")
@@ -236,8 +237,8 @@ Public Class Application
                 If AssemblyImazenWebp Is Nothing Then
                     Log("[Start] 加载 DLL：Imazen.WebP")
                     AssemblyImazenWebp = Assembly.Load(GetResources("Imazen_WebP"))
-                    SetDllDirectory(PathTemp)
-                    File.WriteAllBytes(PathTemp & "libwebp.dll", GetResources("libwebp64"))
+                    SetDllDirectory(GetPureAsciiDir())
+                    File.WriteAllBytes(GetPureAsciiDir() & "\libwebp.dll", GetResources("libwebp64"))
                 End If
                 Return AssemblyImazenWebp
             End SyncLock
