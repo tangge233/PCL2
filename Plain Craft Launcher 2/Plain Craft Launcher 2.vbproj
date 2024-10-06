@@ -278,6 +278,9 @@
     <Compile Include="Pages\PageLink\PageLinkHiper.xaml.vb">
       <DependentUpon>PageLinkHiper.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\PageOther\PageOtherVote.xaml.vb">
+      <DependentUpon>PageOtherVote.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\PageOther\PageOtherHelpDetail.xaml.vb">
       <DependentUpon>PageOtherHelpDetail.xaml</DependentUpon>
     </Compile>
@@ -286,6 +289,9 @@
     </Compile>
     <Compile Include="Pages\PageLink\PageLinkLeft.xaml.vb">
       <DependentUpon>PageLinkLeft.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\PageOther\PageOtherFeedback.xaml.vb">
+      <DependentUpon>PageOtherFeedback.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageVersion\PageVersionLeft.xaml.vb">
       <DependentUpon>PageVersionLeft.xaml</DependentUpon>
@@ -557,6 +563,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Pages\PageOther\PageOtherVote.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Pages\PageOther\PageOtherHelpDetail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -594,6 +604,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\PageVersion\PageVersionScreenshot.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\PageOther\PageOtherFeedback.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
