@@ -577,6 +577,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Resources\Language\sk_SK.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Pages\PageVersion\PageVersionShader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
