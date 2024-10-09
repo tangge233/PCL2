@@ -64,11 +64,6 @@ Public Class MyBitmap
                     BitmapCache.Add(FilePathOrResourceName, Pic)
                 End If
             Else
-                If FilePathOrResourceName.StartsWithF("http") Then '在线图片（这里判断 https:\\ 或 http:\\ 会出问题）
-                    Dim tempFile = PathTemp & "Cache\MyImage\" & GetHash(FilePathOrResourceName)
-                    NetDownload(FilePathOrResourceName, tempFile, True)
-                    FilePathOrResourceName = tempFile
-                End If
                 '使用这种自己接管 FileStream 的方法加载才能解除文件占用
                 Using InputStream As New FileStream(FilePathOrResourceName, FileMode.Open)
                     '判断是否为 WebP 文件头
