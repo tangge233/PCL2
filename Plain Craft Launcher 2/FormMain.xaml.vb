@@ -1120,6 +1120,7 @@ Install:
         DownloadLiteLoader = 9
         DownloadMod = 11
         DownloadPack = 12
+        DownloadCompFavorites = 13
         SetupLaunch = 0
         SetupUI = 1
         SetupSystem = 2
