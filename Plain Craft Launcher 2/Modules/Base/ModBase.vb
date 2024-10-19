@@ -12,13 +12,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.8.8" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.8.8." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.8.9" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.8.9." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
     Public Const VersionCode As Integer = 340 'Release
 #Else
-    Public Const VersionCode As Integer = 339 'Snapshot
+    Public Const VersionCode As Integer = 341 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -172,13 +172,13 @@ Public Module ModBase
         ''' </summary>
         Public Const IconButtonShield As String = "M511.488256 95.184408c35.310345 22.516742 95.184408 55.78011 167.34033 84.437781 75.738131 29.681159 148.405797 40.93953 191.392304 45.033483v353.615193c0 73.691154-50.662669 164.781609-136.123938 244.101949C649.65917 901.181409 558.568716 942.12094 512 942.12094c-46.568716 0-137.65917-40.93953-222.096952-119.748126C204.441779 742.54073 153.77911 651.450275 153.77911 577.247376v-353.103448c42.474763-4.093953 116.165917-15.352324 191.904048-45.545227 75.226387-30.192904 133.565217-63.456272 165.805098-83.414293M512 0c-4.093953 0-8.187906 1.535232-11.258371 3.582209l-14.84058 10.234882c-1.023488 0.511744-67.550225 47.592204-170.410794 88.531735-100.813593 39.916042-198.556722 41.963018-199.58021 41.963018l-25.075462 0.511744c-10.746627 0.511744-18.934533 8.187906-18.934533 18.422789v414.000999c0 216.97951 286.064968 446.24088 440.09995 446.24088s440.09995-229.261369 440.09995-445.729136V163.758121c0-10.234883-8.69965-18.422789-18.934533-18.422789l-24.563718-0.511744c-1.023488 0-98.766617-2.046977-199.58021-41.963018-103.372314-40.93953-170.410795-88.01999-170.922538-88.531734L523.258371 3.582209c-3.070465-2.558721-7.164418-3.582209-11.258371-3.582209z M743.308346 410.930535l-260.477761 260.477761c-15.864068 15.864068-41.963018 15.864068-57.827087 0l-144.823588-144.823588c-15.864068-15.864068-15.864068-41.963018 0-57.827087 8.187906-8.187906 18.422789-11.770115 29.169415-11.770115 10.234883 0 20.981509 4.093953 29.169416 11.770115l115.654173 115.654173L685.993003 352.591704c15.864068-15.864068 41.963018-15.864068 57.827087 0 15.352324 16.375812 15.352324 42.474763-0.511744 58.338831z"
         ''' <summary>
-        ''' 图标按钮，离线，0.85x
-        ''' </summary>
-        Public Const IconButtonOffline As String = "M533.293176 788.841412a60.235294 60.235294 0 1 1 85.202824 85.202823l-42.616471 42.586353c-129.355294 129.385412-339.124706 129.385412-468.510117 0-129.385412-129.385412-129.385412-339.124706 0-468.510117l42.586353-42.616471a60.235294 60.235294 0 1 1 85.202823 85.202824l-42.61647 42.586352a210.823529 210.823529 0 1 0 298.164706 298.164706l42.586352-42.61647z m255.548236-255.548236l42.61647-42.586352a210.823529 210.823529 0 1 0-298.164706-298.164706l-42.586352 42.61647a60.235294 60.235294 0 1 1-85.202824-85.202823l42.616471-42.586353c129.355294-129.385412 339.124706-129.385412 468.510117 0 129.385412 129.385412 129.385412 339.124706 0 468.510117l-42.586353 42.616471a60.235294 60.235294 0 1 1-85.202823-85.202824zM192.542118 192.542118a60.235294 60.235294 0 0 1 85.202823 0l553.712941 553.712941a60.235294 60.235294 0 0 1-85.202823 85.202823L192.542118 277.744941a60.235294 60.235294 0 0 1 0-85.202823z"
-        ''' <summary>
         ''' 图标按钮，复制
         ''' </summary>
         Public Const IconButtonCopy As String = "M394.666667 106.666667h448a74.666667 74.666667 0 0 1 74.666666 74.666666v448a74.666667 74.666667 0 0 1-74.666666 74.666667H394.666667a74.666667 74.666667 0 0 1-74.666667-74.666667V181.333333a74.666667 74.666667 0 0 1 74.666667-74.666666z m0 64a10.666667 10.666667 0 0 0-10.666667 10.666666v448a10.666667 10.666667 0 0 0 10.666667 10.666667h448a10.666667 10.666667 0 0 0 10.666666-10.666667V181.333333a10.666667 10.666667 0 0 0-10.666666-10.666666H394.666667z m245.333333 597.333333a32 32 0 0 1 64 0v74.666667a74.666667 74.666667 0 0 1-74.666667 74.666666H181.333333a74.666667 74.666667 0 0 1-74.666666-74.666666V394.666667a74.666667 74.666667 0 0 1 74.666666-74.666667h74.666667a32 32 0 0 1 0 64h-74.666667a10.666667 10.666667 0 0 0-10.666666 10.666667v448a10.666667 10.666667 0 0 0 10.666666 10.666666h448a10.666667 10.666667 0 0 0 10.666667-10.666666v-74.666667z"
+        ''' <summary>
+        ''' 图标按钮，离线，0.85x
+        ''' </summary>
+        Public Const IconButtonOffline As String = "M533.293176 788.841412a60.235294 60.235294 0 1 1 85.202824 85.202823l-42.616471 42.586353c-129.355294 129.385412-339.124706 129.385412-468.510117 0-129.385412-129.385412-129.385412-339.124706 0-468.510117l42.586353-42.616471a60.235294 60.235294 0 1 1 85.202823 85.202824l-42.61647 42.586352a210.823529 210.823529 0 1 0 298.164706 298.164706l42.586352-42.61647z m255.548236-255.548236l42.61647-42.586352a210.823529 210.823529 0 1 0-298.164706-298.164706l-42.586352 42.61647a60.235294 60.235294 0 1 1-85.202824-85.202823l42.616471-42.586353c129.355294-129.385412 339.124706-129.385412 468.510117 0 129.385412 129.385412 129.385412 339.124706 0 468.510117l-42.586353 42.616471a60.235294 60.235294 0 1 1-85.202823-85.202824zM192.542118 192.542118a60.235294 60.235294 0 0 1 85.202823 0l553.712941 553.712941a60.235294 60.235294 0 0 1-85.202823 85.202823L192.542118 277.744941a60.235294 60.235294 0 0 1 0-85.202823z"
         ''' <summary>
         ''' 图标，音符，1x
         ''' </summary>
@@ -1352,7 +1352,19 @@ RetryDir:
         Dim Stack As String = If(StackList.Any, vbCrLf & Join(StackList, vbCrLf), "")
 
         '常见错误（记得同时修改下面的）
-        Dim CommonReason As String = GetCommonExceptionReason(InnerEx, Desc)
+        Dim CommonReason As String = Nothing
+        If TypeOf InnerEx Is TypeLoadException OrElse TypeOf InnerEx Is BadImageFormatException OrElse TypeOf InnerEx Is MissingMethodException OrElse TypeOf InnerEx Is NotImplementedException OrElse TypeOf InnerEx Is TypeInitializationException Then
+            CommonReason = GetLang("LangModBaseExceptionBadEnvironment")
+        ElseIf TypeOf InnerEx Is UnauthorizedAccessException Then
+            CommonReason = GetLang("LangModBaseExceptionUnauthorizedAccessException")
+        ElseIf TypeOf InnerEx Is OutOfMemoryException Then
+            CommonReason = GetLang("LangModBaseExceptionOutOfMemoryException")
+        ElseIf TypeOf InnerEx Is Runtime.InteropServices.COMException Then
+            CommonReason = GetLang("LangModBaseExceptionCOMException")
+        ElseIf {"远程主机强迫关闭了", "远程方已关闭传输流", "未能解析此远程名称", "由于目标计算机积极拒绝",
+                "操作已超时", "操作超时", "服务器超时", "连接超时"}.Any(Function(s) Desc.Contains(s)) Then
+            CommonReason = GetLang("LangModBaseExceptionBadNetwork")
+        End If
 
         '获取错误类型
         Dim TypeDesc As String = If(InnerEx.GetType.FullName = "System.Exception", "", vbCrLf & "错误类型：" & InnerEx.GetType.FullName)
@@ -1361,7 +1373,7 @@ RetryDir:
         If CommonReason Is Nothing Then
             Return Desc & Stack & TypeDesc
         Else
-            Dim Result As String = DescList.First & vbCrLf & CommonReason & vbCrLf & "————————————" & vbCrLf
+            Dim Result As String = CommonReason & vbCrLf & DescList.First & vbCrLf & "————————————" & vbCrLf
             DescList(0) = "详细错误信息："
             Return Result & Join(DescList, vbCrLf & "→ ") & Stack & TypeDesc
         End If
@@ -1387,27 +1399,9 @@ RetryDir:
         DescList = DescList.Distinct.ToList
         Dim Desc As String = Join(DescList, vbCrLf & "→ ")
 
-        '常见错误
-        Dim CommonReason As String = GetCommonExceptionReason(InnerEx, Desc)
-
-        '构造输出信息
-        If CommonReason IsNot Nothing Then
-            Return DescList.First & "：" & CommonReason
-        Else
-            DescList.Reverse() '让最深层错误在最左边
-            Return Join(DescList, " → ")
-        End If
-    End Function
-
-    ''' <summary>
-    ''' 常见错误（把上面的聚合起来了）
-    ''' </summary>
-    ''' <param name="InnerEx"></param>
-    ''' <param name="Desc"></param>
-    ''' <returns></returns>
-    Public Function GetCommonExceptionReason(InnerEx As Exception, Desc As String) As String
+        '常见错误（记得同时修改上面的）
         Dim CommonReason As String = Nothing
-        If TypeOf InnerEx Is TypeLoadException OrElse TypeOf InnerEx Is MissingMethodException OrElse TypeOf InnerEx Is NotImplementedException OrElse TypeOf InnerEx Is TypeInitializationException Then
+        If TypeOf InnerEx Is TypeLoadException OrElse TypeOf InnerEx Is BadImageFormatException OrElse TypeOf InnerEx Is MissingMethodException OrElse TypeOf InnerEx Is NotImplementedException OrElse TypeOf InnerEx Is TypeInitializationException Then
             CommonReason = GetLang("LangModBaseExceptionBadEnvironment")
         ElseIf TypeOf InnerEx Is UnauthorizedAccessException Then
             CommonReason = GetLang("LangModBaseExceptionUnauthorizedAccessException")
@@ -1419,7 +1413,14 @@ RetryDir:
                 "操作已超时", "操作超时", "服务器超时", "连接超时"}.Any(Function(s) Desc.Contains(s)) Then
             CommonReason = GetLang("LangModBaseExceptionBadNetwork")
         End If
-        Return CommonReason
+
+        '构造输出信息
+        If CommonReason IsNot Nothing Then
+            Return CommonReason & "详细错误：" & DescList.First
+        Else
+            DescList.Reverse() '让最深层错误在最左边
+            Return Join(DescList, " → ")
+        End If
     End Function
 
     ''' <summary>
@@ -1725,16 +1726,6 @@ RetryDir:
     Public Function RegexReplaceEach(Input As String, Replacement As MatchEvaluator, Regex As String, Optional options As RegexOptions = RegularExpressions.RegexOptions.None) As String
         Return RegularExpressions.Regex.Replace(Input, Regex, Replacement, options)
     End Function
-    ''' <summary>
-    ''' 检查传入字符串会不会引发 Issue #4505
-    ''' </summary>
-    Public Function Ntfs83NameCheck(name As String) As Boolean
-        Dim regex As New Regex("(.*)~(\d*)")
-        Dim namePart As Byte() = Encoding.UTF8.GetBytes(regex.Match(name).Groups(1).Value)
-        Dim numPart As Integer = regex.Match(name).Groups(2).Value.Length
-
-        Return namePart.Length >= 6 AndAlso numPart = 1
-    End Function
 
 #End Region
 
@@ -1826,10 +1817,10 @@ RetryDir:
         '进行搜索，获取相似信息
         For Each Entry In Entries
             Entry.Similarity = SearchSimilarityWeighted(Entry.SearchSource, Query)
-            Entry.AbsoluteRight = False
-            For Each Pair In Entry.SearchSource
-                If Pair.Key.Replace(" ", "").ContainsF(Query.Replace(" ", ""), True) Then Entry.AbsoluteRight = True
-            Next
+            Entry.AbsoluteRight =
+                Query.Split(" ").All( '对于按空格分割的每一段
+                Function(QueryPart) Entry.SearchSource.Any( '若与任意一个搜索源完全匹配，则标记为完全匹配项
+                Function(Source) Source.Key.Replace(" ", "").ContainsF(QueryPart, True)))
         Next
         '按照相似度进行排序
         Entries = Sort(Entries,
@@ -1859,9 +1850,25 @@ RetryDir:
 #Region "系统"
 
     ''' <summary>
+    ''' 可用于临时存放文件的，不含任何特殊字符的文件夹路径，以“\”结尾。
+    ''' </summary>
+    Public PathPure As String = GetPureASCIIDir()
+    Private Function GetPureASCIIDir() As String
+        If (Path & "PCL").IsASCII() Then
+            Return Path & "PCL\"
+        ElseIf PathAppdata.IsASCII() Then
+            Return PathAppdata
+        ElseIf PathTemp.IsASCII() Then
+            Return PathTemp
+        Else
+            Return OsDrive & "ProgramData\PCL\"
+        End If
+    End Function
+
+    ''' <summary>
     ''' 指示接取到这个异常的函数进行重试。
     ''' </summary>
-    Public Class RetryException
+    Public Class RestartException
         Inherits Exception
     End Class
 

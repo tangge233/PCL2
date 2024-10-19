@@ -7,9 +7,43 @@
     PanScroll="{Binding ElementName=PanBack}">
     <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" x:Name="PanBack">
         <StackPanel x:Name="PanMain" Margin="25,10">
-
             <local:MyCard Margin="0,15" Title="{StaticResource LangPageSetupSystemDownload}">
-                <StackPanel Margin="25,37,25,12">
+                <StackPanel Margin="25,37,25,15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="Name" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="28" />
+                            <RowDefinition Height="7" />
+                            <RowDefinition Height="27" />
+                            <RowDefinition Height="27" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadVersionListSource}" Margin="0,0,25,0" />
+                        <local:MyComboBox x:Name="ComboDownloadVersion" Grid.ColumnSpan="2" Tag="ToolDownloadVersion" Grid.Column="1">
+                            <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadVersionListSourceA}" IsSelected="True" />
+                            <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadVersionListSourceB}" />
+                            <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadVersionListSourceC}" />
+                        </local:MyComboBox>
+                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadThread}" Margin="0,0,25,0" />
+                        <local:MySlider x:Name="SliderDownloadThread" Grid.Row="2" Tag="ToolDownloadThread" MaxValue="255" Value="63" Grid.Column="1"
+                                        ToolTip="{StaticResource LangPageSetupSystemDownloadThreadToolTip}" />
+                        <TextBlock VerticalAlignment="Center" Grid.Row="3" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadSpeedLimit}" Margin="0,0,25,0" />
+                        <local:MySlider x:Name="SliderDownloadSpeed" Grid.Row="3" Tag="ToolDownloadSpeed" MaxValue="42" Value="42" Grid.Column="1"
+                                        ToolTip="{StaticResource LangPageSetupSystemDownloadSpeedLimitToolTip}" />
+                        <TextBlock VerticalAlignment="Top" Grid.Row="4" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadTargetFolder}" Margin="0,5,25,5" />
+                        <TextBlock Margin="0,5" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadTargetFolderToolTip}" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Opacity="0.5" />
+                        <local:MyCheckBox Margin="0,2,0,4" Text="{StaticResource LangPageSetupSystemDownloadSSL}" Grid.Row="5" Height="22" Grid.ColumnSpan="2"
+                                          x:Name="CheckDownloadCert" Tag="ToolDownloadCert" 
+                                          ToolTip="{StaticResource LangPageSetupSystemDownloadSSLToolTip}" />
+                    </Grid>
+                </StackPanel>
+            </local:MyCard>
+            <local:MyCard Margin="0,0,0,15" Title="Mod 与整合包">
+                <StackPanel Margin="25,37,25,15">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Name" />
@@ -22,51 +56,31 @@
                             <RowDefinition Height="7" />
                             <RowDefinition Height="28" />
                             <RowDefinition Height="7" />
-                            <RowDefinition Height="27" />
-                            <RowDefinition Height="27" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadVersionListSource}" Margin="0,0,25,0" />
-                        <local:MyComboBox x:Name="ComboDownloadVersion" Grid.ColumnSpan="2" Tag="ToolDownloadVersion" Grid.Column="1">
-                            <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadVersionListSourceA}" IsSelected="True" />
-                            <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadVersionListSourceB}" />
-                            <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadVersionListSourceC}" />
-                        </local:MyComboBox>
-                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadModListSource}" Margin="0,0,25,0" />
-                        <local:MyComboBox x:Name="ComboDownloadMod" Grid.Row="2" Grid.ColumnSpan="2" Tag="ToolDownloadMod" Grid.Column="1">
+                        <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadModListSource}" Margin="0,0,25,0" />
+                        <local:MyComboBox x:Name="ComboDownloadMod" Grid.Row="0" Grid.ColumnSpan="2" Tag="ToolDownloadMod" Grid.Column="1">
                             <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModListSourceA}" />
                             <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModListSourceB}" />
                             <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModListSourceC}" IsSelected="True" />
                         </local:MyComboBox>
-                        <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadModFileName}" Margin="0,0,25,0" />
-                        <local:MyComboBox Grid.Row="4" x:Name="ComboDownloadTranslate" Grid.ColumnSpan="2" Tag="ToolDownloadTranslate" Grid.Column="1" 
+                        <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadModFileName}" Margin="0,0,25,0" />
+                        <local:MyComboBox Grid.Row="2" x:Name="ComboDownloadTranslate" Grid.ColumnSpan="2" Tag="ToolDownloadTranslate" Grid.Column="1" 
                                           ToolTip="{StaticResource LangPageSetupSystemDownloadModFileNameToolTip}">
                             <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModFileNameA}" IsSelected="True" />
                             <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModFileNameB}" />
                             <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModFileNameC}" />
                             <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModFileNameD}" />
                         </local:MyComboBox>
-                        <TextBlock Grid.Row="6" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadThread}" Margin="0,0,25,0" />
-                        <local:MySlider x:Name="SliderDownloadThread" Grid.Row="6" Tag="ToolDownloadThread" MaxValue="255" Value="63" Grid.Column="1"
-                                        ToolTip="{StaticResource LangPageSetupSystemDownloadThreadToolTip}" />
-                        <TextBlock VerticalAlignment="Center" Grid.Row="7" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadSpeedLimit}" Margin="0,0,25,0" />
-                        <local:MySlider x:Name="SliderDownloadSpeed" Grid.Row="7" Tag="ToolDownloadSpeed" MaxValue="42" Value="42" Grid.Column="1"
-                                        ToolTip="{StaticResource LangPageSetupSystemDownloadSpeedLimitToolTip}" />
-                        <TextBlock VerticalAlignment="Top" Grid.Row="9" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadTargetFolder}" Margin="0,5,25,5" />
-                        <TextBlock Margin="0,5" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadTargetFolderToolTip}" Grid.Row="9" Grid.Column="1" VerticalAlignment="Center" Opacity="0.5" />
-                        <local:MyCheckBox Margin="0,5,0,4" Text="{StaticResource LangPageSetupSystemDownloadKeepModpackArchive}" Grid.Row="10" Height="22" Grid.ColumnSpan="2"
-                                          x:Name="CheckDownloadKeepModpack" Tag="ToolDownloadKeepModpack" 
-                                          ToolTip="{StaticResource LangPageSetupSystemDownloadKeepModpackArchiveToolTip}" />
-                        <local:MyCheckBox Margin="0,2,0,4" Text="{StaticResource LangPageSetupSystemDownloadSimplifyModLoaderDisplay}" Grid.Row="11" Height="22" Grid.ColumnSpan="2"
+                        <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupSystemDownloadModManageStyle}" Margin="0,0,25,0" />
+                        <local:MyComboBox Grid.Row="4" x:Name="ComboModLocalNameStyle" Grid.ColumnSpan="2" Tag="ToolModLocalNameStyle" Grid.Column="1" 
+                                          ToolTip="{StaticResource LangPageSetupSystemDownloadModManageStyleToolTip}">
+                            <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModManageStyleA}" IsSelected="True" />
+                            <local:MyComboBoxItem Content="{StaticResource LangPageSetupSystemDownloadModManageStyleB}" />
+                        </local:MyComboBox>
+                        <local:MyCheckBox Margin="0,2,0,4" Text="{StaticResource LangPageSetupSystemDownloadSimplifyModLoaderDisplay}" Grid.Row="6" Height="22" Grid.ColumnSpan="2"
                                           x:Name="CheckDownloadIgnoreQuilt" Tag="ToolDownloadIgnoreQuilt" 
                                           ToolTip="{StaticResource LangPageSetupSystemDownloadSimplifyModLoaderDisplayToolTip}" />
-                        <local:MyCheckBox Margin="0,2,0,4" Text="{StaticResource LangPageSetupSystemDownloadSSL}" Grid.Row="12" Height="22" Grid.ColumnSpan="2"
-                                          x:Name="CheckDownloadCert" Tag="ToolDownloadCert" 
-                                          ToolTip="{StaticResource LangPageSetupSystemDownloadSSLToolTip}" />
                     </Grid>
                 </StackPanel>
             </local:MyCard>

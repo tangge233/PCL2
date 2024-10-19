@@ -245,6 +245,8 @@
                             <local:MyComboBoxItem Content="{StaticResource LangSetHomePagePresetPageG}" />
                             <local:MyComboBoxItem Content="{StaticResource LangSetHomePagePresetPageH}" />
                             <local:MyComboBoxItem Content="{StaticResource LangSetHomePagePresetPageI}" />
+                            <local:MyComboBoxItem Content="{StaticResource LangSetHomePagePresetPageJ}" />
+                            <local:MyComboBoxItem Content="{StaticResource LangSetHomePagePresetPageK}" />
                         </local:MyComboBox>
                     </Grid>
                 </StackPanel>
