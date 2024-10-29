@@ -1,7 +1,5 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
-    
-    <!--Common-->
-    <s:String x:Key="LangTaskAbort">Zrušené!</s:String>
+  <s:String x:Key="LangTaskAbort">Zrušené!</s:String>
     <s:String x:Key="LangDialogBtnOK">OK</s:String>
     <s:String x:Key="LangDialogBtnCancel">Zrušiť</s:String>
     <s:String x:Key="LangResourcePack">Zdrojový balík</s:String>
@@ -9,7 +7,6 @@
     <s:String x:Key="LangDialogBtnNo">Nie</s:String>
     <s:String x:Key="LangComma">, </s:String>
     <s:String x:Key="LangColon">: </s:String>
-    <!--Application-->
     <s:String x:Key="LangApplicationExceptionNoAccessPermission">PCL nemá práva na {0}</s:String>
     <s:String x:Key="LangApplicationDialogTitleCacheFolderUnavailable">Priečinok cache je nedostupný</s:String>
     <s:String x:Key="LangApplicationDialogContentCacheFolderUnavailable">PCL is unable to access the cache folder, which may result in a program error or unusability.
@@ -26,7 +23,6 @@ Dôrazne sa odporúča preinštalovať na 64-bitový systém pred pokračovaním
     <s:String x:Key="LangApplicationDialogContentNETWarn">Verzia vášho .NET Framework je príliš nízka alebo je poškodená. Prosím, prevezmite si a nainštalujte .NET Framework 4.6.2 z úvodnej webovej stránky a skúste to znova!</s:String>
     <s:String x:Key="LangApplicationDialogTitleUnknownError">Neznáma chyba</s:String>
     <s:String x:Key="LangApplicationDialogContentUnknownError">V programe došlo k neznámej chybe.</s:String>
-    <!--FormMain-->
     <s:String x:Key="LangTitleDownload">Stiahnuť</s:String>
     <s:String x:Key="LangTitleHome">Spustiť</s:String>
     <s:String x:Key="LangTitleSetup">Nastavenia</s:String>
@@ -89,7 +85,6 @@ Môžete zmeniť spôsob prihlásenia v "Vlastnosti → Nastavenia → Server".<
     <s:String x:Key="LangPageNameModDownload">Stiahnutie módov</s:String>
     <s:String x:Key="LangPageNameModpacksDownload">Stiahnutie modpackov</s:String>
     <s:String x:Key="LangPageNameResourcePacksDownload">Stiahnutie balíčkov zdrojov</s:String>
-    <!--PageSetupUI-->
     <s:String x:Key="LangThemeRealWhite">SKUTOČNÁ BIELA</s:String>
     <s:String x:Key="LangThemeRealFunny">SKUTOČNÁ ZABÁVA</s:String>
     <s:String x:Key="LangThemeUnlockCopyTip8">Po dosiahnutí kumulované podpory 23,33 ¥, odoslať správu s termínom "odemknutie kódu" (Unlock Code) vývojárovi na Afdian, aby sa odemklo.
@@ -254,6 +249,8 @@ Ak ste vytvorili stabilnú online domovskú stránku, môžete kliknutím na ten
     <s:String x:Key="LangSetHomePagePresetPageG">OpenBMCLAPI Dashboard Lite (Autori: Silverteal, Mxmilu666)</s:String>
     <s:String x:Key="LangSetHomePagePresetPageH">PCL Homepage Market (Autor: Lingyun)</s:String>
     <s:String x:Key="LangSetHomePagePresetPageI">PCL Update Log (Autor: Joker2184)</s:String>
+    <s:String x:Key="LangSetHomePagePresetPageJ">PCL 新功能说明书（作者：WForst-Breeze）</s:String>
+    <s:String x:Key="LangSetHomePagePresetPageK">OpenMCIM 仪表盘（作者：SALTWOOD）</s:String>
     <s:String x:Key="LangSetFuncHidden">Skrytie funkcií</s:String>
     <s:String x:Key="LangSetFuncHiddenToolTip">Môžete skryť nepotrebné stránky alebo zakázať konkrétne funkcie. Stlačením klávesy "F12" v akomkoľvek rozhraní môžete dočasne zobraziť skryté funkcie.</s:String>
     <s:String x:Key="LangSetFuncHiddenLaunch">Hlavné rozhranie</s:String>
@@ -282,7 +279,6 @@ Po tejto zmene musíte reštartovať spúšťač.</s:String>
 Vyhnite sa tomu, aby sa "Skrytie funkcií" zmenilo, keď máte otvorenú stránku "Personalizácia".</s:String>
     <s:String x:Key="LangSetBackgroundMusicVolume">Hlasitosť</s:String>
     <s:String x:Key="LangSetHomePagePresetSCOnly">Prepáčte, väčšina predvolených domovských stránok podporuje iba zjednodušenú čínštinu</s:String>
-    <!--PageSelectLeft-->
     <s:String x:Key="LangSelectFolderList">Zoznam priečinkov</s:String>
     <s:String x:Key="LangSelectRename">Preimenovať</s:String>
     <s:String x:Key="LangSelectOpen">Otvoriť</s:String>
@@ -337,7 +333,6 @@ Toto je posledné varovanie!</s:String>
     <s:String x:Key="LangSelectHintNameUpdated">Meno priečinka bolo premenované na </s:String>
     <s:String x:Key="LangSelectFailToRename">Nepodarilo sa premenovať priečinek.</s:String>
     <s:String x:Key="LangSelectDownloadingTaskExistsNoChange">Nemôžete prepnúť priečinky hry, keď je v priebehu úloha stiahnutia!</s:String>
-    <!--PageSelectRight-->
     <s:String x:Key="LangSelectNoAvailableVersion">Žiadne dostupné inštancie</s:String>
     <s:String x:Key="LangSelectNoAvailableVersionTip">Žiadne inštancie neboli nájdené. Najprv stiahnite akúkoľvek verziu hry.
 Ak existuje už existujúca inštancia, kliknite na "Pridať existujúce priečinky" na zozname na ľavej strane a vyberte priečinek ".minecraft" na import.</s:String>
@@ -372,14 +367,12 @@ Stlačte znovu "F11" na opustenie režimu zobrazenia skrytých inštancií.</s:S
     <s:String x:Key="LangSelectVersionDeletedB">Inštancia {0} bola odstránená do košovníka!</s:String>
     <s:String x:Key="LangSelectVersionDeleteCancelled">Odstránenie inštancie {0} bolo ručne zrušené.</s:String>
     <s:String x:Key="LangSelectVersionDeleteFail">Nepodarilo sa odstrániť inštanciu {0}.</s:String>
-    <!--PageSpeedLeft-->
     <s:String x:Key="LangSpeedTotalProgress">Pokrok</s:String>
     <s:String x:Key="LangSpeedSpeed">Rýchlosť</s:String>
     <s:String x:Key="LangSpeedLeftFiles">Súbory</s:String>
     <s:String x:Key="LangSpeedLeftThreads">Niť</s:String>
     <s:String x:Key="LangSpeedClickCopyError">Kliknite na kopírovanie detailov chyby.</s:String>
     <s:String x:Key="LangSpeedHintClickCopyError">Detaily chyby boli skopírované!</s:String>
-    <!--PageSpeedRight-->
     <s:String x:Key="LangPageSpeedRightDownloadVanillaSupportLibrary">Stiahniť knižnice Vanilla</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadVanillaJSON">Stiahniť Vanilla JSON</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadFabricAPI">Stiahniť Fabric API</s:String>
@@ -397,11 +390,9 @@ Stlačte znovu "F11" na opustenie režimu zobrazenia skrytých inštancií.</s:S
     <s:String x:Key="LangPageSpeedRightDownloadOptiFineMainFile">Stiahniť hlavný súbor OptiFine</s:String>
     <s:String x:Key="LangPageSpeedRightInstallOptiFineMethodA">Inštalácia OptiFine (Metóda A)</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadOptiFabric">Stiahniť OptiFabric</s:String>
-    <!--PageDownloadClient-->
     <s:String x:Key="LangDownloadClientLoadingList">Získavanie zoznamu verzií...</s:String>
     <s:String x:Key="LangDownloadClientReleaseReleaseOn">Najnovšia verzia, vydaná dňa</s:String>
     <s:String x:Key="LangDownloadClientBetaReleaseOn">Najnovší vývoj, vydaný dňa</s:String>
-    <!--PageDownload-->
     <s:String x:Key="LangDownloadLatest">Najnovšia</s:String>
     <s:String x:Key="LangDownloadRelease">Verzia</s:String>
     <s:String x:Key="LangDownloadBeta">Vývoj</s:String>
@@ -425,7 +416,7 @@ Stlačte znovu "F11" na opustenie režimu zobrazenia skrytých inštancií.</s:S
     <s:String x:Key="LangDownloadAll">Všetky verzie</s:String>
     <s:String x:Key="LangDownloadCategory">Typ: </s:String>
     <s:String x:Key="LangDownloadUnknown">Neznáma verzia</s:String>
-    <!--PageDownloadCompDetail-->
+    <s:String x:Key="LangDownloadServer">下载服务端</s:String>
     <s:String x:Key="LangDownloadCompToCurseForge">CurseForge</s:String>
     <s:String x:Key="LangDownloadCompToModrinth">Modrinth</s:String>
     <s:String x:Key="LangDownloadCompToMCMod">MCMod</s:String>
@@ -441,19 +432,16 @@ Stlačte znovu "F11" na opustenie režimu zobrazenia skrytých inštancií.</s:S
     <s:String x:Key="LangDownloadCompTaskPrepareInstallModpack">Príprava na inštaláciu modpacku</s:String>
     <s:String x:Key="LangDownloadCompTaskDownloadFile">Stiahniť súbor</s:String>
     <s:String x:Key="LangDownloadCompTaskDownloadFileDetail">Stiahniť: </s:String>
-    <!--PageDownloadFabric-->
     <s:String x:Key="LangDownloadFabricDescTitle">Úvod do Fabric</s:String>
     <s:String x:Key="LangDownloadFabricDesc">Fabric Loader je ľahký načítavací mod pre novšie verzie Minecraftu. Musíte ho najprv nainštalovať, aby ste mohli nainštalovať rôzne Fabric moduly.
 Táto stránka ponúka stiahnutie inštalátorov Fabric. Po stiahnutí musíte manuálne otvoriť inštalátor na inštaláciu.</s:String>
     <s:String x:Key="LangDownloadFabricWebsite">Oficiálna webstránka</s:String>
     <s:String x:Key="LangDownloadFabricVersionList">Zoznam verzií</s:String>
     <s:String x:Key="LangDownloadFabricGettingList">Získavanie zoznamu Fabric...</s:String>
-    <!--PageDownloadForge-->
     <s:String x:Key="LangDownloadForgeDescTitle">Úvod do Forge</s:String>
     <s:String x:Key="LangDownloadForgeDesc">Forge je načítavací mod. Musíte najprv nainštalovať Forge, aby ste mohli nainštalovať rôzne Forge moduly.</s:String>
     <s:String x:Key="LangDownloadForgeWebsite">Oficiálna webstránka</s:String>
     <s:String x:Key="LangDownloadForgeGettingList">Získavanie zoznamu Forge...</s:String>
-    <!--PageDownloadInstall-->
     <s:String x:Key="LangDownloadInstallReview">Náhľad inštalácie</s:String>
     <s:String x:Key="LangDownloadInstallFabricApi">Väčšina módov bude nepoužiteľná, ak nie je vybraný Fabric API!</s:String>
     <s:String x:Key="LangDownloadInstallOptiFabric">OptiFine bude nepoužiteľný, ak nie je vybraný OptiFabric!</s:String>
@@ -485,7 +473,6 @@ PCL odporúča aktivovať "Izoláciu inštancie" v "Nastavenia → Izolácia in�
     <s:String x:Key="LangDownloadInstallNoAdd">Žiadne ďalšie inštalácie</s:String>
     <s:String x:Key="LangDownloadInstallNeoForgeIncompatible">Nekompatibilný s NeoForge</s:String>
     <s:String x:Key="LangDownloadInstallOptiFabricManually">Nekompatibilný s staršími verziemi Fabric, prosím, stiahnite OptiFabric Origins manuálne.</s:String>
-    <!--PageDownloadLeft-->
     <s:String x:Key="LangDownloadPageLeftRefresh">Obnoviť</s:String>
     <s:String x:Key="LangDownloadPageLeftAutoInstall">Inštalácia</s:String>
     <s:String x:Key="LangDownloadPageLeftManualInstall">▼ Balíčky</s:String>
@@ -506,12 +493,10 @@ Najprv vyberte verziu Minecraftu na stránke "Inštalácia", potom vyberte OptiF
     <s:String x:Key="LangDownloadPageLeftLiteLoader">LiteLoader</s:String>
     <s:String x:Key="LangDownloadPageLeftFabricAPI">Fabric API</s:String>
     <s:String x:Key="LangDownloadPageLeftOptiFabric">OptiFabric</s:String>
-    <!--PageDownloadLiteLoader-->
     <s:String x:Key="LangDownloadLiteloaderDescTitle">Úvod do LiteLoader</s:String>
     <s:String x:Key="LangDownloadLiteloaderDesc">Podobne ako Forge, LiteLoader môže byť použitý na načítanie módov LiteLoader v starších verziách Minecraftu.</s:String>
     <s:String x:Key="LangDownloadLiteloaderWebsite">Oficiálna webová stránka</s:String>
     <s:String x:Key="LangDownloadLiteloaderGettingList">Získavanie zoznamu LiteLoader...</s:String>
-    <!--PageDownloadMod-->
     <s:String x:Key="LangDownloadModSearchTitle">Hľadanie módov</s:String>
     <s:String x:Key="LangDownloadModSearchName">Názov</s:String>
     <s:String x:Key="LangDownloadModSearchSource">Zdroj</s:String>
@@ -551,19 +536,16 @@ Najprv vyberte verziu Minecraftu na stránke "Inštalácia", potom vyberte OptiF
     <s:String x:Key="LangDownloadModTypeLib">API &amp; Knihovna</s:String>
     <s:String x:Key="LangDownloadModConnectModrinthFail">Nepodarilo sa pripojiť k Modrinth, takže momentálne sú zobrazené iba obsahy z CurseForge, výsledky môžu byť neúplné.
 Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
-    <!--PageDownloadNeoForge-->
     <s:String x:Key="LangDownloadNeoForgeDescTitle">Úvod do NeoForge</s:String>
     <s:String x:Key="LangDownloadNeoForgeDesc">NeoForge je načítavač módov pre Minecraft 1.20.1+. Musíte ho nainštalovať najprv, než budete môcť nainštalovať rôzne módov pre NeoForge. Je tiež kompatibilný s niektorými módmi pre Forge.
 Táto stránka poskytuje stiahnutie inštalátora NeoForge. Po stiahnutí musíte inštalátor manuálne otvoriť, aby ste dokončili inštaláciu.</s:String>
     <s:String x:Key="LangDownloadNeoForgeWebsite">Oficiálna webová stránka</s:String>
     <s:String x:Key="LangDownloadNeoForgeGettingList">Získavanie zoznamu NeoForge...</s:String>
-    <!--PageDownloadOptiFine-->
     <s:String x:Key="LangDownloadOptiFineDescTitle">Úvod do OptiFine</s:String>
     <s:String x:Key="LangDownloadOptiFineDesc">OptiFine vám umožňuje inštalovať shader, používať HD resource packy a výrazne zlepšiť výkon hry.</s:String>
     <s:String x:Key="LangDownloadOptiFineWebsite">Oficiálna webová stránka</s:String>
     <s:String x:Key="LangDownloadOptiFineChineseWebsite">Čínska webová stránka</s:String>
     <s:String x:Key="LangDownloadOptiFineGettingList">Získavanie zoznamu OptiFine...</s:String>
-    <!--PageDownloadPack-->
     <s:String x:Key="LangDownloadModpackSearchTitle">Hľadaj balíčky módov</s:String>
     <s:String x:Key="LangDownloadModpackSearchName">Názov</s:String>
     <s:String x:Key="LangDownloadModpackSearchSource">Zdroj</s:String>
@@ -601,7 +583,6 @@ Táto stránka poskytuje stiahnutie inštalátora NeoForge. Po stiahnutí musít
 Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
     <s:String x:Key="LangDownloadModpackConnectCurseForge">Nepodarilo sa pripojiť k CurseForge, takže momentálne sú zobrazené iba obsahy z Modrinth, výsledky môžu byť neúplné.
 Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
-    <!--MySkin-->
     <s:String x:Key="LangMySkinSave">Uložiť ako</s:String>
     <s:String x:Key="LangMySkinRefresh">Obnoviť</s:String>
     <s:String x:Key="LangMySkinChange">Zmeniť plášť</s:String>
@@ -641,7 +622,6 @@ Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
     <s:String x:Key="LangMySkinCapeNameFollower's">Plášť Nasledovníka</s:String>
     <s:String x:Key="LangMySkinCapeNameMCC15thYear">Plášť MCC 15. roka</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">Žiadny</s:String>
-    <!--PageLaunchLeft-->
     <s:String x:Key="LangLaunchLeftInstanceChoose">Výber</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">Vlastnosti</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoft">Microsoft</s:String>
@@ -676,7 +656,6 @@ Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
     <s:String x:Key="LangLaunchLeftExportStartingInstanceCommand">Exportovanie spustiteľného skriptu...</s:String>
     <s:String x:Key="LangLaunchLeftDialogContentAutoInstallModpack">PCL automaticky nainštaluje modpack v aktuálnom priečinku.</s:String>
     <s:String x:Key="LangLaunchLeftDialogTitleAutoInstallModpack">Automatická inštalácia</s:String>
-    <!--PageLaunchRight-->
     <s:String x:Key="LangLaunchRightSnapshot">Tip snapshotu</s:String>
     <s:String x:Key="LangLaunchRightLog">Log spustenia</s:String>
     <s:String x:Key="LangLaunchRightLabHint1">Verzia snapshot obsahuje testované funkcie, ktoré neboli oficiálne vydané a je dostupná iba sponzorom. Prosím, neposielajte ju nikomu inému ani nepoužívajte na vytváranie modpackov!</s:String>
@@ -684,7 +663,6 @@ Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
     <s:String x:Key="LangLaunchRightLoadingPage">Načítavanie úvodnej stránky...</s:String>
     <s:String x:Key="LangLaunchRightPageTips">Zaujímavosti</s:String>
     <s:String x:Key="LangLaunchRightPageEcho">Echo díra</s:String>
-    <!--PageLoginAuth-->
     <s:String x:Key="LangPageLoginAuthMail">Email</s:String>
     <s:String x:Key="LangPageLoginAuthPassword">Heslo</s:String>
     <s:String x:Key="LangPageLoginAuthRememberPassword">Pamäť hesla</s:String>
@@ -692,20 +670,17 @@ Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
     <s:String x:Key="LangPageLoginAuthNoEmptyMail">Účet nemôže byť prázdny!</s:String>
     <s:String x:Key="LangPageLoginAuthNoEmptyPassword">Heslo nemôže byť prázdne!</s:String>
     <s:String x:Key="LangPageLoginAuthForgetPassword">Obnoviť heslo</s:String>
-    <!--PageLoginAuthSkin-->
     <s:String x:Key="LangPageLoginAuthSkinLoading">Načítavanie...</s:String>
     <s:String x:Key="LangPageLoginAuthSkinChangeRole">Zmeniť postavu</s:String>
     <s:String x:Key="LangPageLoginAuthSkinLogout">Odhlásiť sa</s:String>
     <s:String x:Key="LangPageLoginAuthSkinLogining">Ešte sa prihlasuje, postavu zmeňte neskôr!</s:String>
     <s:String x:Key="LangPageLoginAuthSkinChanging">Snaží sa zmeniť, prosím čakajte!</s:String>
     <s:String x:Key="LangPageLoginAuthSkinChangeFail">Zmena postavy zlyhala.</s:String>
-    <!--PageLoginLegacy-->
     <s:String x:Key="LangPageLoginLegacySpecialCharacters">Ak obsahuje užívateľské meno znaky okrem a-z, 0-9, a _, môžete po Minecraft 1.18 nemôcť vstúpiť do sveta!</s:String>
     <s:String x:Key="LangPageLoginLegacyID">Užívateľské meno</s:String>
     <s:String x:Key="LangPageLoginLegacyNoEmptyID">Užívateľské meno nemôže byť prázdne!</s:String>
     <s:String x:Key="LangPageLoginLegacyNoQuotationInID">Užívateľské meno nemôže obsahovať úvodzovky!</s:String>
     <s:String x:Key="LangPageLoginLegacyConfigHidden">Možnosti spustenia boli deaktivované!</s:String>
-    <!--PageLoginMs-->
     <s:String x:Key="LangPageLoginMsLogin">Prihlásenie</s:String>
     <s:String x:Key="LangPageLoginMsBuy">» Kúpiť</s:String>
     <s:String x:Key="LangPageLoginMsWebsite">» Webová stránka</s:String>
@@ -716,7 +691,6 @@ Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
 
 Originálna chybová správa: </s:String>
     <s:String x:Key="LangPageLoginMsAddAccountFailBySSL">Prihlásenie bolo zrušené!</s:String>
-    <!--PageLoginMsSkin-->
     <s:String x:Key="LangPageLoginMsLoading">Načítavanie...</s:String>
     <s:String x:Key="LangPageLoginMsSkinSkin">Koža a Plášte</s:String>
     <s:String x:Key="LangPageLoginMsSkinSkinChange">Zmeniť kožu</s:String>
@@ -733,7 +707,6 @@ Originálna chybová správa: </s:String>
     <s:String x:Key="LangPageLoginMsSkinLoginBeforeChangeSkin">Prihlasovanie, po dokončení prihlásenia sa bude pokračovať v zmene kože...</s:String>
     <s:String x:Key="LangPageLoginMsSkinChangeSkinFail">Zmena kože zlyhala.</s:String>
     <s:String x:Key="LangPageLoginMsSkinChangeSkinFailByTimeOut">Zmena kože zlyhala: Spojenie s serverom kože Mojang časovo vypršalo. Prosím, skontrolujte kvalitu svojej siete!</s:String>
-    <!--PageLoginNide-->
     <s:String x:Key="LangPageLoginNideAccount">Účet</s:String>
     <s:String x:Key="LangPageLoginNidePassword">Heslo</s:String>
     <s:String x:Key="LangPageLoginNideRememberPassword">Pamäť hesla</s:String>
@@ -742,18 +715,15 @@ Originálna chybová správa: </s:String>
     <s:String x:Key="LangPageLoginNideNoEmptyAccount">Účet nemôže byť prázdny!</s:String>
     <s:String x:Key="LangPageLoginNideNoEmptyPassword">Heslo nemôže byť prázdne!</s:String>
     <s:String x:Key="LangPageLoginNideForgetPassword">Obnoviť heslo</s:String>
-    <!--PageLoginNideSkin-->
     <s:String x:Key="LangPageLoginNideSkinLoading">Načítavanie...</s:String>
     <s:String x:Key="LangPageLoginNideSkinChangePassword">Zmeniť heslo</s:String>
     <s:String x:Key="LangPageLoginNideSkinLogout">Odhlásiť sa</s:String>
-    <!--PageOtherLeft-->
     <s:String x:Key="LangPageOtherLeftHelp">Centrum pomoci</s:String>
     <s:String x:Key="LangPageOtherLeftRefresh">Obnoviť</s:String>
     <s:String x:Key="LangPageOtherLeftAbout">Poznámky</s:String>
     <s:String x:Key="LangPageOtherLeftTools">Nástroje</s:String>
     <s:String x:Key="LangPageOtherLeftFeedback">Spätná väzba</s:String>
     <s:String x:Key="LangPageOtherLeftVoteNew">Hlasovanie o funkcionalitách</s:String>
-    <!--PageOtherHelp-->
     <s:String x:Key="LangPageOtherHelpSearch">Hľadať pomoc</s:String>
     <s:String x:Key="LangPageOtherHelpLoading">Načítavanie zoznamu pomoci...</s:String>
     <s:String x:Key="LangPageOtherHelpSimpleChineseOnly">Ľutujeme, centrum pomoci je iba v zjednodušenej čínštine.</s:String>
@@ -765,7 +735,6 @@ Originálna chybová správa: </s:String>
     <s:String x:Key="LangPageOtherDialogVoteContent">Chcete otvoriť novú stránku hlasovania o funkcionalitách?</s:String>
     <s:String x:Key="LangPageOtherDialogVoteTitle">Tip</s:String>
     <s:String x:Key="LangPageOtherDialogVoteBtn1">Otvoriť</s:String>
-    <!--PageOtherAbout-->
     <s:String x:Key="LangPageOtherAboutAbout">O aplikácii</s:String>
     <s:String x:Key="LangPageOtherAboutAboutAuthor">LTCat (龙腾猫跃)</s:String>
     <s:String x:Key="LangPageOtherAboutAboutAuthorSubtitle">Vývojár Plain Craft Launcher!</s:String>
@@ -805,9 +774,7 @@ Okrem toho softvér nebude nahrávať žiadne ďalšie informácie.</s:String>
 Copyright čísla registrácie počítačového softvéru: 2020SR0875133
 Email na nahlásenie nelegálneho a nepravidelného správania: hexdragon@vip.qq.com
 Nie je to oficiálny produkt Minecraftu. Nie je schválené Mojangom alebo Microsoftom a nie je spojené s Mojangom alebo Microsoftom.</s:String>
-    <!--PageOtherTest-->
     <s:String x:Key="LangPageOtherTestNoUtility">Pre ľahšiu údržbu, otvorený obsah neobsahuje funkciu Treasure Box...</s:String>
-    <!--PageSetupLaunch-->
     <s:String x:Key="LangPageSetupLaunchSkin">Offline Skin</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinTips">Vzhľadom na technický problém je táto funkcia zaručená len pre verzie pred 1.19.2!</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinTypeRandom">Náhodný</s:String>
@@ -943,7 +910,6 @@ Ak používate mechanický pevný disk, môže to tiež spôsobiť krátkodobné
 Každý raz, keď spustíte hru, PCL vyžaduje administrátorské oprávnenie na optimalizáciu pamäti.
 Aby ste automaticky udelenie oprávnenia, kliknite pravým tlačidlom na PCL a otvorte "Vlastnosti → Kompatibilita → Spustiť tento program ako administrátor".</s:String>
     <s:String x:Key="LangPageSetupLaunchMemReduceDialogEnableTitle">Tip</s:String>
-    <!--PageSetupLeft-->
     <s:String x:Key="LangPageSetupLeftGame">Hra</s:String>
     <s:String x:Key="LangPageSetupLeftPersonalize">Personalizácia</s:String>
     <s:String x:Key="LangPageSetupLeftLaunch">Spúšťač</s:String>
@@ -955,7 +921,6 @@ Aby ste automaticky udelenie oprávnenia, kliknite pravým tlačidlom na PCL a o
 (Vonkajšie súbory ako pozadie, hudba a vlastná úvodná stránka nebudú vymazané.)</s:String>
     <s:String x:Key="LangPageSetupLeftDialogResetLinkConfirmContent">Chcete inicializovať všetky nastavenia na stránke "Hostovanie"? Táto operácia je nevratná.</s:String>
     <s:String x:Key="LangPageSetupLeftDialogResetTitle">Potvrdenie inicializácie</s:String>
-    <!--PageSetupSystem-->
     <s:String x:Key="LangPageSetupSystemDownload">Stiahnutie</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadVersionListSource">Zdroj</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadVersionListSourceA">Zrkadlo (Verzie môžu byť oneskorenie)</s:String>
@@ -1057,7 +1022,7 @@ Ak nie ste vytvárali modpack alebo často aktualizujete spúšťač, táto voľ
     <s:String x:Key="LangPageSetupSystemDownloadModManageStyleToolTip">在 Mod 管理页面中，Mod 项的显示方式</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadModManageStyleA">标题显示译名，详情显示文件名</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadModManageStyleB">标题显示文件名，详情显示译名</s:String>
-    <!--PageVersionLeft-->
+    <s:String x:Key="LangPageSetupSystemDownloadModTitle">Mod 与整合包</s:String>
     <s:String x:Key="LangPageVersionLeftOverview">Prehľad</s:String>
     <s:String x:Key="LangPageVersionLeftSetting">Nastavenia</s:String>
     <s:String x:Key="LangPageVersionLeftModManagement">Modifikácie</s:String>
@@ -1065,7 +1030,6 @@ Ak nie ste vytvárali modpack alebo často aktualizujete spúšťač, táto voľ
     <s:String x:Key="LangPageVersionLeftModManagementRefreshing">Obnovuje sa...</s:String>
     <s:String x:Key="LangPageVersionLeftSettingDialogIndependentSetContent">Chcete inicializovať nastavenia pre túto inštanciu? Táto operácia je nevratná.</s:String>
     <s:String x:Key="LangPageVersionLeftSettingDialogIndependentSetTitle">Potvrdenie inicializácie</s:String>
-    <!--PageVersionMod-->
     <s:String x:Key="LangPageVersionModSearchTip">Hľadajte podľa názvov / popisov / značiek</s:String>
     <s:String x:Key="LangPageVersionModOpenFolder">Priečinky modifikácií</s:String>
     <s:String x:Key="LangPageVersionModSelectAll">Vybrať všetko</s:String>
@@ -1126,13 +1090,11 @@ Prosím, čítajte túto varovanie pozorne, predtým ako budete pokračovať!</s
     <s:String x:Key="LangPageVersionModBack">Späť</s:String>
     <s:String x:Key="LangPageVersionModSearchInMcmod">Hľadajte v Wiki</s:String>
     <s:String x:Key="LangPageVersionModWebsite">Otvoriť oficiálnu webovú stránku</s:String>
-    <!--PageVersionModDisabled-->
     <s:String x:Key="LangPageVersionModDisabledTitle">Táto inštancia nie je dostupná s modifikáciami</s:String>
     <s:String x:Key="LangPageVersionModDisabledContent">Musíte nainštalovať Forge, Fabric alebo iné načítavacie modifikácie, aby ste mohli používať modifikácie. Prosím, nainštalujte tieto načítavacie modifikácie na stránke "Stiahnuť".
 Ak je načítavací modifikácie nainštalovaný, môžete mať vybratú nesprávnu inštanciu. Kliknite na tlačidlo "Výber", aby ste prešli na správnu.</s:String>
     <s:String x:Key="LangPageVersionModDisabledBtnGoToDownload">Prejsť na Stiahnuť</s:String>
     <s:String x:Key="LangPageVersionModDisabledBtnSelectInstance">Výber</s:String>
-    <!--PageVersionOverall-->
     <s:String x:Key="LangPageVersionOverallPersonalize">Personalizácia</s:String>
     <s:String x:Key="LangPageVersionOverallIcon">Ikona</s:String>
     <s:String x:Key="LangPageVersionOverallIconAuto">Automatická</s:String>
@@ -1198,7 +1160,6 @@ Keďže je pre túto inštanciu povolená "Izolácia inštancií", pri vymazaní
     <s:String x:Key="LangPageVersionOverallHintPermanentDeleteSuccess">Inštancia {0} bola trvalo vymazaná!</s:String>
     <s:String x:Key="LangPageVersionOverallHintEnableInstanceAssetsCheck">Prosím, zatvorte možnosť "Nastavenia → Pokročilé spustenie → Zakázať overovanie súborov" pred pokusom o opravu súborov!</s:String>
     <s:String x:Key="LangPageVersionOverallHintEnableAssetsCheck">Prosím, zatvorte možnosť "Nastavenia → Pokročilé spustenie → Zakázať overovanie súborov" pred pokusom o opravu súborov!</s:String>
-    <!--PageVersionSetup-->
     <s:String x:Key="LangPageVersionSetupHintIndependentSetResetSuccess">Nastavenia inštancie boli inicializované!</s:String>
     <s:String x:Key="LangPageVersionSetupHintIndependentSetResetFail">Nepodarilo sa inicializovať nastavenia inštancie.</s:String>
     <s:String x:Key="LangPageVersionSetupDialogLittleSkinContent">Chystáte sa prepísať možnosť tretieho stranického prihlásenia ako prihlásenie LittleSkin.
@@ -1270,13 +1231,11 @@ Pri vykonávaní prikazu je priečinky, kde sa nachádza Príkazový riadok, akt
     <s:String x:Key="LangPageVersionSetupJavaCompatibility">Ak je v nastaveniach manuálne vybraný Java, ktorý je nekompatibilný s aktuálnymi inštanciami, automaticky sa preskočí varovné okno kompatibility a manuálne vybraný Java sa bude nútiť používať.</s:String>
     <s:String x:Key="LangPageVersionSetupFileVerification">Žiadne zmeny aktivít; nepreveruje sa, či boli modifikované knižnice, knižnice tretieho strany pre prihlásenie a client.jar.
 Ak ste nezměnili relevantné súbory, prosím, nekontrolujte túto položku.</s:String>
-    <!--ModMain-->
     <s:String x:Key="LangModMainAprilFoolTipA">Len sa vzdajte! Kliknite na malú bielu vlajku dole vpravo...</s:String>
     <s:String x:Key="LangModMainAprilFoolTipB">Ste videli malú bielu vlajku dole vpravo?</s:String>
     <s:String x:Key="LangModMainAprilFoolTipC">Hmm... Sugerujem, že len kliknete na vlajku :)</s:String>
     <s:String x:Key="LangModMainAprilFoolTipD">Malá biela vlajka vždy čaká na vás...</s:String>
     <s:String x:Key="LangModMainExceptionNoHelpFound">Neboli nájdené žiadne dostupné pomoci. Môžete skryť Centrum pomoci v "Nastaveniach → Osobné nastavenie → Skrývanie funkcií", ak nie je potrebné.</s:String>
-    <!--ModEvent-->
     <s:String x:Key="LangModEventOpeningWeb">Otvára sa, prosím čakajte...</s:String>
     <s:String x:Key="LangModEventStartInstance">Spúšťa sa {0}...</s:String>
     <s:String x:Key="LangModEventChoseAnInstance">Prosím, najprv vyberte inštanciu!</s:String>
@@ -1287,7 +1246,6 @@ PCL nepodporuje iné bláznivé protokoly stiahnutia.</s:String>
     <s:String x:Key="LangModEventDialogUnknownEventContent">Neznámy typ udalosti: {0}
 Prosím, skontrolujte, či je typ udalosti správne vyplnený, či je PCL najnovšej verzie.</s:String>
     <s:String x:Key="LangModEventGettingResource">Získava sa zdroj, prosím čakajte...</s:String>
-    <!--ModMusic-->
     <s:String x:Key="LangModMusicDeviceChanged">Z dôvodu zmeny audio zariadenia hudba nebude fungovať až do restartu spúšťača!</s:String>
     <s:String x:Key="LangModMusicMusicChanged">Zlyhalo prehratie ({0}): Zmena audio vlastností počas prehrávania nie je podporovaná.</s:String>
     <s:String x:Key="LangModMusicMusicFormatNotSupport">Zlyhalo prehratie ({0}): Formát môže byť nepodporovaný, skúste to znova po konverzii na .wav, .mp3 alebo .flac.</s:String>
@@ -1305,7 +1263,6 @@ Prosím, skontrolujte, či je typ udalosti správne vyplnený, či je PCL najnov
     <s:String x:Key="LangModMusicMusicCleared">Pozadie hudby bolo vyčistené!</s:String>
     <s:String x:Key="LangModMusicMusicRefreshed">Pozadie hudby bolo obnovené: {0}</s:String>
     <s:String x:Key="LangModMusicExceptionMusicRefreshFail">Zlyhalo obnovenie pozadie hudby.</s:String>
-    <!--ModSecret-->
     <s:String x:Key="LangModSecretPermissionA">PCL nemôže vytvoriť priečinky "PCL" ({0}PCL), prosím, skúste:
 1. Presuňte PCL do iného priečinka {1}.
 2. Odstráňte priečinky "PCL" v aktuálnom priečinku a skúste to znovu.
@@ -1325,7 +1282,6 @@ Prosím, skontrolujte, či je typ udalosti správne vyplnený, či je PCL najnov
 - Úžitky: Niektoré vývojárske nástroje boli umiestnené tu počas raných fáz vývoja, a bolo ťažké ich rozlíšiť.</s:String>
     <s:String x:Key="LangModSecretHintNoTheme">Aktuálna verzia PCL neobsahuje funkciu Téma...</s:String>
     <s:String x:Key="LangModSecretHintNoUpdate">Aktuálna verzia PCL neobsahuje funkciu Aktualizácie...</s:String>
-    <!--ModMinecraft-->
     <s:String x:Key="LangModMinecraftCurrentFolder">Aktuálny priečinky</s:String>
     <s:String x:Key="LangModMinecraftOfficialFolder">Priečinky spustiteľa Minecraft</s:String>
     <s:String x:Key="LangModMinecraftCheckStatusInstanceNotFound">Žiadne inštancie nenájdené</s:String>
@@ -1386,7 +1342,6 @@ Prosím, skontrolujte, či je typ udalosti správne vyplnený, či je PCL najnov
     <s:String x:Key="LangModMinecraftExceptionNoAssetsIndexInfo">Táto verzia nemá informácie o indexe súborov.</s:String>
     <s:String x:Key="LangModMinecraftExceptionAssetsIndexFileNotFound">Súbor indexu súborov nenájdený.</s:String>
     <s:String x:Key="LangModMinecraftExceptionUnexpectedResult">Neočakávaný výsledok. ({0})</s:String>
-    <!--ModComp-->
     <s:String x:Key="LangModCompModSuitFor">Dostupné pre</s:String>
     <s:String x:Key="LangModCompModDependentCount">závislosť</s:String>
     <s:String x:Key="LangModCompModDependentCountP">závislosti</s:String>
@@ -1404,7 +1359,6 @@ Prosím, skontrolujte, či je typ udalosti správne vyplnený, či je PCL najnov
     <s:String x:Key="LangModCompModDigit2">M</s:String>
     <s:String x:Key="LangModCompModDigit3">B</s:String>
     <s:String x:Key="LangModCompExceptionNoResult">Žiadne výsledky nepasujú kritériám</s:String>
-    <!--ModBase-->
     <s:String x:Key="LangModBaseDateYear">rok</s:String>
     <s:String x:Key="LangModBaseDateYearP">roky</s:String>
     <s:String x:Key="LangModBaseDateMonthA">mesiac</s:String>
@@ -1444,7 +1398,6 @@ Prosím, potvrďte, že problém pretrváva v najnovšej verzii po aktualizácii
     <s:String x:Key="LangModBaseExceptionOutOfMemoryException">Váš počítač sa dostáva do situácie, že sa nedostáva pamäte, čo spôsobuje, že PCL nemôže bežať. Prosím, zatvorte niektoré nepotrebné programy a skúste znovu.</s:String>
     <s:String x:Key="LangModBaseExceptionCOMException">Nastala chyba kvôli problému s operačným systémom alebo grafickou kartou. Prosím, skúste restartovať PCL.</s:String>
     <s:String x:Key="LangModBaseExceptionBadNetwork">Je ťažké spojiť sa so serverom kvôli slabému síťovému prostrediu. Prosím, skontrolujte internet a skúste znovu niekoľkokrát.</s:String>
-    <!--ModLaunch-->
     <s:String x:Key="LangModLaunchStartStageGetJava">Získajte Java</s:String>
     <s:String x:Key="LangModLaunchStartStageCompleteFile">Opraviť súbory</s:String>
     <s:String x:Key="LangModLaunchStartStageGetParameters">Získajte parametre</s:String>
@@ -1459,7 +1412,6 @@ Prosím, potvrďte, že problém pretrváva v najnovšej verzii po aktualizácii
     <s:String x:Key="LangModLaunchStartSuccess">Úspešne spustené!</s:String>
     <s:String x:Key="LangModLaunchCancelStart">Spustenie zrušené!</s:String>
     <s:String x:Key="LangModLaunchCancelExportCommand">Export spustacieho skriptu bol zrušený!</s:String>
-    <!--ModValidate-->
     <s:String x:Key="LangModValidateNoSameFolderName">Názov nemôže byť rovnaký ako existujúcej inštancie!</s:String>
     <s:String x:Key="LangModValidateNoEndWithDotFolderName">Názov nemôže končiť bodkou (.)!</s:String>
     <s:String x:Key="LangModValidateNoEndWithSpecialCharFolderName">Názov nemôže obsahovať špeciálne znaky (%)!</s:String>
@@ -1477,35 +1429,29 @@ Prosím, potvrďte, že problém pretrváva v najnovšej verzii po aktualizácii
     <s:String x:Key="LangModValidateLenMax">Maximálna dĺžka je {0} znakov!</s:String>
     <s:String x:Key="LangModValidateLenMin">Dĺžka musí byť aspoň {0} znakov!</s:String>
     <s:String x:Key="LangModValidateNoContain">Vstup nemôže obsahovať "%"!</s:String>
-    <!--Keep %,do not replace it.-->
     <s:String x:Key="LangModValidateNoContent">Vstup nemôže byť "%"!</s:String>
-    <!--Keep %,do not replace it.-->
     <s:String x:Key="LangModValidateFileNoStartWithSpace">Názov súboru nemôže začínajú medzerou!</s:String>
     <s:String x:Key="LangModValidateFileNoEndWithSpace">Názov súboru nemôže končiť medzerou!</s:String>
     <s:String x:Key="LangModValidateFileNoEndWithDot">Názov súboru nemôže končiť bodkou!</s:String>
     <s:String x:Key="LangModValidateFileNoContain">Názov súboru nemôže obsahovať "%"!</s:String>
-    <!--Keep %,do not replace it.-->
     <s:String x:Key="LangModValidateFileNoContent">Názov súboru nemôže byť "%"!</s:String>
-    <!--Keep %,do not replace it.-->
+    <s:String x:Key="LangModValidateFileNoSpecialName">文件名不能包含这一特殊格式！</s:String>
     <s:String x:Key="LangModValidateFileNoSameName">Názov súboru už existuje!</s:String>
     <s:String x:Key="LangModValidateFileNoParentFolder">Rodičovský priečinok neexistuje: {0}</s:String>
     <s:String x:Key="LangModValidateFileHeadUriIncorrect">Nesprávna hlava cesty priečinku!</s:String>
     <s:String x:Key="LangModValidateFolderUriIncorrect">Nesprávna cesta priečinku!</s:String>
     <s:String x:Key="LangModValidateInvalidChar">Existujú neplatné znaky v ceste!</s:String>
-    <!--MyLocalModItem-->
     <s:String x:Key="LangMyLocalModItemToolTipModUpdate">Aktuálna verzia: {0} ({1})
 Najnovšia verzia: {2} ({3})
 Kliknite na aktualizáciu, kliknite pravým tlačidlom na zobrazenie záznamov zmien.</s:String>
     <s:String x:Key="LangMyLocalModItemDialogContentOpenChangelog">Ktorú webovú stránku chcete zobraziť záznam zmien na?</s:String>
     <s:String x:Key="LangMyLocalModItemDialogTitleOpenChangelog">Zobrazenie záznamu zmien</s:String>
     <s:String x:Key="LangMyLocalModItemFailGetModInfo">Nastala chyba a informácie neboli získané.</s:String>
-    <!--ModMod-->
     <s:String x:Key="LangModModUpdatingMod">Aktualizácia modifikácií...</s:String>
     <s:String x:Key="LangModModLoadingModList">Načítava sa zoznam modifikácií...</s:String>
     <s:String x:Key="LangModModExceptionIncorrectPath">Nesprávna cesta k súboru modifikácie. ({0})</s:String>
     <s:String x:Key="LangModModExceptionFileNotFound">Súbor modifikácie sa nenašiel. ({0})</s:String>
     <s:String x:Key="LangModModExceptionUnauthorizedAccess">Nemáte oprávnenie čítať tento súbor, prosím, kliknite pravým tlačidlom a skúste spustiť PCL ako administrátor.</s:String>
-    <!--ModComp-->
     <s:String x:Key="LangModCompVersionUnknown">Neznáma</s:String>
     <s:String x:Key="LangModCompVersionAll">Všetky verzie</s:String>
     <s:String x:Key="LangModCompVersionAny">Ľubovolná</s:String>
@@ -1517,7 +1463,6 @@ Kliknite na aktualizáciu, kliknite pravým tlačidlom na zobrazenie záznamov z
     <s:String x:Key="LangModCompSearchNoResult">Žiadne výsledky</s:String>
     <s:String x:Key="LangModCompVersionSnapshot">Snapshot</s:String>
     <s:String x:Key="LangModCompVersionUnknownVersion">Neznáma verzia</s:String>
-    <!--ModDownload-->
     <s:String x:Key="LangModDownloadMcLibFixAnalysis">Analyzovať chýbajúce knižnice</s:String>
     <s:String x:Key="LangModDownloadMcLibFixDownload">Stiahnuť knižnice</s:String>
     <s:String x:Key="LangModDownloadMcLibFixDownloadMainLoader">Stiahnuť knižnice (Hlavný načítavací program)</s:String>
@@ -1540,7 +1485,6 @@ Kliknite na aktualizáciu, kliknite pravým tlačidlom na zobrazenie záznamov z
     <s:String x:Key="LangModDownloadExceptionSourceOfficialListLoad">Zlyhalo parsovanie oficiálneho zoznamu verzií {0}. ({1})</s:String>
     <s:String x:Key="LangModDownloadExceptionSourceMirrorListLoad">Zlyhalo parsovanie zoznamu verzií {0}. ({1})</s:String>
     <s:String x:Key="LangModDownloadExceptionMissNecessary">Získaný zoznam chýba nevyhnutných položiek.</s:String>
-    <!--ModJava-->
     <s:String x:Key="LangModJavaManuallyImport">Ručne importovať</s:String>
     <s:String x:Key="LangModJava32Bit">32-bit</s:String>
     <s:String x:Key="LangModJavaExceptionFileNotFound">Súbor {0} sa nenašiel.</s:String>
@@ -1573,7 +1517,6 @@ Ak už máte nainštalovanú {1}, prosím, importujte ju ručne v "Nastaveniach 
     <s:String x:Key="LangModJavaTaskDownloadJavaFile">Stiahnuť súbor Javy</s:String>
     <s:String x:Key="LangModJavaTaskDownloadJava">Stiahnuť Javu {0}</s:String>
     <s:String x:Key="LangModJavaTaskGetJavaDownloadInfo">Získať informácie o stiahnutí Javy</s:String>
-    <!--ModLaunch-->
     <s:String x:Key="LangModLaunchExceptionRunNotInUI">McLaunchStart musí byť volaný na hlavném vlákne!</s:String>
     <s:String x:Key="LangModLaunchAlreadyLaunchGame">Hra sa už spúšťa!</s:String>
     <s:String x:Key="LangModLaunchLaunchFail">Nepodarilo sa spustiť Minecraft: {0}</s:String>
@@ -1656,7 +1599,6 @@ Ak táto možnosť nie je dostupná, prosím, vyberte "Nastaviť heslo", a prihl
     <s:String x:Key="LangModLaunchDialogTitleLoginWithPassword">Prihlásenie s heslom vyžadované</s:String>
     <s:String x:Key="LangModLaunchDialogBtn1LoginWithPassword">Prihlásiť sa znovu</s:String>
     <s:String x:Key="LangModLaunchDialogBtn2LoginWithPassword">Nastaviť heslo</s:String>
-    <!--ModModpack-->
     <s:String x:Key="LangModModpackSelectModpack">Vyberte súbor modpacku</s:String>
     <s:String x:Key="LangModModpackSelectTitleModpack">Vyberte súbor modpacku</s:String>
     <s:String x:Key="LangModModpackUnknownType">Nemôžem identifikovať typ súboru, inštalácia nie je možná!</s:String>
@@ -1695,9 +1637,7 @@ Ak táto možnosť nie je dostupná, prosím, vyberte "Nastaviť heslo", a prihl
     <s:String x:Key="LangModModpackFolderShouldBeEmpty">Prosím, vyberte prázdny priečinok ako cieľovú priečinku inštalácie!</s:String>
     <s:String x:Key="LangModModpackInstallArchive">Inštalujte archív</s:String>
     <s:String x:Key="LangModModpackAddedToGameList">Pridané do zoznamu priečinkov: {0}</s:String>
-    <!--ModWatcher-->
     <s:String x:Key="LangModWatcherMcCrashed">Detekovaný pád Minecraft, začala analýza chyby...</s:String>
-    <!--ModBase-->
     <s:String x:Key="LangModBaseExceptionRenameSubKeyNotSupport">Preimenovanie podkľúča, ktoré obsahuje podkľúče, nie je podporované: {0}.</s:String>
     <s:String x:Key="LangModBaseExceptionPathIncorrect">Cesta nie je zahrnutá: {0}</s:String>
     <s:String x:Key="LangModBaseExceptionFileNameIncorrect">Názov súboru nie je zahrnutý: {0}</s:String>
@@ -1715,12 +1655,10 @@ Ak táto možnosť nie je dostupná, prosím, vyberte "Nastaviť heslo", a prihl
     <s:String x:Key="LangModBaseExceptionEmptyFile">Súbor čítaný je prázdny</s:String>
     <s:String x:Key="LangModBaseExceptionInvalidJson">Nie je platný JSON súbor.</s:String>
     <s:String x:Key="LangModBaseNoExceptionDetail">Nie je dostupná žiadna informácia o chybe!</s:String>
-    <!--ModMyLoading-->
     <s:String x:Key="LangModMyLoadingLoading">Načítava sa...</s:String>
     <s:String x:Key="LangModMyLoadingLoadFail">Načítanie zlyhalo</s:String>
     <s:String x:Key="LangModMyLoadingUnknownError">Neznáma chyba</s:String>
     <s:String x:Key="LangModMyLoadingBadNetwork">Chybná sieť, skontrolujte internet a skúste znovu.</s:String>
-    <!--ModDownloadLib-->
     <s:String x:Key="LangModDownloadLibTaskMcDownload">Stiahnite Minecraft {0}</s:String>
     <s:String x:Key="LangModDownloadLibHintInstanceDownloading">Táto inštancia je momentálne sťahovaná!</s:String>
     <s:String x:Key="LangModDownloadLibDialogContentRedownloadInstance">Inštancia {0} už existuje, chcete ju znovu stiahnuť?
@@ -1787,7 +1725,11 @@ Týmto prepíšete JSON a JAR súbor, ale neovplyvní to súbory izolácie inšt
     <s:String x:Key="LangModDownloadLibTaskDownloadNeoForge">Stiahnite NeoForge {0}</s:String>
     <s:String x:Key="LangModDownloadLibTaskDownloadLiteLoader">Stiahnite LiteLoader {0}</s:String>
     <s:String x:Key="LangModDownloadLibTaskDownloadFabric">Stiahnite Fabric {0}</s:String>
-    <!--ModCrash-->
+    <s:String x:Key="LangModDownloadLibTaskDownloadServer">Minecraft {0} 服务端下载</s:String>
+    <s:String x:Key="LangModDownloadLibTaskDownloadServerBuildServer">构建服务端</s:String>
+    <s:String x:Key="LangModDownloadLibTaskDownloadServerHintDownloading">该服务端正在下载中！</s:String>
+    <s:String x:Key="LangModDownloadLibTaskDownloadServerDownloading">下载服务端文件</s:String>
+    <s:String x:Key="LangModDownloadLibExceptionTaskDownloadServerNoResource">{0} 版本没有提供服务端文件</s:String>
     <s:String x:Key="LangModCrashDialogTitleAnalysisResult">Výsledok analýzy</s:String>
     <s:String x:Key="LangModCrashDialogTitleMcError">Minecraft sa zrútil</s:String>
     <s:String x:Key="LangModCrashViewLog">Log</s:String>
@@ -1976,7 +1918,6 @@ Ak nie je poskytnuté žiadne riešenie, môžete si prezrieť správy o chybác
     <s:String x:Key="LangModCrashCrashReasonDialogContentAskHelpTip">ak hľadáte pomoc, exportujte radu o chybe namiesto toho, aby ste si zobrali snímku obrazovky tohto okna, a pošlite ju iným.</s:String>
     <s:String x:Key="LangModCrashCrashReasonDialogContentUpgradeTip">Okrem toho, momentálne používate zastaranú verziu PCL. Aktualizáciou na najnovšiu verziu môžete vyriešiť tento problém.
 Na aktualizáciu PCL, prejdite na "Nastavenia → Spustenie → Kontrola aktualizácií".</s:String>
-    <!--MyMsgLogin-->
     <s:String x:Key="LangMyMsgLoginDialogBtnReopenWebPage">Znovu otvoriť webovú stránku</s:String>
     <s:String x:Key="LangMyMsgLoginDialogBtnCopyCode">Kopírovať kód</s:String>
     <s:String x:Key="LangMyMsgLoginHintInitFail">Inicializácia prihlasovacieho dialógu zlyhala.</s:String>
