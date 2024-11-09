@@ -1536,7 +1536,7 @@ Retry:
         ''' <returns></returns>
         Public Shared Function GetAll() As List(Of String)
             If FavoritesList IsNot Nothing Then Return FavoritesList
-            Dim RawData As String = Setup.Get("Favorites")
+            Dim RawData As String = Setup.Get("CompFavorites")
             FavoritesList = New List(Of String)
             Dim RawList As JArray = JArray.Parse(RawData)
             For Each CompRawItem As JValue In RawList
@@ -1554,7 +1554,7 @@ Retry:
             For Each item As CompProject In items
                 RawList.Add(item.Id)
             Next
-            Setup.Set("Favorites", RawList.ToString())
+            Setup.Set("CompFavorites", RawList.ToString())
             FavoritesList = Nothing
         End Sub
         Public Shared Sub Replace(items As List(Of String))
@@ -1562,7 +1562,7 @@ Retry:
             For Each item As String In items
                 RawList.Add(item)
             Next
-            Setup.Set("Favorites", RawList.ToString())
+            Setup.Set("CompFavorites", RawList.ToString())
             FavoritesList = items
         End Sub
 
@@ -1571,7 +1571,7 @@ Retry:
             For Each item As String In GetAll()
                 RawList.Add(item)
             Next
-            Setup.Set("Favorites", RawList.ToString())
+            Setup.Set("CompFavorites", RawList.ToString())
         End Sub
 
         ''' <summary>
