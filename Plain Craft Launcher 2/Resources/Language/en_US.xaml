@@ -274,7 +274,7 @@ If you have created a stable online homepage, you can click this tip to submit i
     <s:String x:Key="LangSetFuncHiddenSpecialEmail">Email</s:String>
     <s:String x:Key="LangSetFuncHiddenSpecialEmailToolTip">Hide the email of third-party login accounts and try to asterisk the email to avoid privacy leaking.
 A restart is required to apply this change.</s:String>
-    <s:String x:Key="LangSetFuncHiddenSpecialInstanceSetting">版本管理</s:String>
+    <s:String x:Key="LangSetFuncHiddenSpecialInstanceSetting">Selection</s:String>
     <s:String x:Key="LangSetFuncHiddenSpecialInstanceSettingToolTip">隐藏启动按钮下方的版本选择与版本设置入口。</s:String>
     <s:String x:Key="LangSetFuncHiddenSpecialModUpdate">Mod 更新</s:String>
     <s:String x:Key="LangSetFuncHiddenSpecialModUpdateToolTip">禁止在 Mod 管理页面更新 Mod。</s:String>
@@ -1634,7 +1634,7 @@ If that option is not available, please select "Set password", and log in after 
     <s:String x:Key="LangModModpackCurseforgeNoGameInfo">该 CurseForge 整合包未提供游戏版本信息，无法安装！</s:String>
     <s:String x:Key="LangModModpackTaskMCBBSModpackInstall">Install MCBBS Modpack: </s:String>
     <s:String x:Key="LangModModpackDialogContentInstallTip">Please select the target folder in the opening window. It must be an empty folder.</s:String>
-    <s:String x:Key="LangModModpackDialogTitleInstall">安装</s:String>
+    <s:String x:Key="LangModModpackDialogTitleInstall">Install</s:String>
     <s:String x:Key="LangModModpackSelectInstallFolder">Select installation destination (must be an empty folder)</s:String>
     <s:String x:Key="LangModModpackFolderNoExclamationOrSemicolon">Minecraft folder paths cannot contain exclamation marks (!) or semicolon (;)!</s:String>
     <s:String x:Key="LangModModpackFolderShouldBeEmpty">Please select an empty folder as the installation destination!</s:String>
