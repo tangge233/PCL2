@@ -8,6 +8,8 @@
     <s:String x:Key="LangDialogBtnContinue">続行</s:String>
     <s:String x:Key="LangComma">、</s:String>
     <s:String x:Key="LangColon">：</s:String>
+    <s:String x:Key="LangSaveAs">保存先を選択してください</s:String>
+    <s:String x:Key="LangSaveAsFile">文件</s:String>
     <s:String x:Key="LangApplicationExceptionNoAccessPermission">PCL は {0} へのアクセス権がありません</s:String>
     <s:String x:Key="LangApplicationDialogTitleCacheFolderUnavailable">キャッシュフォルダーが利用できません</s:String>
     <s:String x:Key="LangApplicationDialogContentCacheFolderUnavailable">PCL はキャッシュフォルダーにアクセスできず、プログラムが正常に動作しないか、エラーが発生する可能性があります。
@@ -24,6 +26,7 @@
     <s:String x:Key="LangApplicationDialogContentNETWarn">お使いの.NET Frameworkのバージョンが低すぎるか、損傷しています。開かれたウェブページから.NET Framework 4.6.2を再ダウンロードしてインストールした後、再試行してください！</s:String>
     <s:String x:Key="LangApplicationDialogTitleUnknownError">未知エラー</s:String>
     <s:String x:Key="LangApplicationDialogContentUnknownError">プログラムに未知のエラーが発生しました</s:String>
+    <s:String x:Key="LangApplicationDialogContentMemReduceFail">内存优化失败</s:String>
     <s:String x:Key="LangTitleDownload">ダウンロード</s:String>
     <s:String x:Key="LangTitleHome">起動</s:String>
     <s:String x:Key="LangTitleSetup">設定</s:String>
@@ -101,6 +104,7 @@
     <s:String x:Key="LangHintThemeSetInit">パーソナライズ設定が初期化されました</s:String>
     <s:String x:Key="LangHintThemeSetInitFail">パーソナライズ設定の初期化に失敗しました</s:String>
     <s:String x:Key="LangBackgroundPic">背景画像</s:String>
+    <s:String x:Key="LangSetupUIBackgroundPicPixel">像素</s:String>
     <s:String x:Key="LangBackgroundPicCount">背景画像（{0} 枚）</s:String>
     <s:String x:Key="LangDialogDeleteAllBackgroundPicContent">背景画像フォルダ内のすべてのファイルを削除しようとしています。
 この操作は元に戻せません。実行してもよろしいですか？</s:String>
@@ -252,6 +256,7 @@
     <s:String x:Key="LangSetHomePagePresetPageI">PCL 更新ログ（作者：Joker2184）</s:String>
     <s:String x:Key="LangSetHomePagePresetPageJ">PCL 新功能说明书（作者：WForst-Breeze）</s:String>
     <s:String x:Key="LangSetHomePagePresetPageK">OpenMCIM 仪表盘（作者：SALTWOOD）</s:String>
+    <s:String x:Key="LangSetHomePagePresetPageL">杂志主页（作者：CreeperIsASpy）</s:String>
     <s:String x:Key="LangSetFuncHidden">機能隠し</s:String>
     <s:String x:Key="LangSetFuncHiddenToolTip">不要なページを隠したり、特定の機能をオフにしたりできます。任意の画面で F12 を押すと、隠された機能を一時的に表示できます。</s:String>
     <s:String x:Key="LangSetFuncHiddenLaunch">メインページ</s:String>
@@ -388,7 +393,7 @@
     <s:String x:Key="LangPageSpeedRightInstallForgeMethodA">Forge をインストール（方法 A）</s:String>
     <s:String x:Key="LangPageSpeedRightInstallNeoForge">NeoForge をインストール</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadModLoaderMainFile">ダウンロード {0} メインファイル</s:String>
-    <s:String x:Key="LangPageSpeedRightAnalyseModLoaderSupportLibrary">分析 {0} サポートライブラリファイル</s:String>
+    <s:String x:Key="LangPageSpeedRightAnalyzeModLoaderSupportLibrary">分析 {0} サポートライブラリファイル</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadModLoaderSupportLibrary">ダウンロード {0} サポートライブラリファイル</s:String>
     <s:String x:Key="LangPageSpeedRightGetOptiFineDownloadAddress">OptiFine のダウンロードアドレスを取得</s:String>
     <s:String x:Key="LangPageSpeedRightDownloadOptiFineMainFile">OptiFine メインファイルをダウンロード</s:String>
@@ -854,6 +859,7 @@ PCLを--memoryパラメータ付きで起動すると、静かにメモリ最適
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMHead">JVMパラメータ先頭</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMHeadTops">Minecraft起動時に使用する追加のJVMパラメータです。自信がない場合は変更しないでください。
 デフォルト設定に戻すには、左側のタブの初期化ボタンをクリックしてください。</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMHeadReset">还原</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMTail">JVMパラメータ末尾</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMTailTip">このテキストボックスに入力した内容は、起動パラメータの末尾に直接追加されます。
 例えば、--demoと入力すると、デモモードでゲームが起動します。</s:String>
@@ -946,9 +952,7 @@ PCLを起動するたびに、管理者権限の申請が必要です。自動�
 フォルダまたはゲームバージョンを右クリックして、対応するフォルダを開くことができます。</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadKeepModpackArchive">インストール時にオリジナルの圧縮ファイルを保持</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadKeepModpackArchiveToolTip">インストール時に、バージョンフォルダ下にインストール用のオリジナル圧縮ファイルを保持します。</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadSimplifyModLoaderDisplay">Modローダーの表示を簡略化</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadSimplifyModLoaderDisplayToolTip">Modをダウンロードする際、ForgeとFabricの両方に対応している場合は、任意のModローダーに対応していると表示します。
-例えば、有効にするとJEIは全バージョンに対応していると表示され、無効にするとJEIはForge / Fabric全バージョンに対応していると表示されます。</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadIgnoreQuiltDisplay">显示 Mod 加载器时忽略 Quilt</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadSSL">SSL証明書の検証</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadSSLToolTip">検証を有効にすると、セキュリティが向上し、アカウント盗難のリスクが低下します（#2767参照）。ただし、正規版のログインに失敗する可能性もあります（#3018参照）。</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadAccessibility">アクセシビリティ</s:String>
@@ -992,7 +996,7 @@ PCLを起動するたびに、管理者権限の申請が必要です。自動�
     <s:String x:Key="LangPageSetupSystemSystemLaunchUpdateE">新バージョンがある場合は自動的にダウンロード（スナップショット版の更新には更新キーが必要になる場合があります）</s:String>
     <s:String x:Key="LangPageSetupSystemLaunchResetSuccess">ランチャーの設定を初期化しました！</s:String>
     <s:String x:Key="LangPageSetupSystemLaunchResetFail">ランチャーの設定を初期化できませんでした</s:String>
-    <s:String x:Key="LangPageSetupSystemDownloadSpeedUnlimit">無制限</s:String>
+    <s:String x:Key="LangPageSetupSystemDownloadSpeedUnlimited">無制限</s:String>
     <s:String x:Key="LangPageSetupSystemDebugAnimSpeedDisable">オフ</s:String>
     <s:String x:Key="LangPageSetupSystemDownloadSpeedDialogThreadTooMuchContent">ダウンロードスレッドを過度に設定すると、ダウンロード時に非常に重い遅延が発生する可能性があります。
 ほとんどのダウンロードニーズは64スレッドで満たすことができるので、特に理由がない限り、それ以上のスレッド数を設定することはお勧めしません！</s:String>
@@ -1037,6 +1041,7 @@ PCLを起動するたびに、管理者権限の申請が必要です。自動�
     <s:String x:Key="LangPageVersionModOpenFolder">Mod フォルダを開く</s:String>
     <s:String x:Key="LangPageVersionModSelectAll">すべて選択</s:String>
     <s:String x:Key="LangPageVersionModInstallMod">Mod をインストール</s:String>
+    <s:String x:Key="LangPageVersionModInstallModFromFile">从文件安装</s:String>
     <s:String x:Key="LangPageVersionModCheckMod">Mod をチェック</s:String>
     <s:String x:Key="LangPageVersionModCheckModToolTip">Mod のバージョン要件、重複、欠落の依存関係などの問題を素早くチェックします。
 結果は参考程度にとどめ、一部の Mod に記載されている情報に誤りがある可能性があるため、必ずしも正確ではありません。</s:String>
@@ -1446,9 +1451,15 @@ URL：{0}</s:String>
     <s:String x:Key="LangMyLocalModItemToolTipModUpdate">現在のバージョン：{0} ({1})
 最新バージョン：{2} ({3})
 クリックして更新、右クリックして更新ログを表示。</s:String>
+    <s:String x:Key="LangMyLocalModItemToolTipModUpdateUpgradable">点击以更新，右键查看更新日志。</s:String>
     <s:String x:Key="LangMyLocalModItemDialogContentOpenChangelog">更新ログはどのウェブサイトで確認しますか？</s:String>
     <s:String x:Key="LangMyLocalModItemDialogTitleOpenChangelog">更新ログの確認</s:String>
     <s:String x:Key="LangMyLocalModItemFailGetModInfo">エラーが発生し、情報の取得に失敗しました</s:String>
+    <s:String x:Key="LangMyLocalModItemDialogTitleUpdateConfirm">Mod 更新确认</s:String>
+    <s:String x:Key="LangMyLocalModItemDialogBtn1UpdateConfirm">更新</s:String>
+    <s:String x:Key="LangMyLocalModItemDialogContentUpdateConfirm">是否要更新 {0}？
+
+{1}</s:String>
     <s:String x:Key="LangModModUpdatingMod">Mod を更新しています</s:String>
     <s:String x:Key="LangModModLoadingModList">Mod リストを読み込んでいます</s:String>
     <s:String x:Key="LangModModExceptionIncorrectPath">間違った Mod ファイルパス（{0}）</s:String>
@@ -1487,6 +1498,8 @@ URL：{0}</s:String>
     <s:String x:Key="LangModDownloadExceptionSourceOfficialListLoad">{0} 公式ソースバージョンリストの解析に失敗しました（{1}）</s:String>
     <s:String x:Key="LangModDownloadExceptionSourceMirrorListLoad">{0} バージョンリストの解析に失敗しました（{1}）</s:String>
     <s:String x:Key="LangModDownloadExceptionMissNecessary">取得したリストに必要な項目が欠けています</s:String>
+    <s:String x:Key="LangModDownloadExceptionBMCLMissInstance">BMCLAPI 源未包含目标版本 {0}</s:String>
+    <s:String x:Key="LangModDownloadExceptionConnectionTimeout">下载源连接超时</s:String>
     <s:String x:Key="LangModJavaManuallyImport">手動インポート</s:String>
     <s:String x:Key="LangModJava32Bit">32 ビット</s:String>
     <s:String x:Key="LangModJavaExceptionFileNotFound">ファイル {0} が見つかりません</s:String>
@@ -1548,6 +1561,8 @@ URL：{0}</s:String>
     <s:String x:Key="LangModLaunchHintNoRoleOnlyOne">あなたのアカウントにはキャラクターが一つしかないので、変更できません！</s:String>
     <s:String x:Key="LangModLaunchDialogSelectRole">使用するキャラクターを選択してください</s:String>
     <s:String x:Key="LangModLaunchExceptionLoginFail">ログイン失敗：{0}</s:String>
+    <s:String x:Key="LangModLaunchExceptionTimeout">登录失败：连接登录服务器超时。
+请检查你的网络状况是否良好，或尝试使用 VPN！</s:String>
     <s:String x:Key="LangModLaunchDialogContentWebLogin">ログインが完了したら、ウェブページが完全に空白になります。その空白ページのURLを下の枠にコピーしてください！
     ネットワーク環境が良くない場合、ずっと読み込めない可能性があるので、VPNや加速器を試してみてください。</s:String>
     <s:String x:Key="LangModLaunchDialogTitleWebLogin">ウェブページでのログインを待っています</s:String>
@@ -1628,7 +1643,7 @@ URL：{0}</s:String>
     <s:String x:Key="LangModModpackTaskRenameInstanceJsonFileSideLoader">バージョン Json をリネームしています（副ローダー用）</s:String>
     <s:String x:Key="LangModModpackTaskHMCLModpackInstall">HMCL 統合パックのインストール：</s:String>
     <s:String x:Key="LangModModpackTaskMMCModpackInstall">MMC 統合パックのインストール：</s:String>
-    <s:String x:Key="LangModModpackNoAddons">統合パックがゲームバージョンの追加情報を提供していないため、インストールできません！</s:String>
+    <s:String x:Key="LangModModpackMCBBSNoGameInfoAddons">統合パックがゲームバージョンの追加情報を提供していないため、インストールできません！</s:String>
     <s:String x:Key="LangModModpackHMCLNoGameInfo">该 HMCL 整合包未提供游戏版本信息，无法安装！</s:String>
     <s:String x:Key="LangModModpackMMCNoGameInfo">该 MMC 整合包未提供游戏版本信息，无法安装！</s:String>
     <s:String x:Key="LangModModpackMCBBSNoGameInfo">该 MCBBS 整合包未提供游戏版本信息，无法安装！</s:String>
@@ -1640,9 +1655,9 @@ URL：{0}</s:String>
     <s:String x:Key="LangModModpackSelectInstallFolder">インストール先を選択してください（空のフォルダでなければなりません）</s:String>
     <s:String x:Key="LangModModpackFolderNoExclamationOrSemicolon">Minecraft フォルダのパスに感嘆符やセミコロンを含めることはできません！</s:String>
     <s:String x:Key="LangModModpackFolderShouldBeEmpty">インストール先として空のフォルダを選択してください！</s:String>
-    <s:String x:Key="LangModModpackExtractArchive">解压压缩包</s:String>
+    <s:String x:Key="LangModModpackTaskExtractArchive">解压压缩包</s:String>
     <s:String x:Key="LangModModpackAddedToGameList">ゲームファイルリストに追加されました：{0}</s:String>
-    <s:String x:Key="LangModModpackExceptionManualInsatllFail">手动安装整合包失败</s:String>
+    <s:String x:Key="LangModModpackExceptionManualInstallFail">手动安装整合包失败</s:String>
     <s:String x:Key="LangModModpackExceptionOpenFileFail">打开整合包文件失败</s:String>
     <s:String x:Key="LangModModpackExceptionRarFormat">PCL 无法处理 rar 格式的压缩包，请在解压后重新压缩为 zip 格式再试</s:String>
     <s:String x:Key="LangModModpackExceptionReadFileFail">打开整合包文件失败，文件可能损坏或为不支持的压缩包格式</s:String>
@@ -1696,7 +1711,6 @@ URL：{0}</s:String>
     <s:String x:Key="LangModDownloadLibTaskDownloadAssetsIndexFail">リソースファイルインデックス（副ローダー用）のダウンロード</s:String>
     <s:String x:Key="LangModDownloadLibTaskAnalysisDownloadAssets">必要なリソースファイルの分析（副ローダー用）</s:String>
     <s:String x:Key="LangModDownloadLibTaskDownloadAssets">リソースファイルのダウンロード（副ローダー用）</s:String>
-    <s:String x:Key="LangModDownloadLibSelectTitleSaveAs">保存先を選択してください</s:String>
     <s:String x:Key="LangModDownloadLibTaskOptiFineDownload">OptiFine {0} のダウンロード</s:String>
     <s:String x:Key="LangModDownloadLibOptiFineDownloadJava">Java 8 以上</s:String>
     <s:String x:Key="LangModDownloadLibExceptionOptiFineDownloadCancelJava">Java が見つからないため、インストールを中止しました。</s:String>
@@ -1869,7 +1883,7 @@ Shaders Modを削除すると、ゲームは正常に実行されます。 </s:S
 
 次の解決策を試してください。
  - Forge を 36.2.26 以降に更新する
- - 1.8.0.320 より前の Java バージョンに切り替えます</s:String>
+ - 1.8.0_320 より前の Java バージョンに切り替えます</s:String>
     <s:String x:Key="LangModCrashCrashReasonReasonBH">他のランチャーを使用して Forge バージョンが変更されており、現在のバージョンのファイルに異常があり、ゲームがクラッシュする可能性があります。
 別のランチャーを使用して Forge のバージョンを変更するのではなく、Forge のクリーン再インストールを試してください。 </s:String>
     <s:String x:Key="LangModCrashCrashReasonReasonBI">* 実際、ゲームには何も問題はありません。これはあなた自身が引き起こしたクラッシュです。
@@ -1962,8 +1976,8 @@ PCL を更新するには、[設定] → [ランチャー] → [アップデー�
     <s:String x:Key="LangModExceptionFailedToGet">获取结果失败（{0}）</s:String>
     <s:String x:Key="LangModExceptionTimeOut">连接服务器超时（{0}）</s:String>
     <s:String x:Key="LangModExceptionRunInUI">在 UI 线程执行了网络请求</s:String>
-    <s:String x:Key="LangModTaskDownlaodCode">源码获取 {0}</s:String>
-    <s:String x:Key="LangModExceptionDownlaodCodeSource">连接服务器超时（第一下载源：{0}）</s:String>
+    <s:String x:Key="LangModTaskDownloadCode">源码获取 {0}</s:String>
+    <s:String x:Key="LangModExceptionDownloadCodeSource">连接服务器超时（第一下载源：{0}）</s:String>
     <s:String x:Key="LangModExceptionDownloadFail">直接下载文件失败（{0}）</s:String>
     <s:String x:Key="LangModExceptionCreateDirectoryFail">预处理下载文件路径失败（{0}）</s:String>
     <s:String x:Key="LangModExceptionUnknown">未知错误</s:String>
