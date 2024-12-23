@@ -131,12 +131,7 @@
     End Sub
 
     '打开网页
-    Private Sub TryFeedback(sender As Object, e As RouteEventArgs) Handles ItemFeedback.Changed
-        If Not ItemFeedback.Checked Then Exit Sub
-        TryFeedback()
-        e.Handled = True
-    End Sub
-    Public Shared Sub TryFeedback()
+    Public Shared Sub TryFeedback() 'Handles ItemFeedback.Click
         If Not CanFeedback(True) Then Exit Sub
         Select Case MyMsgBox(GetLang("LangPageOtherDialogFeedbackContent"),
                     GetLang("LangPageOtherDialogFeedbackTitle"), GetLang("LangPageOtherDialogFeedbackBtn1"), GetLang("LangPageOtherDialogFeedbackBtn2"), GetLang("LangDialogBtnCancel"))
@@ -146,14 +141,9 @@
                 OpenWebsite("https://github.com/Hex-Dragon/PCL2/issues/")
         End Select
     End Sub
-    Private Sub TryVote(sender As Object, e As RouteEventArgs) Handles ItemVote.Changed
-        If Not ItemVote.Checked Then Exit Sub
-        TryVote()
-        e.Handled = True
-    End Sub
-    Public Shared Sub TryVote()
-        If MyMsgBox(GetLang("LangPageOtherDialogVoteContent"),
-                    GetLang("LangPageOtherDialogVoteTitle"), GetLang("LangPageOtherDialogVoteBtn1"), GetLang("LangDialogBtnCancel")) = 2 Then Exit Sub
+    Public Shared Sub TryVote() 'Handles ItemVote.Click
+        If MyMsgBox("是否要打开新功能投票网页？" & vbCrLf & "如果无法打开该网页，请尝试使用加速器或 VPN。",
+                    "新功能投票", "打开", "取消") = 2 Then Exit Sub
         OpenWebsite("https://github.com/Hex-Dragon/PCL2/discussions/categories/%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8?discussions_q=category%3A%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8+sort%3Adate_created")
     End Sub
 
