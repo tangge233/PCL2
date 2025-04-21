@@ -310,7 +310,7 @@ Once the first-level translations are complete, their content will serve as the 
 
 Once all first-level and second-level translations are complete, the changes made on Weblate will be committed to the repository.
 
-To aid understanding, a clear flowchart is provided:
+To aid in understanding, a clear flowchart is provided:
 
 ```mermaid
 graph LR;
@@ -338,7 +338,7 @@ graph LR;
     E1 -- Localization --> F1
     E1 --> F2 & F3 & F4 & F5 & F7
     E4 -- ZhConvert --> F6
-    s1 ==> n1["最终译文"]
+    s1 ==> n1["Final Translations"]
     s2 ==> n1
 ```
 
@@ -354,7 +354,7 @@ This process applies to strings that have not yet been translated or approved.
 
 2. **Initial Translation**: Use AI tools (ChatGPT series recommended) or translation software to create a first draft. Ensure the translation is fluent and semantically accurate while maintaining efficiency.
 
-3. **Manual Polishing**: Refine the draft translation to ensure consistency with the original text, avoiding over-interpretation or misrepresentation.
+3. **Manual Polishing**: Refine the draft translation to ensure consistency with the original text and avoid over-interpretation or misrepresentation.
 
 4. **Length Evaluation & Optimization**: Locate the string in the PCL interface and assess whether the translated content fits well within the UI constraints. If needed, simplify expressions and remove redundant words.
 
@@ -372,7 +372,7 @@ graph LR
 
 ### 2. Optimizing Approved Strings
 
-This process is applicable to strings that have already been approved but contain errors or have room for improvement.
+This process applies to strings that have already been approved but contain errors or have room for improvement.
 
 1. Submit the updated translation using the same procedure described in “Submitting Translation Suggestions.”
 
@@ -392,7 +392,7 @@ This applies to strings that have been translated but not yet approved.
 
 1. **Review Suggested Translations**: Carefully examine each suggestion to ensure the meaning is clear, the grammar is correct, and the translation fits the context.
 
-2. **Use Proofing Tools**: Utilize AI tools to assist with grammar checks and to ensure the translation aligns with natural language usage.
+2. **Use Proofing Tools**: Utilize AI tools to assist with grammar checks and to ensure the translation is aligned with natural language usage.
 
 3. **Length Evaluation**: Check the translation within the PCL interface to confirm it fits appropriately. If it's too long, simplify the wording as needed.
 
@@ -417,7 +417,7 @@ This process applies to translations that have already been approved but are fou
 
 3. **If Edits Are Needed**: Change the `Review Status` to `Needs Editing` and save it. The string will then enter a pending modification state.
 
-4. **Reach a Consensus**: Discuss the issue in the comments section or through community channels (e.g., group chat) to reach a consensus. If agreement is achieved, revise the translation and proceed through the “Reviewing Translation Suggestions” process again. If no consensus is reached, reject the suggestion and mark the comment as `Resolved`.
+4. **Reach a Consensus**: Discuss the issue in the comments section or through community channels (e.g. group chat) to reach a consensus. If agreement is achieved, revise the translation and proceed through the “Reviewing Translation Suggestions” process again. If no consensus is reached, reject the suggestion and mark the comment as `Resolved`.
 
 ```mermaid
 graph LR
