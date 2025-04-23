@@ -443,7 +443,7 @@ When converting American English to British English, standard translation tools 
 
 **Recommended tools include:**
 
-- **Grammarly**: [Online Version](https://app.grammarly.com/) or [Desktop Version](https://www.grammarly.com/desktop)  
+- **Grammarly**: [Online Edition](https://app.grammarly.com/) or [Desktop Edition](https://www.grammarly.com/desktop)  
 - **Microsoft Editor** (built into Microsoft Edge)  
 - **GoTranscript’s** [American ↔ British English Converter](https://gotranscript.com/translation-services/american-to-british)  
 - **Microsoft Word**: Built-in spelling and grammar check functionality
