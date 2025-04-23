@@ -259,8 +259,6 @@ graph LR
 
 # PCL i18n & l10n Project Guide
 
-*Scroll down for the English version!!!*
-
 This document is intended to help you quickly understand the **PCL i18n Project** workflow and point out common translation issues to contribute more efficiently and accurately. Whether you're a newcomer to translation projects or an experienced translator, this guide provides clear operational steps and practical advice. By following the processes outlined here, you can ensure the quality and consistency of your translations while avoiding common errors and misunderstandings. We hope this guide becomes a valuable assistant in your contributions to the PCL i18n Project!
 
 ## Overall Translation Workflow
