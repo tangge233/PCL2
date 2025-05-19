@@ -270,7 +270,7 @@
     <s:String x:Key="LangSetFuncHiddenSettingsSubPage">设置 子页面</s:String>
     <s:String x:Key="LangSetFuncHiddenSettingsGame">游戏</s:String>
     <s:String x:Key="LangSetFuncHiddenSettingsPersonalize">个性化</s:String>
-    <s:String x:Key="LangSetFuncHiddenSettingsLaunch">其它</s:String>
+    <s:String x:Key="LangSetFuncHiddenSettingsLaunch">其他</s:String>
     <s:String x:Key="LangSetFuncHiddenSettingsLink">联机</s:String>
     <s:String x:Key="LangSetFuncHiddenMoreSubPage">更多 子页面</s:String>
     <s:String x:Key="LangSetFuncHiddenMoreHelp">帮助</s:String>
@@ -586,7 +586,7 @@
     <s:String x:Key="LangDownloadModpackTypeMapBased">基于地图</s:String>
     <s:String x:Key="LangDownloadModpackTypeLightWeight">轻量整合</s:String>
     <s:String x:Key="LangDownloadModpackTypeHeavyWeight">大型整合</s:String>
-    <s:String x:Key="LangDownloadModpackTypeOther">其它</s:String>
+    <s:String x:Key="LangDownloadModpackTypeOther">其他</s:String>
     <s:String x:Key="LangDownloadResourcepackTypeTitleStyle">风格</s:String>
     <s:String x:Key="LangDownloadResourcepackTypeVanillaLike">原版风</s:String>
     <s:String x:Key="LangDownloadResourcepackTypeRealistic">写实风</s:String>
@@ -995,7 +995,7 @@
     <s:String x:Key="LangPageSetupLaunchMemReduceDialogEnableTitle">提醒</s:String>
     <s:String x:Key="LangPageSetupLeftGame">启动</s:String>
     <s:String x:Key="LangPageSetupLeftPersonalize">个性化</s:String>
-    <s:String x:Key="LangPageSetupLeftLaunch">其它</s:String>
+    <s:String x:Key="LangPageSetupLeftLaunch">其他</s:String>
     <s:String x:Key="LangPageSetupLeftLink">联机</s:String>
     <s:String x:Key="LangPageSetupLeftReset">初始化本页设置</s:String>
     <s:String x:Key="LangPageSetupLeftDialogResetGameConfirmContent">是否要初始化游戏页的所有设置？该操作不可撤销。</s:String>
@@ -1654,7 +1654,7 @@ PCL 不支持其他乱七八糟的下载协议。</s:String>
     <s:String x:Key="LangModLaunchExceptionInvalidSelectedRole">选择的角色 {0} 无效！</s:String>
     <s:String x:Key="LangModLaunchHintNoRoleChangeRole">你还没有创建角色，无法更换！</s:String>
     <s:String x:Key="LangModLaunchHintNoRole">你还没有创建角色，请在创建角色后再试！</s:String>
-    <s:String x:Key="LangModLaunchHintNoRoleOnlyOne">你的账户中只有一个角色， 无法更换！</s:String>
+    <s:String x:Key="LangModLaunchHintNoRoleOnlyOne">你的账户中只有一个角色，无法更换！</s:String>
     <s:String x:Key="LangModLaunchDialogSelectRole">选择使用的角色</s:String>
     <s:String x:Key="LangModLaunchExceptionLoginFail">登录失败：{0}</s:String>
     <s:String x:Key="LangModLaunchExceptionTimeout">登录失败：连接登录服务器超时。
