@@ -248,7 +248,16 @@ Public Class FormMain
 
 
         Opacity = 0
-        '开启管理员权限下的文件拖拽，但下列代码也没用（#2531）
+        '旧代码
+        ''开启管理员权限下的文件拖拽，但下列代码也没用（#2531）
+        'If IsAdmin() Then
+        '    Log("[Start] PCL 正以管理员权限运行")
+        '    ChangeWindowMessageFilter(&H233, 1)
+        '    ChangeWindowMessageFilter(&H4A, 1)
+        '    ChangeWindowMessageFilter(&H49, 1)
+        'End If
+
+        '开启管理员权限下的文件拖拽
         If IsAdmin() Then
             AddHandler Me.SourceInitialized,
             Sub(sender, e)
