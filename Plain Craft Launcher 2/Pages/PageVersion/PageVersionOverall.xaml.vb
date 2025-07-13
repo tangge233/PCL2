@@ -185,7 +185,7 @@
         '选择 自定义 时修改图片
         Try
             If ComboDisplayLogo.SelectedItem Is ItemDisplayLogoCustom Then
-                Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpg;*.gif)|*.png;*.jpg;*.gif", "选择图片")
+                Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpg;*.gif;*.jpeg)|*.png;*.jpg;*.gif;*.jpeg", "选择图片")
                 If FileName = "" Then
                     Reload() '还原选项
                     Return
