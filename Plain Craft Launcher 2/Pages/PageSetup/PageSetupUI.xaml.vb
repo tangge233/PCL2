@@ -274,7 +274,7 @@
 
     '顶部栏
     Private Sub BtnLogoChange_Click(sender As Object, e As EventArgs) Handles BtnLogoChange.Click
-        Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpg;*.gif;*.webp)|*.png;*.jpg;*.gif;*.webp", "选择图片")
+        Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpg;*.gif;*.webp;*.jpeg)|*.png;*.jpg;*.gif;*.webp;*.jpeg", "选择图片")
         If FileName = "" Then Return
         Try
             '拷贝文件
