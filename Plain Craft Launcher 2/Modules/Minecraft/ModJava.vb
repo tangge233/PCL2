@@ -530,6 +530,8 @@ NoUserJava:
                 If Disk.DriveType = DriveType.Network Then Continue For '跳过网络驱动器（#3705）
                 JavaSearchFolder(Disk.Name, JavaPreList, False)
             Next
+            '查找 ~/.jdks 文件夹中的 Java
+            JavaSearchFolder(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) & "\.jdks\", JavaPreList, False)
             '查找 APPDATA 文件夹中的 Java
             JavaSearchFolder(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\", JavaPreList, False)
             JavaSearchFolder(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) & "\", JavaPreList, False)
