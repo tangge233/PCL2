@@ -105,13 +105,15 @@
         Dim UnknownFailureCount As Integer = 0
         Do While Not MyConverter.IsExited
             Try
-                Dim Result = NetRequestOnce(
-                    "https://login.microsoftonline.com/consumers/oauth2/v2.0/token", "POST",
-                    "grant_type=urn:ietf:params:oauth:grant-type:device_code" & "&" &
-                    "client_id=" & OAuthClientId & "&" &
-                    "device_code=" & DeviceCode & "&" &
-                    "scope=XboxLive.signin%20offline_access",
-                    "application/x-www-form-urlencoded", 5000 + UnknownFailureCount * 5000, MakeLog:=False)
+                Dim Result = NetRequestByClient(
+                    "https://login.microsoftonline.com/consumers/oauth2/v2.0/token", HttpMethod.Post,
+                    Content:=
+                        "grant_type=urn:ietf:params:oauth:grant-type:device_code" & "&" &
+                        "client_id=" & OAuthClientId & "&" &
+                        "device_code=" & DeviceCode & "&" &
+                        "scope=XboxLive.signin%20offline_access",
+                    ContentType:="application/x-www-form-urlencoded",
+                    Timeout:=5000 + UnknownFailureCount * 5000)
                 '获取结果
                 Dim ResultJson As JObject = GetJson(Result)
                 McLaunchLog($"令牌过期时间：{ResultJson("expires_in")} 秒")
@@ -125,8 +127,8 @@
                 ElseIf ex.Message.Contains("expired_token") Then
                     Finished(New Exception("$登录用时太长啦，重新试试吧！"))
                     Return
-                Else If ex.Message.Contains("Account security interrupt") Then
-                    Finished(New Exception("$非常抱歉，该账号由于安全问题无法登陆，请前往 Microsoft 账户页获取更多信息。"))
+                ElseIf ex.Message.Contains("Account security interrupt") Then
+                    Finished(New Exception("$该账号由于安全问题无法登陆，请前往微软账户页获取更多信息。"))
                     Return
                 ElseIf ex.Message.Contains("service abuse") Then
                     Finished(New Exception("$非常抱歉，该账号已被微软封禁，无法登录。"))

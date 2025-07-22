@@ -99,7 +99,6 @@ Public Class PageComp
             End If
             TargetVersion = Nothing
             If TargetName IsNot Nothing Then
-                '设置搜索框内容
                 TextSearchName.Text = TargetName
                 TargetName = Nothing
             End If

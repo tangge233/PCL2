@@ -83,6 +83,13 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 363 Then 'Snapshot 2.10.4
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：下载资源时，会单独记忆每种资源上次下载到的文件夹，以防混淆"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：网络底层框架与下载稳定性"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法启动一部分 LabyMod 和 GTNH 客户端"))
+            FeatureCount += 22
+            BugCount += 26
+        End If
         If LastVersion < 362 Then 'Snapshot 2.10.3
             FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：无法安装部分使用老版本 PCL 导出的整合包"))
         End If
@@ -204,8 +211,6 @@ Public Class FormMain
         End Sub, "UpdateLog Output")
     End Sub
 
-    Private ReadOnly Helper As New DragFileHelper()
-
     '窗口加载
     Private IsWindowLoadFinished As Boolean = False
     Public Sub New()
@@ -228,7 +233,7 @@ Public Class FormMain
             If Not Setup.IsUnset("LaunchArgumentIndie") Then
                 Log("[Start] 从老 PCL 迁移版本隔离")
                 Setup.Set("LaunchArgumentIndieV2", Setup.Get("LaunchArgumentIndie"))
-            ElseIf Not Setup.IsUnset("WindowHeight") Then
+            ElseIf Not Setup.IsUnset("LaunchVersionSelect") Then
                 Log("[Start] 从老 PCL 升级，但此前未调整版本隔离，使用老的版本隔离默认值")
                 Setup.Set("LaunchArgumentIndieV2", Setup.GetDefault("LaunchArgumentIndie"))
             Else
@@ -244,36 +249,24 @@ Public Class FormMain
         [AddHandler](DragDrop.DragOverEvent, New DragEventHandler(AddressOf HandleDrag), handledEventsToo:=True)
         '加载 UI
         InitializeComponent()
-
-
-
         Opacity = 0
-        '旧代码
-        ''开启管理员权限下的文件拖拽，但下列代码也没用（#2531）
-        'If IsAdmin() Then
-        '    Log("[Start] PCL 正以管理员权限运行")
+        '开启管理员权限下的文件拖拽
+        If IsAdmin() Then
+            Static Helper As New DragHelper
+            AddHandler SourceInitialized,
+            Sub()
+                Dim WpfHelper As New WindowInteropHelper(Me)
+                Helper.HwndIntPtrSource = HwndSource.FromHwnd(WpfHelper.Handle)
+                Helper.AddHook()
+            End Sub
+            AddHandler Closing, Sub() Helper.RemoveDragHook()
+            AddHandler Helper.DragDrop, Sub() FileDrag(Helper.DropFilePaths)
+        End If
+        'If IsAdmin() Then '下列代码没用（#2531）
         '    ChangeWindowMessageFilter(&H233, 1)
         '    ChangeWindowMessageFilter(&H4A, 1)
         '    ChangeWindowMessageFilter(&H49, 1)
         'End If
-
-        '开启管理员权限下的文件拖拽
-        If IsAdmin() Then
-            AddHandler Me.SourceInitialized,
-            Sub(sender, e)
-                Dim wpfHelper As New WindowInteropHelper(Me)
-                Helper.HwndIntPtrSource = HwndSource.FromHwnd(wpfHelper.Handle)
-                Helper.AddHook()
-            End Sub
-            AddHandler Me.Closing,
-            Sub(sender, e)
-                Helper.RemoveDragHook()
-            End Sub
-            AddHandler Helper.DragDrop,
-            Sub(sender, e)
-                Me.FileDrag(Helper.DropFilePaths)
-            End Sub
-        End If
         '切换到首页
         If Not IsNothing(FrmLaunchLeft.Parent) Then FrmLaunchLeft.SetValue(ContentPresenter.ContentProperty, Nothing)
         If Not IsNothing(FrmLaunchRight.Parent) Then FrmLaunchRight.SetValue(ContentPresenter.ContentProperty, Nothing)
@@ -390,7 +383,7 @@ Public Class FormMain
             Catch ex As Exception
                 Log(ex, "清理自动更新文件失败")
             End Try
-        End Sub, "Start Loader", ThreadPriority.Lowest)
+        End Sub, "初始化", ThreadPriority.Lowest)
 
         Log("[Start] 第三阶段加载用时：" & GetTimeTick() - ApplicationStartTick & " ms")
     End Sub
@@ -616,11 +609,12 @@ Public Class FormMain
     '按键事件
     Private Sub FormMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         If e.IsRepeat Then Return
-        '调用弹窗：回车选择第一个，Esc 选择最后一个
-        If PanMsg.Children.Count > 0 Then
+        '修复按下 Alt 后误认为弹出系统菜单导致的冻结
+        If e.SystemKey = Key.LeftAlt OrElse e.SystemKey = Key.RightAlt Then e.Handled = True
+        '在有弹窗时：回车选择第一个，Esc 选择最后一个
+        If PanMsg.Children.Any Then
             If e.Key = Key.Enter Then
                 CType(PanMsg.Children(0), Object).Btn1_Click()
-                Return
             ElseIf e.Key = Key.Escape Then
                 Dim Msg As Object = PanMsg.Children(0)
                 If TypeOf Msg IsNot MyMsgInput AndAlso TypeOf Msg IsNot MyMsgSelect AndAlso Msg.Btn3.Visibility = Visibility.Visible Then
@@ -630,9 +624,14 @@ Public Class FormMain
                 Else
                     Msg.Btn1_Click()
                 End If
-                Return
             End If
+            Return
         End If
+
+        '==========================
+        ' 在没有弹窗时：继续检查……
+        '==========================
+
         '按 ESC 返回上一级
         If e.Key = Key.Escape Then TriggerPageBack()
         '更改隐藏版本可见性
@@ -666,8 +665,6 @@ Public Class FormMain
                 FrmLaunchLeft.LaunchButtonClick()
             End If
         End If
-        '修复按下 Alt 后误认为弹出系统菜单导致的冻结
-        If e.SystemKey = Key.LeftAlt OrElse e.SystemKey = Key.RightAlt Then e.Handled = True
     End Sub
     Private Sub FormMain_MouseDown(sender As Object, e As MouseButtonEventArgs) Handles Me.MouseDown
         '鼠标侧键返回上一级
@@ -732,6 +729,7 @@ Public Class FormMain
     End Sub
     Private Sub FrmMain_Drop(sender As Object, e As DragEventArgs) Handles Me.Drop
         Try
+            ShowWindowToTop()
             If e.Data.GetDataPresent(DataFormats.Text) Then
                 '获取文本
                 Try

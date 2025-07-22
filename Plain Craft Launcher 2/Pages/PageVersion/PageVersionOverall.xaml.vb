@@ -116,12 +116,14 @@
             Dim TempName As String = NewName & "_temp"
             Dim TempPath As String = PathMcFolder & "versions\" & TempName & "\"
             Dim IsCaseChangedOnly As Boolean = NewName.ToLower = OldName.ToLower
-            '重新加载版本 Json 信息，避免 HMCL 项被合并
+            '重新读取版本 JSON 信息，避免 JsonObject 中已被合并的项被重新存储
             Dim JsonObject As JObject
             Try
-                JsonObject = GetJson(ReadFile(PageVersionLeft.Version.Path & PageVersionLeft.Version.Name & ".json"))
+                Dim JsonPath As String = PageVersionLeft.Version.GetJsonPath()
+                JsonObject = GetJson(ReadFile(JsonPath))
+                File.Delete(JsonPath)
             Catch ex As Exception
-                Log(ex, "重命名读取 json 时失败")
+                Log(ex, "在重命名读取 json 时失败")
                 JsonObject = PageVersionLeft.Version.JsonObject
             End Try
             '重命名主文件夹
@@ -130,32 +132,24 @@
             '清理 ini 缓存
             IniClearCache(PageVersionLeft.Version.PathIndie & "options.txt")
             IniClearCache(PageVersionLeft.Version.Path & "PCL\Setup.ini")
-            '重命名 JAR 文件、JSON 文件与 natives 文件夹
-            If Directory.Exists(NewPath & OldName & "-natives") Then
+            '重命名 jar 文件与 natives 文件夹
+            '不能进行遍历重命名，否则在版本名很短的时候容易误伤其他文件（#6443）
+            If Directory.Exists($"{NewPath}{OldName}-natives") Then
                 If IsCaseChangedOnly Then
-                    My.Computer.FileSystem.RenameDirectory(NewPath & OldName & "-natives", OldName & "natives" & "_temp")
-                    My.Computer.FileSystem.RenameDirectory(NewPath & OldName & "-natives" & "_temp", NewName & "-natives")
+                    My.Computer.FileSystem.RenameDirectory($"{NewPath}{OldName}-natives", $"{OldName}natives_temp")
+                    My.Computer.FileSystem.RenameDirectory($"{NewPath}{OldName}-natives_temp", $"{NewName}-natives")
                 Else
-                    DeleteDirectory(NewPath & NewName & "-natives")
-                    My.Computer.FileSystem.RenameDirectory(NewPath & OldName & "-natives", NewName & "-natives")
+                    DeleteDirectory($"{NewPath}{NewName}-natives")
+                    My.Computer.FileSystem.RenameDirectory($"{NewPath}{OldName}-natives", $"{NewName}-natives")
                 End If
             End If
-            If File.Exists(NewPath & OldName & ".jar") Then
+            If File.Exists($"{NewPath}{OldName}.jar") Then
                 If IsCaseChangedOnly Then
-                    My.Computer.FileSystem.RenameFile(NewPath & OldName & ".jar", OldName & "_temp" & ".jar")
-                    My.Computer.FileSystem.RenameFile(NewPath & OldName & "_temp" & ".jar", NewName & ".jar")
+                    My.Computer.FileSystem.RenameFile($"{NewPath}{OldName}.jar", $"{OldName}_temp.jar")
+                    My.Computer.FileSystem.RenameFile($"{NewPath}{OldName}_temp.jar", $"{NewName}.jar")
                 Else
-                    File.Delete(NewPath & NewName & ".jar")
-                    My.Computer.FileSystem.RenameFile(NewPath & OldName & ".jar", NewName & ".jar")
-                End If
-            End If
-            If File.Exists(NewPath & OldName & ".json") Then
-                If IsCaseChangedOnly Then
-                    My.Computer.FileSystem.RenameFile(NewPath & OldName & ".json", OldName & "_temp" & ".json")
-                    My.Computer.FileSystem.RenameFile(NewPath & OldName & "_temp" & ".json", NewName & ".json")
-                Else
-                    File.Delete(NewPath & NewName & ".json")
-                    My.Computer.FileSystem.RenameFile(NewPath & OldName & ".json", NewName & ".json")
+                    File.Delete($"{NewPath}{NewName}.jar")
+                    My.Computer.FileSystem.RenameFile($"{NewPath}{OldName}.jar", $"{NewName}.jar")
                 End If
             End If
             '替换版本设置文件中的路径
@@ -166,15 +160,13 @@
             If ReadIni(PathMcFolder & "PCL.ini", "Version") = OldName Then
                 WriteIni(PathMcFolder & "PCL.ini", "Version", NewName)
             End If
-            '更改版本 Json
-            If File.Exists(NewPath & NewName & ".json") Then
-                Try
-                    JsonObject("id") = NewName
-                    WriteFile(NewPath & NewName & ".json", JsonObject.ToString)
-                Catch ex As Exception
-                    Log(ex, "重命名版本 json 失败")
-                End Try
-            End If
+            '写入版本 Json
+            Try
+                JsonObject("id") = NewName
+                WriteFile(NewPath & NewName & ".json", JsonObject.ToString)
+            Catch ex As Exception
+                Log(ex, "重命名版本 json 失败")
+            End Try
             '刷新与提示
             Hint("重命名成功！", HintType.Finish)
             PageVersionLeft.Version = New McVersion(NewName).Load()
@@ -192,7 +184,7 @@
         '选择 自定义 时修改图片
         Try
             If ComboDisplayLogo.SelectedItem Is ItemDisplayLogoCustom Then
-                Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpg;*.gif;*.jpeg)|*.png;*.jpg;*.gif;*.jpeg", "选择图片")
+                Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpeg;*.jpg;*.gif;*.webp)|*.png;*.jpeg;*.jpg;*.gif;*.webp", "选择图片")
                 If FileName = "" Then
                     Reload() '还原选项
                     Return

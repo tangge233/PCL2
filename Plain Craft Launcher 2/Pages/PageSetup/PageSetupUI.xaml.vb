@@ -1,6 +1,4 @@
-﻿Imports NAudio.Wave
-
-Public Class PageSetupUI
+﻿Public Class PageSetupUI
 
     Public Shadows IsLoaded As Boolean = False
 
@@ -276,7 +274,7 @@ Public Class PageSetupUI
 
     '顶部栏
     Private Sub BtnLogoChange_Click(sender As Object, e As EventArgs) Handles BtnLogoChange.Click
-        Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpg;*.gif;*.webp;*.jpeg)|*.png;*.jpg;*.gif;*.webp;*.jpeg", "选择图片")
+        Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpg;*.jpeg;*.gif;*.webp)|*.png;*.jpg;*.jpeg;*.gif;*.webp", "选择图片")
         If FileName = "" Then Return
         Try
             '拷贝文件
@@ -321,7 +319,7 @@ Refresh:
             Return
         End If
         '没有图片则要求选择
-        Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpg;*.gif;*.webp)|*.png;*.jpg;*.gif;*.webp", "选择图片")
+        Dim FileName As String = SelectFile("常用图片文件(*.png;*.jpeg;*.jpg;*.gif;*.webp)|*.png;*.jpeg;*.jpg;*.gif;*.webp", "选择图片")
         If FileName = "" Then
             FrmMain.ImageTitleLogo.Source = Nothing
             e.Handled = True
@@ -359,15 +357,9 @@ Refresh:
             PanMusicVolume.Visibility = Visibility.Visible
             PanMusicDetail.Visibility = Visibility.Visible
             BtnMusicClear.Visibility = Visibility.Visible
-            Dim validMusicCount As Integer = 0
-            For Each File In EnumerateFiles(Path & "PCL\Musics\")
-                Try
-                    If {".ini", ".jpg", ".txt", ".cfg", ".lrc", ".db", ".png"}.Contains(File.Extension.ToLower) Then Continue For
-                    validMusicCount += 1
-                Catch ex As Exception
-                End Try
-            Next
-            CardMusic.Title = "背景音乐（" & validMusicCount & " 首）"
+            CardMusic.Title = "背景音乐（" &
+                EnumerateFiles(Path & "PCL\Musics\").Count(Function(f) {".ini", ".jpg", ".txt", ".cfg", ".lrc", ".db", ".png"}.Contains(f.Extension.ToLower)) &
+                " 首）"
         Else
             PanMusicVolume.Visibility = Visibility.Collapsed
             PanMusicDetail.Visibility = Visibility.Collapsed

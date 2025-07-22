@@ -1,6 +1,5 @@
 ﻿'由于包含加解密等安全信息，本文件中的部分代码已被删除
 
-Imports System.Net.Http
 Imports System.Security.Cryptography
 
 Friend Module ModSecret
@@ -13,7 +12,6 @@ Friend Module ModSecret
     Public OAuthClientId As String = If(Environment.GetEnvironmentVariable("PCL_MS_CLIENT_ID"), "")
     'CurseForge API Key
     Public CurseForgeAPIKey As String = If(Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY"), "")
-
 
     Friend Sub SecretOnApplicationStart()
         '提升 UI 线程优先级
@@ -73,7 +71,7 @@ Friend Module ModSecret
 
 #Region "网络鉴权"
 
-    Friend Function SecretCdnSign(UrlWithMark As String)
+    Friend Function SecretCdnSign(UrlWithMark As String) As String
         If Not UrlWithMark.EndsWithF("{CDN}") Then Return UrlWithMark
         Return UrlWithMark.Replace("{CDN}", "").Replace(" ", "%20")
     End Function
@@ -91,7 +89,6 @@ Friend Module ModSecret
         Req.Headers.Add("Referer", $"http://{VersionCode}.open.pcl2.server/")
         If Url.Contains("api.curseforge.com") Then Req.Headers.Add("x-api-key", CurseForgeAPIKey)
     End Sub
-
 
 #End Region
 

@@ -1,11 +1,10 @@
-﻿Imports System
+﻿'来源：https://blog.csdn.net/simpleman2000/article/details/140952294
+
 Imports System.ComponentModel
 Imports System.Runtime.InteropServices
-Imports System.Text
 Imports System.Windows.Interop
 
-
-Public Class DragFileHelper
+Public Class DragHelper
 
     Public Event DragDrop As EventHandler
 
@@ -32,22 +31,22 @@ Public Class DragFileHelper
     Public Property HwndIntPtrSource As HwndSource
 
     Public Sub AddHook()
-        Me.RemoveDragHook()
-        Me.HwndIntPtrSource.AddHook(AddressOf WndProc)
-        Dim handle As IntPtr = Me.HwndIntPtrSource.Handle
+        RemoveDragHook()
+        HwndIntPtrSource.AddHook(AddressOf WndProc)
+        Dim handle As IntPtr = HwndIntPtrSource.Handle
         If IsUserAnAdmin() Then RevokeDragDrop(handle)
         DragAcceptFiles(handle, True)
         ChangeMessageFilter(handle)
     End Sub
 
     Public Sub RemoveDragHook()
-        Me.HwndIntPtrSource.RemoveHook(AddressOf WndProc)
-        DragAcceptFiles(Me.HwndIntPtrSource.Handle, False)
+        HwndIntPtrSource.RemoveHook(AddressOf WndProc)
+        DragAcceptFiles(HwndIntPtrSource.Handle, False)
     End Sub
 
-    Private Function WndProc(ByVal hwnd As IntPtr, ByVal msg As Integer, ByVal wParam As IntPtr, ByVal lParam As IntPtr, ByRef handled As Boolean) As IntPtr
+    Private Function WndProc(hwnd As IntPtr, msg As Integer, wParam As IntPtr, lParam As IntPtr, ByRef handled As Boolean) As IntPtr
         Dim filePaths As String() = Nothing
-        Dim point As POINT = New POINT()
+        Dim point As New POINT()
 
         If TryGetDropInfo(msg, wParam, filePaths, point) Then
             DropPoint = point
@@ -59,31 +58,31 @@ Public Class DragFileHelper
     End Function
 
     <DllImport("user32.dll", SetLastError:=True)>
-    Private Shared Function ChangeWindowMessageFilterEx(ByVal hWnd As IntPtr, ByVal msg As UInteger, ByVal action As UInteger, ByRef pChangeFilterStruct As CHANGEFILTERSTRUCT) As Boolean
+    Private Shared Function ChangeWindowMessageFilterEx(hWnd As IntPtr, msg As UInteger, action As UInteger, ByRef pChangeFilterStruct As CHANGEFILTERSTRUCT) As Boolean
     End Function
 
     <DllImport("user32.dll", SetLastError:=True)>
-    Private Shared Function ChangeWindowMessageFilter(ByVal msg As UInteger, ByVal flags As UInteger) As Boolean
+    Private Shared Function ChangeWindowMessageFilter(msg As UInteger, flags As UInteger) As Boolean
     End Function
 
     <DllImport("shell32.dll")>
-    Private Shared Sub DragAcceptFiles(ByVal hWnd As IntPtr, ByVal fAccept As Boolean)
+    Private Shared Sub DragAcceptFiles(hWnd As IntPtr, fAccept As Boolean)
     End Sub
 
     <DllImport("shell32.dll", CharSet:=CharSet.Unicode)>
-    Private Shared Function DragQueryFile(ByVal hWnd As IntPtr, ByVal iFile As UInteger, ByVal lpszFile As StringBuilder, ByVal cch As Integer) As UInteger
+    Private Shared Function DragQueryFile(hWnd As IntPtr, iFile As UInteger, lpszFile As StringBuilder, cch As Integer) As UInteger
     End Function
 
     <DllImport("shell32.dll")>
-    Private Shared Function DragQueryPoint(ByVal hDrop As IntPtr, ByRef lppt As POINT) As Boolean
+    Private Shared Function DragQueryPoint(hDrop As IntPtr, ByRef lppt As POINT) As Boolean
     End Function
 
     <DllImport("shell32.dll")>
-    Private Shared Sub DragFinish(ByVal hDrop As IntPtr)
+    Private Shared Sub DragFinish(hDrop As IntPtr)
     End Sub
 
     <DllImport("ole32.dll")>
-    Private Shared Function RevokeDragDrop(ByVal hWnd As IntPtr) As Integer
+    Private Shared Function RevokeDragDrop(hWnd As IntPtr) As Integer
     End Function
 
     <DllImport("shell32.dll")>
@@ -109,13 +108,13 @@ Public Class DragFileHelper
     Private Const MSGFLT_ADD As UInteger = 1
     Private Const MAX_PATH As Integer = 260
 
-    Private Shared Sub ChangeMessageFilter(ByVal handle As IntPtr)
+    Private Shared Sub ChangeMessageFilter(handle As IntPtr)
         Dim ver As Version = Environment.OSVersion.Version
         Dim isVistaOrHigher As Boolean = ver >= New Version(6, 0)
         Dim isNt61OrHiger As Boolean = ver >= New Version(6, 1)
 
         If isVistaOrHigher Then
-            Dim status As CHANGEFILTERSTRUCT = New CHANGEFILTERSTRUCT With {.cbSize = 8}
+            Dim status As New CHANGEFILTERSTRUCT With {.cbSize = 8}
             For Each msg As UInteger In New UInteger() {WM_DROPFILES, WM_COPYGLOBALDATA, WM_COPYDATA}
                 Dim [error] As Boolean = False
                 If isNt61OrHiger Then
@@ -129,7 +128,7 @@ Public Class DragFileHelper
         End If
     End Sub
 
-    Private Shared Function TryGetDropInfo(ByVal msg As Integer, ByVal wParam As IntPtr, ByRef dropFilePaths As String(), ByRef dropPoint As POINT) As Boolean
+    Private Shared Function TryGetDropInfo(msg As Integer, wParam As IntPtr, ByRef dropFilePaths As String(), ByRef dropPoint As POINT) As Boolean
         dropFilePaths = Nothing
         dropPoint = New POINT()
 
@@ -141,7 +140,7 @@ Public Class DragFileHelper
         For i As UInteger = 0 To fileCount - 1
             Dim sb As New StringBuilder(MAX_PATH)
             Dim result As UInteger = DragQueryFile(wParam, i, sb, sb.Capacity)
-            If result > 0 Then dropFilePaths(CInt(i)) = sb.ToString()
+            If result > 0 Then dropFilePaths(i) = sb.ToString()
         Next
 
         DragQueryPoint(wParam, dropPoint)

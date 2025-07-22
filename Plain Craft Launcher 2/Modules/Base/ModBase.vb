@@ -13,13 +13,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.10.3" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.10.3." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.10.4" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.10.4." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
     Public Const VersionCode As Integer = 361 'Release
 #Else
-    Public Const VersionCode As Integer = 362 'Snapshot
+    Public Const VersionCode As Integer = 363 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -1551,7 +1551,7 @@ RetryDir:
     ''' <summary>
     ''' 获取 JSON 对象。
     ''' </summary>
-    Public Function GetJson(Data As String)
+    Public Function GetJson(Data As String) As JToken
         Try
             Return JsonConvert.DeserializeObject(Data, New JsonSerializerSettings With {.DateTimeZoneHandling = DateTimeZoneHandling.Local})
         Catch ex As Exception
@@ -2132,6 +2132,19 @@ RetryDir:
     End Class
 
     ''' <summary>
+    ''' 将二维数组转换为字典。
+    ''' </summary>
+    <Extension> Public Function ToDictionary(Of T)(arr As T(,)) As Dictionary(Of T, T)
+        Dim result As New Dictionary(Of T, T)
+        If arr.Length = 0 Then Return result
+        If arr.GetLength(1) <> 2 Then Throw New ArgumentException("数组必须为两列，第一列为 Key，第二列为 Value。")
+        For i As Integer = 0 To arr.GetLength(0) - 1
+            result(arr(i, 0)) = arr(i, 1)
+        Next
+        Return result
+    End Function
+
+    ''' <summary>
     ''' 可用于临时存放文件的，不含任何特殊字符的文件夹路径，以“\”结尾。
     ''' </summary>
     Public PathPure As String = GetPureASCIIDir()
@@ -2179,10 +2192,10 @@ RetryDir:
     End Function
 
     ''' <summary>
-    ''' 判断当前系统语言是否为 zh-CN。
+    ''' 判断当前系统语言是否为中文。
     ''' </summary>
     Public Function IsSystemLanguageChinese() As Boolean
-        Return CultureInfo.CurrentCulture.Name = "zh-CN" OrElse CultureInfo.CurrentUICulture.Name = "zh-CN"
+        Return CultureInfo.CurrentCulture.Name.StartsWithF("zh-") OrElse CultureInfo.CurrentUICulture.Name.StartsWithF("zh-")
     End Function
 
     Private Uuid As Integer = 1
@@ -2224,6 +2237,9 @@ RetryDir:
 NextElement:
         Next i
         Return ResultArray
+    End Function
+    <Extension> Public Function Any(Arr As UIElementCollection) As Boolean
+        Return Arr?.Count > 0
     End Function
 
     ''' <summary>
@@ -2462,7 +2478,7 @@ NextElement:
     ''' </summary>
     Public Sub RunInThread(Action As Action)
         If RunInUi() Then
-            RunInNewThread(Action, "Runtime Invoke " & GetUuid() & "#")
+            RunInNewThread(Action, "Invoke " & GetUuid())
         Else
             Action()
         End If
@@ -2760,11 +2776,11 @@ Retry:
             Using Reader As New XamlXmlReader(Stream)
                 While Reader.Read()
                     For Each BlackListType In {GetType(WebBrowser), GetType(Frame), GetType(MediaElement), GetType(ObjectDataProvider), GetType(XamlReader), GetType(Window), GetType(XmlDataProvider)}
-                        If Reader.Type IsNot Nothing AndAlso BlackListType.IsAssignableFrom(Reader.Type.UnderlyingType) Then Throw New UnauthorizedAccessException($"不允许使用 {BlackListType.Name} 类型。")
-                        If Reader.Value IsNot Nothing AndAlso Reader.Value = BlackListType.Name Then Throw New UnauthorizedAccessException($"不允许使用 {BlackListType.Name} 值。")
+                        If Reader.Type IsNot Nothing AndAlso BlackListType.IsAssignableFrom(Reader.Type.UnderlyingType) Then Throw New UnauthorizedAccessException($"基于安全考虑，不允许使用 {BlackListType.Name} 类型。")
+                        If Reader.Value IsNot Nothing AndAlso Reader.Value = BlackListType.Name Then Throw New UnauthorizedAccessException($"基于安全考虑，不允许使用 {BlackListType.Name} 值。")
                     Next
                     For Each BlackListMember In {"Code", "FactoryMethod", "Static"}
-                        If Reader.Member IsNot Nothing AndAlso Reader.Member.Name = BlackListMember Then Throw New UnauthorizedAccessException($"不允许使用 {BlackListMember} 成员。")
+                        If Reader.Member IsNot Nothing AndAlso Reader.Member.Name = BlackListMember Then Throw New UnauthorizedAccessException($"基于安全考虑，不允许使用 {BlackListMember} 成员。")
                     Next
                 End While
             End Using
@@ -2922,7 +2938,7 @@ Retry:
         '处理错误会导致再次调用 Log() 导致无限循环
 
         '输出日志
-        Dim AppendText As String = "[" & GetTimeNow() & "] " & Text & vbCrLf '减轻同步锁占用
+        Dim AppendText As String = $"[{GetTimeNow()}] <{If(Thread.CurrentThread.Name = "", "主线程", Thread.CurrentThread.Name)}> {Text}{vbCrLf}" '减轻同步锁占用
         If ModeDebug Then
             SyncLock LogListLock
                 LogList.Append(AppendText)
@@ -2986,7 +3002,7 @@ Retry:
         Dim ExFull As String = Desc & "：" & GetExceptionDetail(Ex)
 
         '输出日志
-        Dim AppendText As String = "[" & GetTimeNow() & "] " & Desc & "：" & GetExceptionDetail(Ex, True) & vbCrLf '减轻同步锁占用
+        Dim AppendText As String = $"[{GetTimeNow()}] <{If(Thread.CurrentThread.Name = "", "主线程", Thread.CurrentThread.Name)}> {Desc}：{GetExceptionDetail(Ex, True)}{vbCrLf}" '减轻同步锁占用
         If ModeDebug Then
             SyncLock LogListLock
                 LogList.Append(AppendText)
@@ -3048,7 +3064,7 @@ Retry:
         If ForceOpenLog OrElse (ShowMsgbox AndAlso MyMsgBox("若你在汇报一个 Bug，请点击 打开文件夹 按钮，并上传 Log(1~5).txt 中包含错误信息的文件。" & vbCrLf & "游戏崩溃一般与启动器无关，请不要因为游戏崩溃而提交反馈。", "反馈提交提醒", "打开文件夹", "不需要") = 1) Then
             OpenExplorer(Path & "PCL\Log1.txt")
         End If
-        OpenWebsite("https://github.com/Hex-Dragon/PCL2/issues/")
+        OpenWebsite("https://github.com/Meloong-Git/PCL/issues/")
     End Sub
     Public Function CanFeedback(ShowHint As Boolean) As Boolean
         If False.Equals(PageSetupSystem.IsLauncherNewest) Then
