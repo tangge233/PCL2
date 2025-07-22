@@ -113,7 +113,8 @@
                         "device_code=" & DeviceCode & "&" &
                         "scope=XboxLive.signin%20offline_access",
                     ContentType:="application/x-www-form-urlencoded",
-                    Timeout:=5000 + UnknownFailureCount * 5000)
+                    Timeout:=5000 + UnknownFailureCount * 5000,
+                    MakeLog:=False)
                 '获取结果
                 Dim ResultJson As JObject = GetJson(Result)
                 McLaunchLog($"令牌过期时间：{ResultJson("expires_in")} 秒")
@@ -121,24 +122,29 @@
                 Finished({ResultJson("access_token").ToString, ResultJson("refresh_token").ToString})
                 Return
             Catch ex As Exception
-                If ex.Message.Contains("authorization_declined") Then
-                    Finished(New Exception("$你拒绝了 PCL 申请的权限……"))
-                    Return
-                ElseIf ex.Message.Contains("expired_token") Then
-                    Finished(New Exception("$登录用时太长啦，重新试试吧！"))
-                    Return
-                ElseIf ex.Message.Contains("Account security interrupt") Then
-                    Finished(New Exception("$该账号由于安全问题无法登陆，请前往微软账户页获取更多信息。"))
-                    Return
-                ElseIf ex.Message.Contains("service abuse") Then
-                    Finished(New Exception("$非常抱歉，该账号已被微软封禁，无法登录。"))
-                    Return
-                ElseIf ex.Message.Contains("AADSTS70000") Then '可能不能判 “invalid_grant”，见 #269
-                    Finished(New RestartException)
-                    Return
-                ElseIf ex.Message.Contains("authorization_pending") Then
-                    Thread.Sleep(2000)
-                ElseIf UnknownFailureCount <= 2 Then
+                If TypeOf ex Is ResponsedWebException Then
+                    Dim Response = CType(ex, ResponsedWebException).Response
+                    If Response.Contains("authorization_declined") Then
+                        Finished(New Exception("$你拒绝了 PCL 申请的权限……"))
+                        Return
+                    ElseIf Response.Contains("expired_token") Then
+                        Finished(New Exception("$登录用时太长啦，重新试试吧！"))
+                        Return
+                    ElseIf Response.Contains("Account security interrupt") Then
+                        Finished(New Exception("$该账号由于安全问题无法登陆，请前往微软账户页获取更多信息。"))
+                        Return
+                    ElseIf Response.Contains("service abuse") Then
+                        Finished(New Exception("$非常抱歉，该账号已被微软封禁，无法登录。"))
+                        Return
+                    ElseIf Response.Contains("AADSTS70000") Then '可能不能判 “invalid_grant”，见 #269
+                        Finished(New RestartException)
+                        Return
+                    ElseIf Response.Contains("authorization_pending") Then
+                        Thread.Sleep(2000)
+                        Continue Do
+                    End If
+                End If
+                If UnknownFailureCount <= 2 Then
                     UnknownFailureCount += 1
                     Log(ex, $"登录轮询第 {UnknownFailureCount} 次失败")
                     Thread.Sleep(2000)

@@ -83,6 +83,12 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 364 Then 'Snapshot 2.10.5
+            If LastVersion >= 363 Then
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法添加新的正版账号"))
+                BugCount += 1
+            End If
+        End If
         If LastVersion < 363 Then 'Snapshot 2.10.4
             FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：下载资源时，会单独记忆每种资源上次下载到的文件夹，以防混淆"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：网络底层框架与下载稳定性"))

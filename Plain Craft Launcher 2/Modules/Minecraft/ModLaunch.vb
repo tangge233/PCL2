@@ -857,7 +857,7 @@ Retry:
         McLaunchLog("开始微软登录步骤 1/6（原始登录）")
         Dim PrepareJson As JObject = GetJson(NetRequestByClientRetry("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode", HttpMethod.Post,
             Content:=$"client_id={OAuthClientId}&tenant=/consumers&scope=XboxLive.signin%20offline_access",
-            Accept:="application/x-www-form-urlencoded"))
+            ContentType:="application/x-www-form-urlencoded"))
         McLaunchLog("网页登录地址：" & PrepareJson("verification_uri").ToString)
 
         '弹窗
@@ -994,10 +994,10 @@ Retry:
         Catch ex As Net.WebException
             Dim Message As String = GetExceptionSummary(ex)
             If Message.Contains("(429)") Then
-                Log(ex, "微软登录第 5 步汇报 429")
+                Log(ex, "微软登录第 4 步汇报 429")
                 Throw New Exception("$登录尝试太过频繁，请等待几分钟后再试！")
             ElseIf Message.Contains("(403)") Then
-                Log(ex, "微软登录第 5 步汇报 403")
+                Log(ex, "微软登录第 4 步汇报 403")
                 Throw New Exception("$当前 IP 的登录尝试异常。" & vbCrLf & "如果你使用了 VPN 或加速器，请把它们关掉或更换节点后再试！")
             Else
                 Throw
@@ -1024,7 +1024,7 @@ Retry:
                 Throw New Exception("$$")
             End If
         Catch ex As Exception
-            Log(ex, "微软登录第 6 步异常：" & Result)
+            Log(ex, "微软登录第 5 步异常：" & Result)
             Throw
         End Try
     End Sub
@@ -1039,10 +1039,10 @@ Retry:
         Catch ex As Net.WebException
             Dim Message As String = GetExceptionSummary(ex)
             If Message.Contains("(429)") Then
-                Log(ex, "微软登录第 7 步汇报 429")
+                Log(ex, "微软登录第 6 步汇报 429")
                 Throw New Exception("$登录尝试太过频繁，请等待几分钟后再试！")
             ElseIf Message.Contains("(404)") Then
-                Log(ex, "微软登录第 7 步汇报 404")
+                Log(ex, "微软登录第 6 步汇报 404")
                 RunInNewThread(
                 Sub()
                     Select Case MyMsgBox("请先创建 Minecraft 玩家档案，然后再重新登录。", "登录失败", "创建档案", "取消")

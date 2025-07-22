@@ -12,9 +12,9 @@ Public Module ModNet
     Public Function NetRequestByClient(Url As String, Optional Method As HttpMethod = Nothing,
             Optional Content As Object = Nothing, Optional ContentType As String = Nothing, Optional Accept As String = "*/*",
             Optional Timeout As Integer = 25000, Optional Headers As String(,) = Nothing,
-            Optional Encoding As Encoding = Nothing, Optional UseBrowserUserAgent As Boolean = False) As String
+            Optional Encoding As Encoding = Nothing, Optional UseBrowserUserAgent As Boolean = False, Optional MakeLog As Boolean = True) As String
         If Method Is Nothing Then Method = HttpMethod.Get
-        Log("[Net] 发起网络请求（" & Method.Method & "，" & Url & "），最大超时 " & Timeout)
+        If MakeLog Then Log("[Net] 发起网络请求（" & Method.Method & "，" & Url & "），最大超时 " & Timeout)
         Try
             Dim HeaderDictionary = If(Headers, {}).ToDictionary
             If ContentType IsNot Nothing Then HeaderDictionary("Content-Type") = ContentType
@@ -22,8 +22,11 @@ Public Module ModNet
             Return If(Encoding, Encoding.UTF8).GetString(SendRequest(Url, Method, Content, HeaderDictionary, Timeout:=Timeout, Encoding:=Encoding, UseBrowserUserAgent:=UseBrowserUserAgent))
         Catch ex As ThreadInterruptedException
             Throw
+        Catch ex As ResponsedWebException
+            If MakeLog Then Log(ex, "网络请求失败，返回内容为：" & vbCrLf & ex.Response, LogLevel.Developer)
+            Throw
         Catch ex As Exception
-            Log(ex, "网络请求失败", LogLevel.Developer)
+            If MakeLog Then Log(ex, "网络请求失败", LogLevel.Developer)
             Throw
         End Try
     End Function
