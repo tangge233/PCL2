@@ -178,36 +178,30 @@
             Catch ex As Exception
                 Log(ex, "重命名版本 json 失败")
                 '如果JSON处理失败，尝试回滚整个操作
-                Try
-                    '首先尝试恢复文件夹名
-                    If Directory.Exists(NewPath) AndAlso Not Directory.Exists(OldPath) Then
+                If Directory.Exists(NewPath) AndAlso Not Directory.Exists(OldPath) Then
+                    Try
                         '还原jar文件名
                         If File.Exists($"{NewPath}{NewName}.jar") Then
-                            Try
-                                My.Computer.FileSystem.RenameFile($"{NewPath}{NewName}.jar", $"{OldName}.jar")
-                            Catch
-                                '忽略jar文件还原失败
-                            End Try
+                            My.Computer.FileSystem.RenameFile($"{NewPath}{NewName}.jar", $"{OldName}.jar")
                         End If
                         '还原natives文件夹名
                         If Directory.Exists($"{NewPath}{NewName}-natives") Then
-                            Try
-                                My.Computer.FileSystem.RenameDirectory($"{NewPath}{NewName}-natives", $"{OldName}-natives")
-                            Catch
-                                '忽略natives文件夹还原失败
-                            End Try
+                            My.Computer.FileSystem.RenameDirectory($"{NewPath}{NewName}-natives", $"{OldName}-natives")
                         End If
-                        '还原文件夹名
-                        My.Computer.FileSystem.RenameDirectory(NewPath, OldName)
-                        Hint("重命名失败：无法处理版本配置文件，已回滚更改", HintType.Critical)
-                        Return
-                    End If
+                    Catch
+                        ' 忽略 jar 文件, natives 文件夹还原失败
+                    End Try
+                End If
+                Try
+                    '还原文件夹名
+                    My.Computer.FileSystem.RenameDirectory(NewPath, OldName)
+                    Hint("重命名失败：无法处理版本配置文件，已回滚更改", HintType.Critical)
+                    Return
                 Catch rollbackEx As Exception
                     Log(rollbackEx, "重命名失败后尝试回滚也失败")
                     Hint("重命名失败：版本文件可能已损坏，请检查版本文件夹", HintType.Critical)
                     Return
                 End Try
-                Throw ex
             End Try
             
             '刷新与提示
