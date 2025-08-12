@@ -2,7 +2,9 @@
 
     '构造函数
     Private TempFolder As String
-    Public Sub New(UUID As Integer)
+    Private TargetVersion As McVersion
+    Public Sub New(Optional TargetVersion As McVersion = Nothing)
+        Me.TargetVersion = TargetVersion
         '构建文件结构
         TempFolder = RequestTaskTempFolder()
         Directory.CreateDirectory(TempFolder & "Temp\")
@@ -508,7 +510,7 @@ Done:
             If LogMc.Contains("Couldn't set pixel format") Then AppendReason(CrashReason.显卡驱动不支持导致无法设置像素格式)
             If LogMc.Contains("java.lang.OutOfMemoryError") OrElse LogMc.Contains("an out of memory error") Then AppendReason(CrashReason.内存不足)
             If LogMc.Contains("java.lang.RuntimeException: Shaders Mod detected. Please remove it, OptiFine has built-in support for shaders.") Then AppendReason(CrashReason.ShadersMod与OptiFine同时安装)
-            If LogMc.Contains("java.lang.NoSuchMethodError: sun.security.util.ManifestEntryVerifier") Then AppendReason(CrashReason.低版本Forge与高版本Java不兼容)
+            If LogMc.Contains("java.lang.NoSuchMethodError: sun.security.util.ManifestEntryVerifier") OrElse LogMc.Contains("java.lang.NoSuchMethodError: 'void sun.security.util.ManifestEntryVerifier") Then AppendReason(CrashReason.低版本Forge与高版本Java不兼容)
             If LogMc.Contains("1282: Invalid operation") Then AppendReason(CrashReason.光影或资源包导致OpenGL1282错误)
             If LogMc.Contains("signer information does not match signer information of other classes in the same package") Then AppendReason(CrashReason.文件或内容校验失败, If(RegexSeek(LogMc, "(?<=class "")[^']+(?=""'s signer information)"), "").TrimEnd(vbCrLf))
             If LogMc.Contains("Maybe try a lower resolution resourcepack?") Then AppendReason(CrashReason.材质过大或显卡配置不足)
@@ -856,12 +858,13 @@ NextStack:
     ''' <summary>
     ''' 弹出崩溃弹窗，并指导导出崩溃报告。
     ''' </summary>
-    Public Sub Output(IsHandAnalyze As Boolean, Optional ExtraFiles As List(Of String) = Nothing)
+    Public Sub Output(IsManualAnalyze As Boolean, Optional ExtraFiles As List(Of String) = Nothing)
         '弹窗提示
         FrmMain.ShowWindowToTop()
-        Select Case MyMsgBox(GetAnalyzeResult(IsHandAnalyze), If(IsHandAnalyze, "错误报告分析结果", "Minecraft 出现错误"),
-            "确定", If(IsHandAnalyze OrElse DirectFile Is Nothing, "", "查看日志"), If(IsHandAnalyze, "", "导出错误报告"),
-            Button2Action:=If(IsHandAnalyze OrElse DirectFile Is Nothing, Nothing,
+        Dim Detail As String = GetAnalyzeResult(IsManualAnalyze)
+        Select Case MyMsgBox(Detail, If(IsManualAnalyze, "错误报告分析结果", "Minecraft 出现错误"),
+            "确定", If(IsManualAnalyze OrElse DirectFile Is Nothing, "", "查看日志"), If(IsManualAnalyze, "", "导出错误报告"),
+            Button2Action:=If(IsManualAnalyze OrElse DirectFile Is Nothing, Nothing,
             Sub()
                 '弹窗选择：查看日志
                 If File.Exists(DirectFile.Value.Key) Then
@@ -918,6 +921,11 @@ NextStack:
                 End Try
                 OpenExplorer(FileAddress)
         End Select
+        '上报
+        If IsManualAnalyze Then Return
+        Telemetry("Minecraft 崩溃",
+                  "Version", If(TargetVersion Is Nothing, "null", TargetVersion.Version.ToString),
+                  "Detail", FilterUserName(Detail, "*"))
     End Sub
     ''' <summary>
     ''' 获取崩溃分析的结果描述。
@@ -1102,7 +1110,7 @@ NextStack:
                 If(Not Results.Any(Function(r) r.EndsWithF("\h")) OrElse IsHandAnalyze, "",
                     vbCrLf & "如果要寻求帮助，请把错误报告文件发给对方，而不是发送这个窗口的照片或者截图。" &
                     If(If(PageSetupSystem.IsLauncherNewest(), True), "",
-                    vbCrLf & vbCrLf & "此外，你正在使用老版本 PCL，更新 PCL 或许也能解决这个问题。" & vbCrLf & "你可以点击 设置 → 启动器 → 检查更新 来更新 PCL。"))
+                    vbCrLf & vbCrLf & "此外，你正在使用老版本 PCL，更新 PCL 或许也能解决这个问题。" & vbCrLf & "你可以点击 [设置 → 其他 → 启动器 → 检查更新] 更新 PCL。"))
     End Function
 
 End Class

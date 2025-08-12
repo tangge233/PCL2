@@ -242,7 +242,7 @@
                     </StackPanel>
                     <local:MyTextBox x:Name="TextAdvanceJvm" Grid.ColumnSpan="2" Tag="LaunchAdvanceJvm" Grid.Column="1" ToolTip="启动 Minecraft 时使用的额外 JVM 参数，除非有确定把握，否则请不要修改。&#xa;支持 Minecraft 版本 JSON 中的字符串替换标记，例如 ${library_directory}。" MaxLength="4000"
                                  Height="100" AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" Padding="0,5" VerticalScrollBarVisibility="Auto" />
-                    <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="游戏参数尾部" Margin="0,0,25,0" />
+                    <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="游戏参数" Margin="0,0,25,0" />
                     <local:MyTextBox x:Name="TextAdvanceGame" Grid.Row="2" Grid.ColumnSpan="2" Tag="LaunchAdvanceGame" Grid.Column="1" ToolTip="文本框中的内容将会被直接拼合在启动参数的末尾。&#xa;例如，输入 --demo 则会以试玩模式启动游戏。&#xa;支持 Minecraft 版本 JSON 中的字符串替换标记，例如 ${library_directory}。" />
                     <TextBlock Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Left" Text="启动前执行命令" Margin="0,0,25,0" />
                     <local:MyTextBox x:Name="TextAdvanceRun" Grid.Row="4" Grid.ColumnSpan="2" Tag="LaunchAdvanceRun" Grid.Column="1" HintText=""

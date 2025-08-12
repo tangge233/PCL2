@@ -137,7 +137,7 @@ Public Class DragHelper
         Dim fileCount As UInteger = DragQueryFile(wParam, UInteger.MaxValue, Nothing, 0)
         ReDim dropFilePaths(CInt(fileCount) - 1)
 
-        For i As UInteger = 0 To fileCount - 1
+        For i As UInteger = 0 To CInt(fileCount) - 1
             Dim sb As New StringBuilder(MAX_PATH)
             Dim result As UInteger = DragQueryFile(wParam, i, sb, sb.Capacity)
             If result > 0 Then dropFilePaths(i) = sb.ToString()

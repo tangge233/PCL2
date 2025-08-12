@@ -22,9 +22,6 @@ Public Module ModNet
             Return If(Encoding, Encoding.UTF8).GetString(SendRequest(Url, Method, Content, HeaderDictionary, Timeout:=Timeout, Encoding:=Encoding, UseBrowserUserAgent:=UseBrowserUserAgent))
         Catch ex As ThreadInterruptedException
             Throw
-        Catch ex As ResponsedWebException
-            If MakeLog Then Log(ex, "网络请求失败，返回内容为：" & vbCrLf & ex.Response, LogLevel.Developer)
-            Throw
         Catch ex As Exception
             If MakeLog Then Log(ex, "网络请求失败", LogLevel.Developer)
             Throw
@@ -244,7 +241,10 @@ RequestFinished:
             If Response.IsSuccessStatusCode Then
                 Return ResponseBytes
             Else
-                Throw New ResponsedWebException($"错误码 {Response.StatusCode} ({CInt(Response.StatusCode)})，{Method}，{Url}", If(Encoding, Encoding.UTF8).GetString(ResponseBytes))
+                Dim ResponseMessage = If(Encoding, Encoding.UTF8).GetString(ResponseBytes)
+                Throw New ResponsedWebException(
+                    $"错误码 {Response.StatusCode} ({CInt(Response.StatusCode)})，{Method}，{Url}" &
+                    If(String.IsNullOrEmpty(ResponseMessage), "", vbCrLf & ResponseMessage), ResponseMessage)
             End If
         Catch ex As ThreadInterruptedException
             Throw
@@ -807,7 +807,7 @@ StartSingleThreadDownload:
                     '是否禁用多线程，以及规定碎片大小
                     Dim TargetUrl As String = GetSource().Url
                     If TargetUrl.Contains("pcl2-server") OrElse TargetUrl.Contains("bmclapi") OrElse TargetUrl.Contains("github.com") OrElse
-                       TargetUrl.Contains("optifine.net") OrElse TargetUrl.Contains("modrinth") Then Return Nothing
+                       TargetUrl.Contains("optifine.net") OrElse TargetUrl.Contains("modrinth") OrElse TargetUrl.Contains("momot.rs") Then Return Nothing
                     '寻找最大碎片
                     'FUTURE: 下载引擎重做，计算下载源平均链接时间和线程下载速度，按最高时间节省来开启多线程
                     Dim FilePieceMax As NetThread = Threads
@@ -990,7 +990,8 @@ NotSupportRange:
                                     Th.DownloadDone += RealDataCount
                                     ResultStream.Write(ResponseBytes, 0, RealDataCount)
                                     '检查速度是否过慢
-                                    If DeltaTime > 1500 AndAlso DeltaTime > RealDataCount Then '数据包间隔大于 1.5s，且速度小于 1.5K/s
+                                    If DeltaTime > 1500 AndAlso DeltaTime > RealDataCount AndAlso '数据包间隔大于 1.5s，且速度小于 1.5K/s
+                                        Th.Source.SingleThread Is Nothing Then '并非单线程下载
                                         Throw New TimeoutException("由于速度过慢断开链接，下载 " & RealDataCount & " B，消耗 " & DeltaTime & " ms。")
                                     End If
                                     Th.LastReceiveTime = GetTimeTick()
@@ -1027,7 +1028,8 @@ SourceBreak:
                 End SyncLock
                 '合并
                 If Not IsNoSplit Then ResultStream?.Dispose()
-                If ((FileSize >= 0 AndAlso DownloadDone >= FileSize) OrElse (FileSize = -1 AndAlso DownloadDone > 0)) AndAlso State < NetState.Merge Then Merge(Th)
+                If ((FileSize >= 0 AndAlso DownloadDone >= FileSize) OrElse (FileSize = -1 AndAlso DownloadDone > 0)) AndAlso
+                    State < NetState.Merge AndAlso Th.State <> NetState.Error Then Merge(Th)
             End Try
         End Sub
         Private Sub SourceFail(Th As NetThread, ex As Exception, IsMergeFailure As Boolean)
@@ -1069,7 +1071,7 @@ SourceBreak:
                         '当前源失败，但还有下载源：正常地继续执行
                     ElseIf Not Retried AndAlso Sources.Count > 1 Then
                         '合并失败或首次下载失败，未重试：将所有下载源重新标记为不允许断点续传的下载源，逐个重新尝试下载
-                        Log($"[Download] {LocalName}：文件下载失败，正在自动重试……", If(ModeDebug, LogLevel.Hint, LogLevel.Debug)) '在调试模式下给出红色提示
+                        Hint($"{LocalName}：文件下载失败，正在自动重试……", If(ModeDebug, HintType.Critical, HintType.Info)) '在调试模式下给出红色提示
                         Retried = True
                         SyncLock LockSource
                             SourcesOnce.Clear()
@@ -1525,10 +1527,14 @@ Retry:
                 '获取实际失败的文件
                 For Each File In Files
                     If File.State <> NetState.Error Then Continue For
+                    Dim Detail As String = Join(File.Sources.Select(Function(s) $"{If(s.Ex?.Message, "无错误信息。"）}（{s.Url}）"), vbCrLf)
                     [Error] = New Exception("文件下载失败：" & File.LocalPath & vbCrLf &
-                                            "各下载源的错误如下：" & vbCrLf &
-                                            Join(File.Sources.Select(Function(s) $"{If(s.Ex?.Message, "无错误信息。"）}（{s.Url}）"), vbCrLf),
+                                            "各下载源的错误如下：" & vbCrLf & Detail,
                                             [Error])
+                    '上报
+                    Telemetry("文件下载失败",
+                              "FileName", File.LocalName,
+                              "Exception", Detail)
                     Exit For
                 Next
                 '在设置 Error 对象后再更改为失败，避免 WaitForExit 无法捕获错误

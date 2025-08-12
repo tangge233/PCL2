@@ -594,7 +594,7 @@
             VersionName = Version
             Me.Version = New Version(Version)
             Me.Inherit = Inherit
-            FileVersion = Version & If(Branch Is Nothing, ""， "-" & Branch)
+            FileVersion = Version & If(Branch Is Nothing, "", "-" & Branch)
         End Sub
     End Class
 
@@ -1106,26 +1106,27 @@
     Public Function DlModRequest(Url As String, Optional Method As HttpMethod = Nothing,
                                  Optional Content As String = Nothing, Optional ContentType As String = Nothing) As JToken
         Dim Urls As New List(Of KeyValuePair(Of String, Integer))
-        Urls.Add(New KeyValuePair(Of String, Integer)(Url, 10)) '至少 10s，要不然有时候远端服务器来不及完成
-        Urls.Add(New KeyValuePair(Of String, Integer)(Url, 30))
-        'Dim McimUrl As String = DlSourceModGet(Url)
-        'If McimUrl <> Url Then
-        '   Select Case Setup.Get("ToolDownloadMod")
-        '       Case 0
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 10))
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 30))
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(Url, 30))
-        '       Case 1
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(Url, 10))
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 10))
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(Url, 30))
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 30))
-        '       Case Else
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(Url, 10))
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(Url, 30))
-        '           Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 30))
-        '   End Select
-        'End If
+        Dim McimUrl As String = DlSourceModGet(Url)
+        If McimUrl <> Url Then
+            Select Case Setup.Get("ToolDownloadMod")
+                Case 0
+                    Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 10))
+                    Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 10))
+                    Urls.Add(New KeyValuePair(Of String, Integer)(Url, 30))
+                Case 1
+                    Urls.Add(New KeyValuePair(Of String, Integer)(Url, 10)) '至少 10s，要不然有时候远端服务器来不及完成
+                    Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 10))
+                    Urls.Add(New KeyValuePair(Of String, Integer)(Url, 30))
+                    Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 30))
+                Case Else
+                    Urls.Add(New KeyValuePair(Of String, Integer)(Url, 10))
+                    Urls.Add(New KeyValuePair(Of String, Integer)(Url, 30))
+                    Urls.Add(New KeyValuePair(Of String, Integer)(McimUrl, 30))
+            End Select
+        Else
+            Urls.Add(New KeyValuePair(Of String, Integer)(Url, 10))
+            Urls.Add(New KeyValuePair(Of String, Integer)(Url, 30))
+        End If
         Dim Exs As String = ""
         For Each Source In Urls
             Try
@@ -1232,7 +1233,14 @@
 
     'Mod 下载源
     Public Function DlSourceModGet(Original As String) As String
-        Return Original
+        Return Original.
+            Replace("api.modrinth.com", "mod.mcimirror.top/modrinth").
+            Replace("staging-api.modrinth.com", "mod.mcimirror.top/modrinth").
+            Replace("cdn.modrinth.com", "mod.mcimirror.top").
+            Replace("api.curseforge.com", "mod.mcimirror.top/curseforge").
+            Replace("edge.forgecdn.net", "mod.mcimirror.top").
+            Replace("mediafilez.forgecdn.net", "mod.mcimirror.top").
+            Replace("media.forgecdn.net", "mod.mcimirror.top")
     End Function
 
     'Loader 自动切换

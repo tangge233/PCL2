@@ -11,6 +11,19 @@ Public Class FormMain
         Dim FeatureList As New List(Of KeyValuePair(Of Integer, String))
         '统计更新日志条目
 #If BETA Then
+        If LastVersion < 367 Then 'Release 2.10.6
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：启用 MCIM 社区资源镜像源，以缓解社区资源难以下载的问题"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：正版登录出错时无法给出正确的错误信息"))
+            FeatureCount += 9
+            BugCount += 9
+        End If
+        If LastVersion < 365 Then 'Release 2.10.5
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：下载资源时，会单独记忆每种资源上次下载到的文件夹，以防混淆"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：网络底层框架与下载稳定性"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法启动一部分 LabyMod 和 GTNH 客户端"))
+            FeatureCount += 22
+            BugCount += 26
+        End If
         If LastVersion < 361 Then 'Release 2.10.3
             FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "修复：无法安装部分使用老版本 PCL 导出的整合包"))
         End If
@@ -83,6 +96,12 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 366 Then 'Snapshot 2.10.6
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：启用 MCIM 社区资源镜像源，以缓解社区资源难以下载的问题"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：正版登录出错时无法给出正确的错误信息"))
+            FeatureCount += 9
+            BugCount += 9
+        End If
         If LastVersion < 364 Then 'Snapshot 2.10.5
             If LastVersion >= 363 Then
                 FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法添加新的正版账号"))
@@ -268,11 +287,6 @@ Public Class FormMain
             AddHandler Closing, Sub() Helper.RemoveDragHook()
             AddHandler Helper.DragDrop, Sub() FileDrag(Helper.DropFilePaths)
         End If
-        'If IsAdmin() Then '下列代码没用（#2531）
-        '    ChangeWindowMessageFilter(&H233, 1)
-        '    ChangeWindowMessageFilter(&H4A, 1)
-        '    ChangeWindowMessageFilter(&H49, 1)
-        'End If
         '切换到首页
         If Not IsNothing(FrmLaunchLeft.Parent) Then FrmLaunchLeft.SetValue(ContentPresenter.ContentProperty, Nothing)
         If Not IsNothing(FrmLaunchRight.Parent) Then FrmLaunchRight.SetValue(ContentPresenter.ContentProperty, Nothing)
@@ -389,6 +403,8 @@ Public Class FormMain
             Catch ex As Exception
                 Log(ex, "清理自动更新文件失败")
             End Try
+            '上报
+            Telemetry("启动")
         End Sub, "初始化", ThreadPriority.Lowest)
 
         Log("[Start] 第三阶段加载用时：" & GetTimeTick() - ApplicationStartTick & " ms")
@@ -874,7 +890,7 @@ Public Class FormMain
             '错误报告分析
             Try
                 Log("[System] 尝试进行错误报告分析")
-                Dim Analyzer As New CrashAnalyzer(GetUuid())
+                Dim Analyzer As New CrashAnalyzer
                 Analyzer.Import(FilePath)
                 If Not Analyzer.Prepare() Then Exit Try
                 Analyzer.Analyze()

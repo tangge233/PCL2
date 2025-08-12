@@ -66,7 +66,7 @@ Public Module ModLaunch
     ''' </summary>
     Public Sub McLaunchLog(Text As String)
         Text = FilterUserName(FilterAccessToken(Text, "*"), "*")
-        RunInUi(Sub() FrmLaunchRight.LabLog.Text += vbCrLf & "[" & GetTimeNow() & "] " & Text)
+        RunInUi(Sub() FrmLaunchRight.LabLog.Text += $"{vbCrLf}[{GetTimeNow()}] {Text}")
         Log("[Launch] " & Text)
     End Sub
 
@@ -101,6 +101,8 @@ Public Module ModLaunch
             If Not ex.Message.StartsWithF("$$") Then Hint(ex.Message, HintType.Critical)
             Throw
         End Try
+        Dim IsSavingBatch As Boolean = CurrentLaunchOptions?.SaveBatch IsNot Nothing
+
         '正式加载
         Try
             '构造主加载器
@@ -145,9 +147,15 @@ Public Module ModLaunch
             Select Case LaunchLoader.State
                 Case LoadState.Finished
                     Hint(McVersionCurrent.Name & " 启动成功！", HintType.Finish)
+                    '上报
+                    If Not IsSavingBatch Then
+                        Telemetry("Minecraft 启动成功",
+                              "Version", McVersionCurrent.Version.ToString,
+                              "LoginType", GetStringFromEnum(CType(Setup.Get("LoginType"), McLoginType)))
+                    End If
                 Case LoadState.Aborted
                     If AbortHint Is Nothing Then
-                        Hint(If(CurrentLaunchOptions?.SaveBatch Is Nothing, "已取消启动！", "已取消导出启动脚本！"), HintType.Info)
+                        Hint(If(IsSavingBatch, "已取消导出启动脚本！", "已取消启动！"), HintType.Info)
                     Else
                         Hint(AbortHint, HintType.Finish)
                     End If
@@ -162,7 +170,7 @@ NextInner:
             If CurrentEx.Message.StartsWithF("$") Then
                 '若有以 $ 开头的错误信息，则以此为准显示提示
                 '若错误信息为 $$，则不提示
-                If Not CurrentEx.Message = "$$" Then MyMsgBox(CurrentEx.Message.TrimStart("$"), If(CurrentLaunchOptions?.SaveBatch Is Nothing, "启动失败", "导出启动脚本失败"))
+                If Not CurrentEx.Message = "$$" Then MyMsgBox(CurrentEx.Message.TrimStart("$"), If(IsSavingBatch, "导出启动脚本失败", "启动失败"))
                 Throw
             ElseIf CurrentEx.InnerException IsNot Nothing Then
                 '检查下一级错误
@@ -172,8 +180,15 @@ NextInner:
                 '没有特殊处理过的错误信息
                 McLaunchLog("错误：" & GetExceptionDetail(ex))
                 Log(ex,
-                    If(CurrentLaunchOptions?.SaveBatch Is Nothing, "Minecraft 启动失败", "导出启动脚本失败"), LogLevel.Msgbox,
-                    If(CurrentLaunchOptions?.SaveBatch Is Nothing, "启动失败", "导出启动脚本失败"))
+                    If(IsSavingBatch, "导出启动脚本失败", "Minecraft 启动失败"), LogLevel.Msgbox,
+                    If(IsSavingBatch, "导出启动脚本失败", "启动失败"))
+                '上报
+                If Not IsSavingBatch Then
+                    Telemetry("Minecraft 启动失败",
+                              "Version", McVersionCurrent.Version.ToString,
+                              "LoginType", GetStringFromEnum(CType(Setup.Get("LoginType"), McLoginType)),
+                              "Exception", FilterUserName(FilterAccessToken(GetExceptionDetail(ex), "*"), "*"))
+                End If
                 Throw
             End If
         End Try
@@ -891,9 +906,9 @@ Retry:
                 ContentType:="application/x-www-form-urlencoded",
                 Headers:={{"Accept-Language", "en-US,en;q=0.5"}, {"X-Requested-With", "XMLHttpRequest"}},
                 ThreadCount:=2)
-        Catch ex As Exception
-            If ex.Message.ContainsF("must sign in again", True) OrElse ex.Message.ContainsF("password expired", True) OrElse
-               (ex.Message.Contains("refresh_token") AndAlso ex.Message.Contains("is not valid")) Then '#269
+        Catch ex As ResponsedWebException
+            If ex.Response.ContainsF("must sign in again", True) OrElse ex.Response.ContainsF("password expired", True) OrElse
+               (ex.Response.Contains("refresh_token") AndAlso ex.Response.Contains("is not valid")) Then '#269
                 Return {"Relogin", ""}
             Else
                 Throw
@@ -942,20 +957,20 @@ Retry:
         Try
             Result = NetRequestByClientMultiple("https://xsts.auth.xboxlive.com/xsts/authorize", HttpMethod.Post,
                 Content:=Request, ContentType:="application/json")
-        Catch ex As Net.WebException
+        Catch ex As ResponsedWebException
             '参考 https://github.com/PrismarineJS/prismarine-auth/blob/master/src/common/Constants.js
-            If ex.Message.Contains("2148916227") Then
+            If ex.Response.Contains("2148916227") Then
                 MyMsgBox("该账号似乎已被微软封禁，无法登录。", "登录失败", "我知道了", IsWarn:=True)
                 Throw New Exception("$$")
-            ElseIf ex.Message.Contains("2148916233") Then
+            ElseIf ex.Response.Contains("2148916233") Then
                 If MyMsgBox("你尚未注册 Xbox 账户，请在注册后再登录。", "登录提示", "注册", "取消") = 1 Then
                     OpenWebsite("https://signup.live.com/signup")
                 End If
                 Throw New Exception("$$")
-            ElseIf ex.Message.Contains("2148916235") Then
+            ElseIf ex.Response.Contains("2148916235") Then
                 MyMsgBox($"你的网络所在的国家或地区无法登录微软账号。{vbCrLf}请使用加速器或 VPN。", "登录失败", "我知道了")
                 Throw New Exception("$$")
-            ElseIf ex.Message.Contains("2148916238") Then
+            ElseIf ex.Response.Contains("2148916238") Then
                 If MyMsgBox("该账号年龄不足，你需要先修改出生日期，然后才能登录。" & vbCrLf &
                             "该账号目前填写的年龄是否在 13 岁以上？", "登录提示", "13 岁以上", "12 岁以下", "我不知道") = 1 Then
                     OpenWebsite("https://account.live.com/editprof.aspx")
@@ -1364,12 +1379,12 @@ Retry:
             McLaunchLog("新版 Game 参数获取成功")
         End If
         '编码参数（#4700、#5892、#5909）
+        If McLaunchJavaSelected.VersionCode >= 18 Then 'Dfile.encoding 需要放在 Dstdout.encoding 后面（#6934）
+            If Not Arguments.Contains("-Dfile.encoding=") Then Arguments = "-Dfile.encoding=COMPAT " & Arguments
+        End If
         If McLaunchJavaSelected.VersionCode > 8 Then
             If Not Arguments.Contains("-Dstdout.encoding=") Then Arguments = "-Dstdout.encoding=UTF-8 " & Arguments
             If Not Arguments.Contains("-Dstderr.encoding=") Then Arguments = "-Dstderr.encoding=UTF-8 " & Arguments
-        End If
-        If McLaunchJavaSelected.VersionCode >= 18 Then
-            If Not Arguments.Contains("-Dfile.encoding=") Then Arguments = "-Dfile.encoding=COMPAT " & Arguments
         End If
         'MJSB
         Arguments = Arguments.Replace(" -Dos.name=Windows 10", " -Dos.name=""Windows 10""")
@@ -1692,7 +1707,7 @@ NextVersion:
         GameArguments.Add("${access_token}", McLoginLoader.Output.AccessToken)
         GameArguments.Add("${auth_session}", McLoginLoader.Output.AccessToken)
         GameArguments.Add("${user_type}", "msa") '#1221
-        GameArguments.Add("${primary_jar}", Version.Path & Version.Name & ".jar")
+        GameArguments.Add("${primary_jar}", Version.Path & Version.Name & ".jar") '#6942
 
         '窗口尺寸参数
         Dim GameSize As Size

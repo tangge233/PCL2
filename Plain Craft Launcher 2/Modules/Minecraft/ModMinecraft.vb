@@ -989,7 +989,7 @@ ExitDataLoad:
             If ToString = "" Then
                 Return "原版 " & McName
             Else
-                Return McName & ToString & If(ModeDebug, " (" & SortCode & "#)", "")
+                Return McName & ToString
             End If
         End Function
 
@@ -2415,7 +2415,7 @@ NextEntry:
     Public Function FilterUserName(Raw As String, FilterChar As Char) As String
         If Raw.Contains(":\Users\") Then
             For Each Token In RegexSearch(Raw, "(?<=:\\Users\\)[^\\]+")
-                Raw = Raw.Replace(Token, New String(FilterChar, Token.Count))
+                Raw = Raw.Replace("\" & Token, "\" & New String(FilterChar, Token.Count))
             Next
         End If
         Return Raw

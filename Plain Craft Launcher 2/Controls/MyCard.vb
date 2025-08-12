@@ -320,11 +320,10 @@
         End Set
     End Property
     Private _IsSwapped As Boolean = False
-    
     ''' <summary>
     ''' 是否已被折叠。(已过时，请使用 IsSwapped)
     ''' </summary>
-    <Obsolete("请使用 IsSwapped 属性，IsSwaped 存在拼写错误")>
+    <Obsolete("IsSwaped 存在拼写错误，请换用 IsSwapped 属性。")>
     Public Property IsSwaped As Boolean
         Get
             Return IsSwapped

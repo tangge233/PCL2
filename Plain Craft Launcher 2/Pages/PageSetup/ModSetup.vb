@@ -41,6 +41,7 @@
         {"SystemSystemCache", New SetupEntry("", Source:=SetupSource.Registry)},
         {"SystemSystemUpdate", New SetupEntry(0)},
         {"SystemSystemActivity", New SetupEntry(0)},
+        {"SystemSystemTelemetry", New SetupEntry(True, Source:=SetupSource.Registry)},
         {"CacheExportConfig", New SetupEntry("", Source:=SetupSource.Registry)},
         {"CacheSavedPageUrl", New SetupEntry("", Source:=SetupSource.Registry)},
         {"CacheSavedPageVersion", New SetupEntry("", Source:=SetupSource.Registry)},
@@ -123,7 +124,7 @@
         {"ToolDownloadTranslateV2", New SetupEntry(1, Source:=SetupSource.Registry)},
         {"ToolDownloadIgnoreQuilt", New SetupEntry(True, Source:=SetupSource.Registry)},
         {"ToolDownloadCert", New SetupEntry(False, Source:=SetupSource.Registry)},
-        {"ToolDownloadMod", New SetupEntry(1, Source:=SetupSource.Registry)},
+        {"ToolDownloadMod", New SetupEntry(2, Source:=SetupSource.Registry)},
         {"ToolModLocalNameStyle", New SetupEntry(0, Source:=SetupSource.Registry)},
         {"ToolUpdateAlpha", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
         {"ToolUpdateRelease", New SetupEntry(False, Source:=SetupSource.Registry)},
@@ -355,13 +356,6 @@
                 If Version Is Nothing Then Throw New Exception($"判断版本设置 {Key} 是否存在时未提供目标版本")
                 Return Not HasIniKey(Version.Path & "PCL\Setup.ini", Key)
         End Select
-    End Function
-    ''' <summary>
-    ''' 某个设置项是否加密。
-    ''' </summary>
-    Public Function IsEncoded(Key As String) As Boolean
-        If Not SetupDict.ContainsKey(Key) Then Throw New KeyNotFoundException("未找到设置项：" & Key) With {.Source = Key}
-        Return SetupDict(Key).Encoded
     End Function
 
     ''' <summary>
