@@ -853,7 +853,7 @@ LoginFinish:
                                             " - 只注册了账号，但没有加入对应服务器。")
                 End Select
             ElseIf AllMessage.Contains("超时") OrElse AllMessage.Contains("imeout") OrElse AllMessage.Contains("网络请求失败") Then
-                Throw New Exception("$登录失败：你的网络环境不佳，导致难以连接到海外服务器。" & vbCrLf & "请稍后重试，或使用加速器或 VPN 以改善网络环境。")
+                Throw New Exception("$登录失败：你的网络环境不佳，导致难以连接到海外服务器。" & vbCrLf & "请稍后重试，或使用加速器或 VPN 以改善网络环境")
             ElseIf ex.Message.StartsWithF("$") Then
                 Throw
             Else
@@ -907,9 +907,12 @@ Retry:
                 Headers:={{"Accept-Language", "en-US,en;q=0.5"}, {"X-Requested-With", "XMLHttpRequest"}},
                 ThreadCount:=2)
         Catch ex As ResponsedWebException
-            If ex.Response.ContainsF("must sign in again", True) OrElse ex.Response.ContainsF("password expired", True) OrElse
-               (ex.Response.Contains("refresh_token") AndAlso ex.Response.Contains("is not valid")) Then '#269
+            Dim Response = ex.Response
+            If Response.ContainsF("must sign in again", True) OrElse Response.ContainsF("password expired", True) OrElse
+               (Response.Contains("refresh_token") AndAlso Response.Contains("is not valid")) Then '#269
                 Return {"Relogin", ""}
+            ElseIf Response.Contains("Account security interrupt") Then
+                MyMsgBox("该账号由于安全问题无法登陆，请前往微软账户页获取更多信息。", "登录失败", "我知道了", IsWarn:=True)
             Else
                 Throw
             End If
@@ -2131,7 +2134,7 @@ IgnoreCustomSkin:
 
         '输出 bat
         Try
-            Dim CmdString As String =
+            Dim CmdString =
                 $"{If(McLaunchJavaSelected.VersionCode > 8, "chcp 65001>nul" & vbCrLf, "")}" &
                 "@echo off" & vbCrLf &
                 $"title 启动 - {McVersionCurrent.Name}" & vbCrLf &
