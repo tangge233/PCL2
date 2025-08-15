@@ -8,7 +8,7 @@ Public Module ModModpack
     ''' </summary>
     Public Sub ModpackInstall()
         Dim File As String = SelectFile("整合包文件(*.rar;*.zip;*.mrpack)|*.rar;*.zip;*.mrpack", "选择整合包压缩文件") '选择整合包文件
-        If String.IsNullOrEmpty(File) Then Exit Sub
+        If String.IsNullOrEmpty(File) Then Return
         RunInThread(
         Sub()
             Try
@@ -128,7 +128,7 @@ Retry:
             '完全不知道为啥会出现文件正在被另一进程使用的问题，总之加个重试
             If RetryCount < 5 Then
                 Thread.Sleep(RetryCount * 2000)
-                If Loader IsNot Nothing AndAlso Loader.LoadingState <> MyLoading.MyLoadingState.Run Then Exit Sub
+                If Loader IsNot Nothing AndAlso Loader.LoadingState <> MyLoading.MyLoadingState.Run Then Return
                 RetryCount += 1
                 GoTo Retry
             Else
@@ -244,7 +244,7 @@ Retry:
             '获取 Mod 下载信息
             ModDownloadLoaders.Add(New LoaderTask(Of Integer, JArray)("获取 Mod 下载信息",
             Sub(Task As LoaderTask(Of Integer, JArray))
-                Task.Output = GetJson(DlModRequest("https://api.curseforge.com/v1/mods/files", "POST", "{""fileIds"": [" & Join(ModList, ",") & "]}", "application/json"))("data")
+                Task.Output = DlModRequest("https://api.curseforge.com/v1/mods/files", HttpMethod.Post, "{""fileIds"": [" & Join(ModList, ",") & "]}", "application/json")("data")
                 '如果文件已被删除，则 API 会跳过那一项
                 If ModList.Count > Task.Output.Count Then Throw New Exception("整合包中的部分 Mod 版本已被 Mod 作者删除，所以没法继续安装了，请向整合包作者反馈该问题")
             End Sub) With {.ProgressWeight = ModList.Count / 10}) '每 10 Mod 需要 1s
@@ -258,8 +258,7 @@ Retry:
                     If FileList.ContainsKey(Id) Then Continue For
                     '可选 Mod 提示
                     If ModOptionalList.Contains(Id) Then
-                        If MyMsgBox("是否要下载整合包中的可选文件 " & ModJson("displayName").ToString & "？",
-                                        "下载可选文件", "是", "否") = 2 Then
+                        If MyMsgBox("是否要下载整合包中的可选文件 " & ModJson("displayName").ToString & "？", "下载可选文件", "是", "否") = 2 Then
                             Continue For
                         End If
                     End If
@@ -423,7 +422,7 @@ Retry:
                 End Select
             End If
             '添加下载文件
-            Dim Urls = File("downloads").Select(Function(t) t.ToString.Replace("://edge.forgecdn", "://media.forgecdn")).ToList
+            Dim Urls = File("downloads").SelectMany(Function(t) CompFile.HandleCurseForgeDownloadUrls(t.ToString)).ToList
             Urls.AddRange(Urls.Select(Function(u) DlSourceModGet(u)).ToList)
             Urls = Urls.Distinct.ToList()
             Dim TargetPath As String = $"{PathMcFolder}versions\{VersionName}\{File("path")}"
@@ -693,6 +692,7 @@ Retry:
         End If
         '解压
         Dim InstallTemp As String = RequestTaskTempFolder()
+        Dim SetupFile As String = $"{PathMcFolder}versions\{VersionName}\PCL\Setup.ini"
         Dim InstallLoaders As New List(Of LoaderBase)
         InstallLoaders.Add(New LoaderTask(Of String, Integer)("解压整合包文件",
         Sub(Task As LoaderTask(Of String, Integer))
@@ -701,6 +701,12 @@ Retry:
                 InstallTemp & ArchiveBaseFolder & "overrides",
                 PathMcFolder & "versions\" & VersionName,
                 Task, 0.4)
+            'JVM 参数
+            If Json("launchInfo") IsNot Nothing Then
+                Dim LaunchInfo As JObject = Json("launchInfo")
+                If LaunchInfo.ContainsKey("javaArgument") Then WriteIni(SetupFile, "VersionAdvanceJvm", String.Join(" ", LaunchInfo("javaArgument")))
+                If LaunchInfo.ContainsKey("launchArgument") Then WriteIni(SetupFile, "VersionAdvanceGame", String.Join(" ", LaunchInfo("launchArgument")))
+            End If
         End Sub) With {.ProgressWeight = New FileInfo(FileAddress).Length / 1024 / 1024 / 6, .Block = False}) '每 6M 需要 1s
         '构造加载器
         If Json("addons") Is Nothing Then Throw New Exception("该 MCBBS 整合包未提供游戏版本附加信息，无法安装！")

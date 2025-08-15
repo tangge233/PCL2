@@ -65,7 +65,7 @@ Download:
                     RunInUiWait(Sub() LoadContent("")) '在加载结束前清空页面
                     Setup.Set("CacheSavedPageVersion", "")
                     OnlineLoader.Start(Url) '下载完成后将会再次触发更新
-                    Exit Sub
+                    Return
                 End If
             Case 3
                 Select Case Setup.Get("UiCustomPreset")
@@ -89,11 +89,11 @@ Download:
                             </local:MyCard>"
                     Case 2
                         Log("[Page] 主页预设：Minecraft 新闻")
-                        Url = "http://pcl.mcnews.thestack.top"
+                        Url = "https://pcl.mcnews.thestack.top"
                         GoTo Download
                     Case 3
                         Log("[Page] 主页预设：简单主页")
-                        Url = "https://raw.gitcode.com/mfn233/PCL-Mainpage/raw/main/Custom.xaml"
+                        Url = "https://pclhomeplazaoss.lingyunawa.top:26994/d/Homepages/MFn233/Custom.xaml"
                         GoTo Download
                     Case 4
                         Log("[Page] 主页预设：每日整合包推荐")
@@ -127,6 +127,10 @@ Download:
                         Log("[Page] 主页预设：杂志主页")
                         Url = "https://pclhomeplazaoss.lingyunawa.top:26994/d/Homepages/Ext1nguisher/Custom.xaml"
                         GoTo Download
+                    Case 12
+                        Log("[Page] 主页预设：PCL GitHub 仪表盘")
+                        Url = "https://ddf.pcl-community.org/Custom.xaml"
+                        GoTo Download
                 End Select
         End Select
         RunInUi(Sub() LoadContent(Content))
@@ -146,13 +150,13 @@ Download:
                 VersionAddress = Address.BeforeFirst("?")
                 If Not VersionAddress.EndsWith("/") Then VersionAddress += "/"
                 VersionAddress += "version"
-                If Address.Contains("?") Then VersionAddress += Address.AfterLast("?")
+                If Address.Contains("?") Then VersionAddress += "?" & Address.AfterFirst("?")
             End If
             '校验版本
             Dim Version As String = ""
             Dim NeedDownload As Boolean = True
             Try
-                Version = NetGetCodeByRequestOnce(VersionAddress, Timeout:=10000)
+                Version = NetRequestByClientRetry(VersionAddress)
                 If Version.Length > 1000 Then Throw New Exception($"获取的主页版本过长（{Version.Length} 字符）")
                 Dim CurrentVersion As String = Setup.Get("CacheSavedPageVersion")
                 If Version <> "" AndAlso CurrentVersion <> "" AndAlso Version = CurrentVersion Then
@@ -167,14 +171,14 @@ Download:
             End Try
             '实际下载
             If NeedDownload Then
-                Dim FileContent As String = NetGetCodeByRequestRetry(Address)
+                Dim FileContent As String = NetRequestByClientRetry(Address)
                 Log($"[Page] 已联网下载主页，内容长度：{FileContent.Length}，来源：{Address}")
                 Setup.Set("CacheSavedPageUrl", Address)
                 Setup.Set("CacheSavedPageVersion", Version)
                 WriteFile(PathTemp & "Cache\Custom.xaml", FileContent)
             End If
             '要求刷新
-            Refresh()
+            RunInUi(AddressOf Refresh) '不直接调用 Refresh，以防止死循环（#6245）
         Catch ex As Exception
             Log(ex, $"下载主页失败（{Address}）", If(ModeDebug, LogLevel.Msgbox, LogLevel.Hint))
         End Try
@@ -215,7 +219,7 @@ Download:
         SyncLock LoadContentLock
             '如果加载目标内容一致则不加载
             Dim Hash = Content.GetHashCode()
-            If Hash = LoadedContentHash Then Exit Sub
+            If Hash = LoadedContentHash Then Return
             LoadedContentHash = Hash
             '实际加载内容
             PanCustom.Children.Clear()
@@ -223,10 +227,13 @@ Download:
                 Log($"[Page] 实例化：清空主页 UI，来源为空")
                 Return
             End If
+            Dim LoadStartTime As Date = Date.Now
             Try
                 '修改时应同时修改 PageOtherHelpDetail.Init
                 Content = HelpArgumentReplace(Content)
-                If Content.Contains("xmlns") Then Content = Content.RegexReplace("xmlns[^""']*(""|')[^""']*(""|')", "").Replace("xmlns", "") '禁止声明命名空间
+                Do While Content.Contains("xmlns")
+                    Content = Content.RegexReplace("xmlns[^""']*(""|')[^""']*(""|')", "").Replace("xmlns", "") '禁止声明命名空间
+                Loop
                 Content = "<StackPanel xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"" xmlns:sys=""clr-namespace:System;assembly=mscorlib"" xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"" xmlns:local=""clr-namespace:PCL;assembly=Plain Craft Launcher 2"">" & Content & "</StackPanel>"
                 Log($"[Page] 实例化：加载主页 UI 开始，最终内容长度：{Content.Count}")
                 PanCustom.Children.Add(GetObjectFromXML(Content))
@@ -240,8 +247,11 @@ Download:
                 Else
                     Log(ex, "加载主页界面失败", LogLevel.Hint)
                 End If
+                Return
             End Try
-            Log($"[Page] 实例化：加载主页 UI 完成")
+            Dim LoadCostTime = (Date.Now - LoadStartTime).Milliseconds
+            Log($"[Page] 实例化：加载主页 UI 完成，耗时 {LoadCostTime}ms")
+            If LoadCostTime > 3000 Then Hint($"主页加载过于缓慢（花费了 {Math.Round(LoadCostTime / 1000, 1)} 秒），请向主页作者反馈此问题，或暂时停止使用该主页")
         End SyncLock
         Return
 Refresh:

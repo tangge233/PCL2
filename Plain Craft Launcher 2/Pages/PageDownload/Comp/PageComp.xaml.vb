@@ -68,6 +68,10 @@ Public Class PageComp
     ''' 在切换到页面时，应自动将筛选项设置为与该目标 MC 版本和加载器相同。
     ''' </summary>
     Public Shared TargetVersion As McVersion = Nothing
+    ''' <summary>
+    ''' 在切换到该页面时自动设置的搜索框内的内容。
+    ''' </summary>
+    Public Shared TargetName As String = Nothing
 
     '在点击 MyCompItem 时会获取 Loader 的输入，以使资源详情页面可以应用相同的筛选项
     Public Loader As New LoaderTask(Of CompProjectRequest, Integer)("社区资源获取：XXX", AddressOf CompProjectsGet, AddressOf LoaderInput) With {.ReloadTimeout = 60 * 1000}
@@ -94,6 +98,10 @@ Public Class PageComp
                 ComboSearchLoader.SelectedItem = GetTargetItemByName("NeoForge")
             End If
             TargetVersion = Nothing
+            If TargetName IsNot Nothing Then
+                TextSearchName.Text = TargetName
+                TargetName = Nothing
+            End If
             '如果已经完成请求，则重新开始
             If IsLoaderInited Then StartNewSearch()
             ScrollToHome()
@@ -108,19 +116,11 @@ Public Class PageComp
         Dim Request As New CompProjectRequest(PageType, Storage, (Page + 1) * PageSize)
         Dim GameVersion As String = If(TextSearchVersion.Text = "全部 (也可自行输入)", Nothing,
                 If(TextSearchVersion.Text.Contains(".") OrElse TextSearchVersion.Text.Contains("w"), TextSearchVersion.Text, Nothing))
-        Dim ModLoader As CompModLoaderType = CompModLoaderType.Any
-        If PageType = CompType.Mod Then '只有 Mod 考虑加载器
-            ModLoader = Val(ComboSearchLoader.SelectedItem.Tag)
-            If GameVersion IsNot Nothing AndAlso GameVersion.Contains(".") AndAlso Val(GameVersion.Split(".")(1)) < 14 AndAlso '1.14-
-                ModLoader = CompModLoaderType.Forge Then '选择了 Forge
-                ModLoader = CompModLoaderType.Any '此时，视作没有筛选 Mod Loader（因为部分老 Mod 没有设置自己支持的加载器）
-            End If
-        End If
         With Request
             .SearchText = TextSearchName.Text
             .GameVersion = GameVersion
             .Tag = ComboSearchTag.SelectedItem.Tag
-            .ModLoader = ModLoader
+            .ModLoader = If(PageType = CompType.Mod, Val(ComboSearchLoader.SelectedItem.Tag), CompModLoaderType.Any)
             .Source = CType(Val(ComboSearchSource.SelectedItem.Tag), CompSourceType)
         End With
         Return Request
@@ -188,7 +188,6 @@ Public Class PageComp
     End Sub
 
     '切换页码
-
     Private Sub BtnPageFirst_Click(sender As Object, e As RoutedEventArgs) Handles BtnPageFirst.Click
         ChangePage(0)
     End Sub

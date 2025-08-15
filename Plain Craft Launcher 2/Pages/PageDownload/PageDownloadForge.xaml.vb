@@ -19,7 +19,7 @@
                 Dim NewStack As New StackPanel With {.Margin = New Thickness(20, MyCard.SwapedHeight, 18, 0), .VerticalAlignment = VerticalAlignment.Top, .RenderTransform = New TranslateTransform(0, 0), .Tag = Version}
                 NewCard.Children.Add(NewStack)
                 NewCard.SwapControl = NewStack
-                NewCard.IsSwaped = True
+                NewCard.IsSwapped = True
                 PanMain.Children.Add(NewCard)
             Next
             ''非官方源警示
@@ -42,7 +42,7 @@
         End If
     End Sub
     Public Sub Forge_StateChanged(sender As MyLoading, newState As MyLoading.MyLoadingState, oldState As MyLoading.MyLoadingState)
-        If newState <> MyLoading.MyLoadingState.Stop Then Exit Sub
+        If newState <> MyLoading.MyLoadingState.Stop Then Return
 
         Dim Card As MyCard = CType(sender.Parent, FrameworkElement).Parent
         Dim Loader As LoaderTask(Of String, List(Of DlForgeVersionEntry)) = sender.State
