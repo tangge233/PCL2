@@ -517,7 +517,7 @@ Done:
             If LogMc.Contains("Maybe try a lower resolution resourcepack?") Then AppendReason(CrashReason.材质过大或显卡配置不足)
             If LogMc.Contains("java.lang.NoSuchMethodError: net.minecraft.world.server.ChunkManager$ProxyTicketManager.shouldForceTicks(J)Z") AndAlso LogMc.Contains("OptiFine") Then AppendReason(CrashReason.OptiFine导致无法加载世界)
             If LogMc.Contains("Unsupported class file major version") Then AppendReason(CrashReason.Java版本不兼容)
-            If LogMc.Contains("com.electronwill.nightconfig.core.io.ParsingException: Not enough data available") AndAlso Not CrashReasons.ContainsKey(CrashReason.Mod配置文件导致游戏崩溃) AppendReason(CrashReason.NightConfig的Bug)
+            If LogMc.Contains("com.electronwill.nightconfig.core.io.ParsingException: Not enough data available") AndAlso Not CrashReasons.ContainsKey(CrashReason.Mod配置文件导致游戏崩溃) Then AppendReason(CrashReason.NightConfig的Bug)
             If LogMc.Contains("Cannot find launch target fmlclient, unable to launch") Then AppendReason(CrashReason.Forge安装不完整)
             If LogMc.Contains("Invalid paths argument, contained no existing paths") AndAlso LogMc.Contains("libraries\net\minecraftforge\fmlcore") Then AppendReason(CrashReason.Forge安装不完整)
             If LogMc.Contains("Invalid module name: '' is not a Java identifier") Then AppendReason(CrashReason.Mod名称包含特殊字符)
