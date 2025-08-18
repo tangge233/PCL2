@@ -171,7 +171,7 @@
                     </Grid>
                 </StackPanel>
             </local:MyCard>
-            <local:MyCard x:Name="CardSkin" Margin="0,0,0,15" Title="{StaticResource LangPageSetupLaunchSkin}" CanSwap="True" IsSwaped="True">
+            <local:MyCard x:Name="CardSkin" Margin="0,0,0,15" Title="{StaticResource LangPageSetupLaunchSkin}" CanSwap="True" IsSwapped="True">
                 <StackPanel Margin="25,40,25,15">
                     <local:MyHint Text="{StaticResource LangPageSetupLaunchSkinTips}" Theme="Yellow" Margin="0,0,0,10" />
                     <Grid Margin="-1,0,0,0">
@@ -205,7 +205,7 @@
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
                             </Grid.ColumnDefinitions>
                             <local:MyButton x:Name="BtnSkinSave" Text="{StaticResource LangPageSetupLaunchSkinSave}" MinWidth="140" Padding="13,0" Margin="0,0,20,0" Grid.Row="1" />
-                            <local:MyButton x:Name="BtnSkinCache" Text="{StaticResource LangPageSetupLaunchSkinRefresh}" MinWidth="140" Padding="13,0" Margin="0,0,20,0" ToolTip="{StaticResource LangPageSetupLaunchSkinRefreshToolTip}" Grid.Row="1" Grid.Column="1" />
+                            <local:MyButton x:Name="BtnSkinCache" Text="{StaticResource LangRefresh}" MinWidth="140" Padding="13,0" Margin="0,0,20,0" ToolTip="{StaticResource LangPageSetupLaunchSkinRefreshToolTip}" Grid.Row="1" Grid.Column="1" />
                         </Grid>
                     </Grid>
                     <Grid x:Name="PanSkinChange" Margin="0,14,0,2" Height="35" Visibility="Collapsed">
@@ -218,7 +218,7 @@
                     </Grid>
                 </StackPanel>
             </local:MyCard>
-            <local:MyCard Margin="0,0,0,15" Title="{StaticResource LangPageSetupLaunchLaunchAdvanceOptions}" IsSwaped="True" CanSwap="True">
+            <local:MyCard Margin="0,0,0,15" Title="{StaticResource LangPageSetupLaunchLaunchAdvanceOptions}" IsSwapped="True" CanSwap="True">
                 <Grid Margin="25,40,25,15">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -240,7 +240,7 @@
                                         ToolTip="{StaticResource LangPageSetupLaunchLaunchAdvanceOptionsJVMHeadReset}" ToolTipService.Placement="Right" ToolTipService.InitialShowDelay="200" ToolTipService.VerticalOffset="-1"
                                         Logo="M530 0c287 0 521 229 521 511s-233 511-521 511c-233 0-436-151-500-368a63 63 0 0 1 44-79 65 65 0 0 1 80 43c48 162 200 276 375 276 215 0 390-171 390-383s-174-383-390-383c-103 0-199 39-270 106l21-5a63 63 0 0 1 33 123l-157 42a65 65 0 0 1-90-42l-49-183a65 65 0 1 1 126-33l6 26A524 524 0 0 1 530 0z" LogoScale="0.9" />
                     </StackPanel>
-                    <local:MyTextBox x:Name="TextAdvanceJvm" Grid.ColumnSpan="2" Tag="LaunchAdvanceJvm" Grid.Column="1" ToolTip="{StaticResource LangPageSetupLaunchLaunchAdvanceOptionsJVMHeadTops}" MaxLength="4000"
+                    <local:MyTextBox x:Name="TextAdvanceJvm" Grid.ColumnSpan="2" Tag="LaunchAdvanceJvm" Grid.Column="1" ToolTip="{StaticResource LangPageSetupLaunchLaunchAdvanceOptionsJVMHeadTops}。&#xa;支持 Minecraft 版本 JSON 中的字符串替换标记，例如 ${library_directory}。" MaxLength="4000"
                                  Height="100" AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" Padding="0,5" VerticalScrollBarVisibility="Auto" />
                     <TextBlock Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{StaticResource LangPageSetupLaunchLaunchAdvanceOptionsJVMTail}" Margin="0,0,25,0" />
                     <local:MyTextBox x:Name="TextAdvanceGame" Grid.Row="2" Grid.ColumnSpan="2" Tag="LaunchAdvanceGame" Grid.Column="1" ToolTip="{StaticResource LangPageSetupLaunchLaunchAdvanceOptionsJVMTailTip}" />
