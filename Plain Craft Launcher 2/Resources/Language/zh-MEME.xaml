@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
     <s:String x:Key="LangTaskAbort">取消了！</s:String>
     <s:String x:Key="LangDialogBtnOK">好的</s:String>
     <s:String x:Key="LangDialogBtnCancel">算了</s:String>
@@ -825,6 +825,7 @@
     <s:String x:Key="LangPageOtherAboutThanksMCModBtn">打开百科</s:String>
     <s:String x:Key="LangPageOtherAboutThanks00ll00">提供了爪哇擦腚纸和一些重要服务支持！</s:String>
     <s:String x:Key="LangPageOtherAboutThanksz0z0r4">提供了 MCIM 中国模组下崽镜像源和帮助库图床！</s:String>
+    <s:String x:Key="LangPageOtherAboutThanksz0z0r4Detail">MCIM 主页</s:String>
     <s:String x:Key="LangPageOtherAboutThanksPatrick">设计并制作了平原合成发射台图标，让我从做图标的水深火热中得到了解脱……</s:String>
     <s:String x:Key="LangPageOtherAboutThanksHao_Tian">在内测中找出了一大堆没人想得到的诡异虫子，有非同寻常的虫子体质</s:String>
     <s:String x:Key="LangPageOtherAboutThanksMCBBSTitle">麦恩克拉夫特中文论坛</s:String>
@@ -842,6 +843,9 @@
     <s:String x:Key="LangPageOtherAboutLicenseDoc">看看许可文档</s:String>
     <s:String x:Key="LangPageOtherAboutLicenseWeb">看看来源网站</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoAgreement">用户协议与免责声明</s:String>
+    <s:String x:Key="LangPageOtherAboutLawInfoTelemetryTitle">匿名数据收集</s:String>
+    <s:String x:Key="LangPageOtherAboutLawInfoTelemetryContent">当下载失败、PCL 出错、游戏崩溃等事件时，PCL 会匿名上报信息，以通知龙猫 “哦吼，出错了”，让龙猫能更好地修 Bug……（PCL 不会上传或收集任何个人信息，包括上报的东西里面也没有！）
+你可以在 设置 → 其他 → 启动器 中关闭上报，不过龙猫就不知道你遇到了什么 Bug 了……</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoPrivacyTitle">隐私说明</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoPrivacyContent">本软件的 User Agent 中包含发射器的版本号，以统计各版本的用户数量。
 除此之外，本软件不会向开发者上传任何其他信息。</s:String>
@@ -862,7 +866,6 @@
 食用此方式更换的外壳在多人游戏中仅自己可见，且会替换游戏中所有的角色。</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinTypeMicrosoftName">正版播放器名</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinSave">拯救外壳</s:String>
-    <s:String x:Key="LangPageSetupLaunchSkinRefresh">刷亲斤缓存</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinRefreshToolTip">刷亲斤并重新下崽平原合成发射台当前展示的外壳</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinChange">换外壳</s:String>
     <s:String x:Key="LangPageSetupLaunchSkinReset">重置外壳</s:String>
