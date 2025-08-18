@@ -49,6 +49,62 @@ Public Class MyListItem
     '勾选条
     Public RectCheck As Border
 
+
+    ''' <summary>
+    ''' Tags 的存放 StackPanel
+    ''' </summary>
+    Public _PanTags As StackPanel
+    Public ReadOnly Property PanTags As StackPanel
+        Get
+            If _PanTags IsNot Nothing Then Return _PanTags
+            Dim NewStack As New StackPanel With {
+            .IsHitTestVisible = False,
+            .Orientation = Orientation.Horizontal,
+            .VerticalAlignment = VerticalAlignment.Bottom,
+            .Margin = New Thickness(0, 0, -3, 0)
+            }
+            SetColumn(NewStack, 3)
+            SetRow(NewStack, 2)
+            PanBack.Children.Add(NewStack)
+            _PanTags = NewStack
+            Return _PanTags
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' 标签，可以传入 String 和 List(Of String)
+    ''' </summary>
+    Public WriteOnly Property Tags As Object
+        Set(value As Object)
+            Dim list As New List(Of String)
+            If TypeOf (value) Is String Then
+                list = CType(value, String).Split("|").ToList()
+            End If
+            If TypeOf (value) Is List(Of String) Then
+                list = CType(value, List(Of String))
+            End If
+            PanTags.Children.Clear()
+            PanTags.Visibility = If(list.Any(), Visibility.Visible, Visibility.Collapsed)
+            For Each TagText In list
+                Dim NewTag As New Border With {
+                    .Background = New SolidColorBrush(Color.FromArgb(17, 0, 0, 0)),
+                    .Padding = New Thickness(3, 1, 3, 1),
+                    .CornerRadius = New CornerRadius(3),
+                    .Margin = New Thickness(0, 0, 3, 0),
+                    .SnapsToDevicePixels = True,
+                    .UseLayoutRounding = False
+                }
+                Dim TagTextBlock As New TextBlock With {
+                    .Text = TagText,
+                    .Foreground = New SolidColorBrush(Color.FromRgb(134, 134, 134)),
+                    .FontSize = 11
+                }
+                NewTag.Child = TagTextBlock
+                PanTags.Children.Add(NewTag)
+            Next
+        End Set
+    End Property
+
     '副文本
     Private _LabInfo As TextBlock = Nothing
     Public ReadOnly Property LabInfo As TextBlock
@@ -66,9 +122,9 @@ Public Class MyListItem
                     .Margin = New Thickness(4, 0, 0, 0),
                     .Opacity = 0.6
                 }
-                SetColumn(Lab, 3)
+                SetColumn(Lab, 4)
                 SetRow(Lab, 2)
-                Children.Add(Lab)
+                PanBack.Children.Add(Lab)
                 _LabInfo = Lab
                 '<TextBlock Grid.Row="2" SnapsToDevicePixels="False" UseLayoutRounding="False" HorizontalAlignment="Left" x:Name = "LabInfo" IsHitTestVisible="False" Grid.Column="2" 
                 'TextTrimming = "CharacterEllipsis" Visibility="Collapsed" FontSize="12" Foreground="{StaticResource ColorBrushGray2}" Margin="4,0,0,0" />
@@ -196,81 +252,92 @@ Public Class MyListItem
             Return GetValue(InfoProperty)
         End Get
         Set(value As String)
-            SetValue(InfoProperty, value)
+            If Info = value Then Return
             value = value.Replace(vbCr, "").Replace(vbLf, "")
-            If LabInfo Is Nothing Then Exit Property
-            LabInfo.Text = value
-            LabInfo.Visibility = If(String.IsNullOrWhiteSpace(value), Visibility.Collapsed, Visibility.Visible)
+            SetValue(InfoProperty, value)
         End Set
     End Property
-    Public Shared ReadOnly InfoProperty As DependencyProperty = DependencyProperty.Register("Info", GetType(String), GetType(MyListItem), New PropertyMetadata(New PropertyChangedCallback(
-                                                                                                                                                               Sub(sender As DependencyObject, e As DependencyPropertyChangedEventArgs)
-                                                                                                                                                                   If Not IsNothing(sender) Then
-                                                                                                                                                                       CType(sender, MyListItem).Info = e.NewValue
-                                                                                                                                                                   End If
-                                                                                                                                                               End Sub)))
+    Public Shared ReadOnly InfoProperty As DependencyProperty = DependencyProperty.Register("Info", GetType(String), GetType(MyListItem), New PropertyMetadata("", AddressOf OnInfoChanged))
+    Private Shared Sub OnInfoChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim control = CType(d, MyListItem)
+        Dim value = CStr(e.NewValue)
+        control.LabInfo.Text = value
+        control.LabInfo.Visibility = If(value = "", Visibility.Collapsed, Visibility.Visible)
+    End Sub
 
     '图片
-    Private _Logo As String = ""
     Public Property Logo As String
         Get
-            Return _Logo
+            Return GetValue(LogoProperty)
         End Get
         Set(value As String)
-            If _Logo = value Then Return
-            _Logo = value
-            '删除旧 Logo
-            If Not IsNothing(PathLogo) Then Children.Remove(PathLogo)
-            '添加新 Logo
-            If Not _Logo = "" Then
-                If _Logo.StartsWithF("http", True) Then
-                    '网络图片
-                    PathLogo = New MyImage With {
-                            .Tag = Me,
-                            .IsHitTestVisible = LogoClickable,
-                            .Source = _Logo,
-                            .RenderTransformOrigin = New Point(0.5, 0.5),
-                            .RenderTransform = New ScaleTransform With {.ScaleX = LogoScale, .ScaleY = LogoScale},
-                            .SnapsToDevicePixels = True, .UseLayoutRounding = False}
-                    RenderOptions.SetBitmapScalingMode(PathLogo, BitmapScalingMode.Linear)
-                ElseIf _Logo.EndsWithF(".png", True) OrElse _Logo.EndsWithF(".jpg", True) OrElse _Logo.EndsWithF(".webp", True) Then
-                    '位图
-                    PathLogo = New Canvas With {
-                            .Tag = Me,
-                            .IsHitTestVisible = LogoClickable,
-                            .Background = New MyBitmap(_Logo),
-                            .RenderTransformOrigin = New Point(0.5, 0.5),
-                            .RenderTransform = New ScaleTransform With {.ScaleX = LogoScale, .ScaleY = LogoScale},
-                            .SnapsToDevicePixels = True, .UseLayoutRounding = False,
-                            .HorizontalAlignment = HorizontalAlignment.Stretch, .VerticalAlignment = VerticalAlignment.Stretch
-                    }
-                    RenderOptions.SetBitmapScalingMode(PathLogo, BitmapScalingMode.Linear)
-                Else
-                    '矢量图
-                    PathLogo = New Shapes.Path With {
-                        .Tag = Me,
-                        .IsHitTestVisible = LogoClickable, .HorizontalAlignment = HorizontalAlignment.Center, .VerticalAlignment = VerticalAlignment.Center, .Stretch = Stretch.Uniform,
-                        .Data = (New GeometryConverter).ConvertFromString(_Logo),
-                        .RenderTransformOrigin = New Point(0.5, 0.5),
-                        .RenderTransform = New ScaleTransform With {.ScaleX = LogoScale, .ScaleY = LogoScale},
-                        .SnapsToDevicePixels = False, .UseLayoutRounding = False}
-                    PathLogo.SetBinding(Shapes.Path.FillProperty, New Binding("Foreground") With {.Source = Me})
-                End If
-                SetColumn(PathLogo, 2)
-                SetRowSpan(PathLogo, 4)
-                OnSizeChanged() '设置边距
-                Children.Add(PathLogo)
-                '图标的点击事件
-                If LogoClickable Then
-                    AddHandler PathLogo.MouseLeave, Sub(sender, e) IsLogoDown = False
-                    AddHandler PathLogo.MouseLeftButtonDown, Sub(sender, e) IsLogoDown = True
-                    AddHandler PathLogo.MouseLeftButtonUp, Sub(sender, e) If IsLogoDown Then IsLogoDown = False : RaiseEvent LogoClick(sender.Tag, e)
-                End If
-            End If
-            '改变行距
-            ColumnLogo.Width = New GridLength(If(_Logo = "", 0, 34) + If(Height < 40, 0, 4))
+            If Logo = value Then Return
+            SetValue(LogoProperty, value)
         End Set
     End Property
+    Public Shared ReadOnly LogoProperty As DependencyProperty = DependencyProperty.Register("Logo", GetType(String), GetType(MyListItem), New PropertyMetadata("", AddressOf OnLogoChanged))
+    Private Shared Sub OnLogoChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
+        Dim control = CType(d, MyListItem)
+        Dim value = CStr(e.NewValue)
+        control.UpdateLogo(value)
+    End Sub
+    Private Sub UpdateLogo(_Logo As String)
+        '删除旧 Logo
+        If Not IsNothing(PathLogo) Then Children.Remove(PathLogo)
+        '添加新 Logo
+        If Not _Logo = "" Then
+            If _Logo.StartsWithF("http", True) Then
+                '网络图片
+                PathLogo = New MyImage With {
+                        .Tag = Me,
+                        .IsHitTestVisible = LogoClickable,
+                        .Source = _Logo,
+                        .RenderTransformOrigin = New Point(0.5, 0.5),
+                        .RenderTransform = New ScaleTransform With {.ScaleX = LogoScale, .ScaleY = LogoScale},
+                        .SnapsToDevicePixels = True, .UseLayoutRounding = False}
+                RenderOptions.SetBitmapScalingMode(PathLogo, BitmapScalingMode.Linear)
+            ElseIf _Logo.EndsWithF(".png", True) OrElse _Logo.EndsWithF(".jpg", True) OrElse _Logo.EndsWithF(".webp", True) Then
+                '位图
+                PathLogo = New Canvas With {
+                        .Tag = Me,
+                        .IsHitTestVisible = LogoClickable,
+                        .Background = New MyBitmap(_Logo),
+                        .RenderTransformOrigin = New Point(0.5, 0.5),
+                        .RenderTransform = New ScaleTransform With {.ScaleX = LogoScale, .ScaleY = LogoScale},
+                        .SnapsToDevicePixels = True, .UseLayoutRounding = False,
+                        .HorizontalAlignment = HorizontalAlignment.Stretch, .VerticalAlignment = VerticalAlignment.Stretch
+                }
+                If _Logo.Contains(PathTemp & $"Cache\Skin\Head") Then
+                    RenderOptions.SetBitmapScalingMode(PathLogo, BitmapScalingMode.NearestNeighbor)
+                Else
+                    RenderOptions.SetBitmapScalingMode(PathLogo, BitmapScalingMode.Linear)
+                End If
+            Else
+                '矢量图
+                PathLogo = New Shapes.Path With {
+                    .Tag = Me,
+                    .IsHitTestVisible = LogoClickable, .HorizontalAlignment = HorizontalAlignment.Center, .VerticalAlignment = VerticalAlignment.Center, .Stretch = Stretch.Uniform,
+                    .Data = (New GeometryConverter).ConvertFromString(_Logo),
+                    .RenderTransformOrigin = New Point(0.5, 0.5),
+                    .RenderTransform = New ScaleTransform With {.ScaleX = LogoScale, .ScaleY = LogoScale},
+                    .SnapsToDevicePixels = False, .UseLayoutRounding = False}
+                PathLogo.SetBinding(Shapes.Path.FillProperty, New Binding("Foreground") With {.Source = Me})
+            End If
+            SetColumn(PathLogo, 2)
+            SetRowSpan(PathLogo, 4)
+            OnSizeChanged() '设置边距
+            Children.Add(PathLogo)
+            '图标的点击事件
+            If LogoClickable Then
+                AddHandler PathLogo.MouseLeave, Sub(sender, e) IsLogoDown = False
+                AddHandler PathLogo.MouseLeftButtonDown, Sub(sender, e) IsLogoDown = True
+                AddHandler PathLogo.MouseLeftButtonUp, Sub(sender, e) If IsLogoDown Then IsLogoDown = False : RaiseEvent LogoClick(sender.Tag, e)
+            End If
+        End If
+        '改变行距
+        ColumnLogo.Width = New GridLength(If(_Logo = "", 0, 34) + If(Height < 40, 0, 4))
+    End Sub
+
     Private _LogoScale As Double = 1
     Public Property LogoScale() As Double
         Get
@@ -331,6 +398,7 @@ Public Class MyListItem
 
     '适应尺寸
     Private Sub OnSizeChanged() Handles Me.SizeChanged
+        Dim _Logo = Logo
         ColumnCheck.Width = New GridLength(If(_Type = CheckType.None OrElse _Type = CheckType.Clickable, If(Height < 40, 4, 2), 6))
         ColumnLogo.Width = New GridLength(If(_Logo = "", 0, 34) + If(Height < 40, 0, 4))
         If PathLogo IsNot Nothing Then
@@ -496,10 +564,10 @@ Public Class MyListItem
             SetValue(ForegroundProperty, value)
         End Set
     End Property
-    Public Shared ReadOnly ForegroundProperty As DependencyProperty = DependencyProperty.Register("Foreground", GetType(Brush), GetType(MyListItem), New PropertyMetadata(CType(Color1, SolidColorBrush)))
+    Public Shared ReadOnly ForegroundProperty As DependencyProperty = DependencyProperty.Register("Foreground", GetType(Brush), GetType(MyListItem), New PropertyMetadata(DynamicColors.Color1Brush))
 
     '菜单与按钮绑定
-    Public ContentHandler As Action(Of MyListItem, EventArgs)
+    Public Property ContentHandler As Action(Of MyListItem, EventArgs)
 
 #End Region
 
@@ -569,7 +637,7 @@ Public Class MyListItem
     Public Sub RefreshColor(sender As Object, e As EventArgs) Handles Me.MouseEnter, Me.MouseLeave, Me.MouseLeftButtonDown, Me.MouseLeftButtonUp
         '菜单虚拟化检测
         If ContentHandler IsNot Nothing Then
-            ContentHandler(sender, e)
+            ContentHandler.Invoke(sender, e)
             ContentHandler = Nothing
         End If
         '判断当前颜色
@@ -635,7 +703,7 @@ Public Class MyListItem
                     ColumnPaddingRight.Width = New GridLength(Math.Max(MinPaddingRight, 5 + Buttons.Count * 25))
                 End If
                 '由于鼠标已经移入，所以直接实例化 RectBack
-                RectBack.Background = ColorBg1
+                RectBack.Background = DynamicColors.ColorBg1Brush
                 RectBack.Opacity = 1
                 RectBack.RenderTransform = New ScaleTransform(1, 1)
                 Me.RenderTransform = New ScaleTransform(1, 1)
@@ -647,7 +715,7 @@ Public Class MyListItem
                 Me.RenderTransform = New ScaleTransform(1, 1)
                 If _RectBack IsNot Nothing Then
                     If IsScaleAnimationEnabled Then RectBack.RenderTransform = New ScaleTransform(0.75, 0.75)
-                    RectBack.Background = Color7
+                    RectBack.Background = DynamicColors.Color7Brush
                     RectBack.Opacity = 0
                 End If
             End If

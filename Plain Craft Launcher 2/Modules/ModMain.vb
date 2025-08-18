@@ -1,5 +1,6 @@
-﻿Imports System.Windows.Interop
+Imports System.Windows.Interop
 Imports System.Windows.Threading
+Imports PCL.Core.Controls
 
 Public Module ModMain
 
@@ -181,6 +182,9 @@ EndHint:
         ''' 登录模式：登录步骤 1 中返回的 JSON。
         ''' </summary>
         Public Content As Object
+
+        '设置轮询 Url
+        Public AuthUrl = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
         ''' <summary>
         ''' 输入模式：输入验证规则。
         ''' </summary>
@@ -227,6 +231,7 @@ EndHint:
         [Select]
         Input
         Login
+        Markdown
     End Enum
 
     ''' <summary>
@@ -249,6 +254,65 @@ EndHint:
         If Button1 = "确定" Then Button1 = GetLang("LangDialogBtnOK")
         If Title = "提示" Then Title = GetLang("LangDialogTitleTip")
         Dim Converter As New MyMsgBoxConverter With {.Type = MyMsgBoxType.Text, .Button1 = Button1, .Button2 = Button2, .Button3 = Button3, .Text = Caption, .IsWarn = IsWarn, .Title = Title, .HighLight = HighLight, .ForceWait = True, .Button1Action = Button1Action, .Button2Action = Button2Action, .Button3Action = Button3Action}
+        WaitingMyMsgBox.Add(Converter)
+        If RunInUi() Then
+            '若为 UI 线程，立即执行弹窗刻， 避免快速（连点器）点击时多次弹窗
+            MyMsgBoxTick()
+        End If
+        If Button2.Length > 0 OrElse ForceWait Then
+            '若有多个按钮则开始等待
+            If FrmMain Is Nothing OrElse FrmMain.PanMsg Is Nothing AndAlso RunInUi() Then
+                '主窗体尚未加载，用老土的弹窗来替代
+                WaitingMyMsgBox.Remove(Converter)
+                If Button2.Length > 0 Then
+                    Dim RawResult As MsgBoxResult = MsgBox(Caption, If(Button3.Length > 0, MsgBoxStyle.YesNoCancel, MsgBoxStyle.YesNo) + If(IsWarn, MsgBoxStyle.Critical, MsgBoxStyle.Question), Title)
+                    Select Case RawResult
+                        Case MsgBoxResult.Yes
+                            Converter.Result = 1
+                        Case MsgBoxResult.No
+                            Converter.Result = 2
+                        Case MsgBoxResult.Cancel
+                            Converter.Result = 3
+                    End Select
+                Else
+                    MsgBox(Caption, MsgBoxStyle.OkOnly + If(IsWarn, MsgBoxStyle.Critical, MsgBoxStyle.Question), Title)
+                    Converter.Result = 1
+                End If
+                Log("[Control] 主窗体加载完成前出现意料外的等待弹窗：" & Button1 & "," & Button2 & "," & Button3, LogLevel.Debug)
+            Else
+                Try
+                    FrmMain.DragStop()
+                    ComponentDispatcher.PushModal()
+                    Dispatcher.PushFrame(Converter.WaitFrame)
+                Finally
+                    ComponentDispatcher.PopModal()
+                End Try
+            End If
+            Log("[Control] 普通弹框返回：" & If(Converter.Result, "null"))
+            Return Converter.Result
+        Else
+            '不进行等待，直接返回
+            Return 1
+        End If
+    End Function
+    ''' <summary>
+    ''' 显示弹窗，返回点击按钮的编号（从 1 开始）。
+    ''' </summary>
+    ''' <param name="Title">弹窗的标题。</param>
+    ''' <param name="Caption">弹窗的内容。</param>
+    ''' <param name="Button1">显示的第一个按钮，默认为“确定”。</param>
+    ''' <param name="Button2">显示的第二个按钮，默认为空。</param>
+    ''' <param name="Button3">显示的第三个按钮，默认为空。</param>
+    ''' <param name="Button1Action">点击第一个按钮将执行该方法，不关闭弹窗。</param>
+    ''' <param name="Button2Action">点击第二个按钮将执行该方法，不关闭弹窗。</param>
+    ''' <param name="Button3Action">点击第三个按钮将执行该方法，不关闭弹窗。</param>
+    ''' <param name="IsWarn">是否为警告弹窗，若为 True，弹窗配色和背景会变为红色。</param>
+    Public Function MyMsgBoxMarkdown(Caption As String, Optional Title As String = "提示",
+                             Optional Button1 As String = "确定", Optional Button2 As String = "", Optional Button3 As String = "",
+                             Optional IsWarn As Boolean = False, Optional HighLight As Boolean = True, Optional ForceWait As Boolean = False,
+                             Optional Button1Action As Action = Nothing, Optional Button2Action As Action = Nothing, Optional Button3Action As Action = Nothing) As Integer
+        '将弹窗列入队列
+        Dim Converter As New MyMsgBoxConverter With {.Type = MyMsgBoxType.Markdown, .Button1 = Button1, .Button2 = Button2, .Button3 = Button3, .Text = Caption, .IsWarn = IsWarn, .Title = Title, .HighLight = HighLight, .ForceWait = True, .Button1Action = Button1Action, .Button2Action = Button2Action, .Button3Action = Button3Action}
         WaitingMyMsgBox.Add(Converter)
         If RunInUi() Then
             '若为 UI 线程，立即执行弹窗刻， 避免快速（连点器）点击时多次弹窗
@@ -352,10 +416,10 @@ EndHint:
             If FrmMain Is Nothing OrElse FrmMain.PanMsg Is Nothing OrElse FrmMain.WindowState = WindowState.Minimized Then Return
             If FrmMain.PanMsg.Children.Count > 0 Then
                 '弹窗中
-                FrmMain.PanMsg.Visibility = Visibility.Visible
+                FrmMain.PanMsgBackground.Visibility = Visibility.Visible
             ElseIf WaitingMyMsgBox.Any Then
                 '没有弹窗，显示一个等待的弹窗
-                FrmMain.PanMsg.Visibility = Visibility.Visible
+                FrmMain.PanMsgBackground.Visibility = Visibility.Visible
                 Select Case CType(WaitingMyMsgBox(0), MyMsgBoxConverter).Type
                     Case MyMsgBoxType.Input
                         FrmMain.PanMsg.Children.Add(New MyMsgInput(WaitingMyMsgBox(0)))
@@ -365,11 +429,13 @@ EndHint:
                         FrmMain.PanMsg.Children.Add(New MyMsgText(WaitingMyMsgBox(0)))
                     Case MyMsgBoxType.Login
                         FrmMain.PanMsg.Children.Add(New MyMsgLogin(WaitingMyMsgBox(0)))
+                    Case MyMsgBoxType.Markdown
+                        FrmMain.PanMsg.Children.Add(New MyMsgMarkdown(WaitingMyMsgBox(0)))
                 End Select
                 WaitingMyMsgBox.RemoveAt(0)
             Else
                 '没有弹窗，没有等待的弹窗
-                If Not FrmMain.PanMsg.Visibility = Visibility.Collapsed Then FrmMain.PanMsg.Visibility = Visibility.Collapsed
+                If Not FrmMain.PanMsgBackground.Visibility = Visibility.Collapsed Then FrmMain.PanMsgBackground.Visibility = Visibility.Collapsed
             End If
         Catch ex As Exception
             Log(ex, "处理等待中的弹窗失败", LogLevel.Feedback)
@@ -388,6 +454,8 @@ EndHint:
     '页面声明（出于单元测试考虑，初始化页面已转入 FormMain 中）
     Public FrmLaunchLeft As PageLaunchLeft
     Public FrmLaunchRight As PageLaunchRight
+    Public FrmLogLeft As PageLogLeft
+    Public FrmLogRight As PageLogRight
     Public FrmSelectLeft As PageSelectLeft
     Public FrmSelectRight As PageSelectRight
     Public FrmSpeedLeft As PageSpeedLeft
@@ -395,8 +463,7 @@ EndHint:
 
     '联机页面声明
     Public FrmLinkLeft As PageLinkLeft
-    Public FrmLinkIoi As PageLinkIoi
-    Public FrmLinkHiper As PageLinkHiper
+    Public FrmLinkLobby As PageLinkLobby
     Public FrmLinkHelp As PageOtherHelpDetail
     Public FrmLinkFeedback As PageLinkFeedback
 
@@ -408,12 +475,16 @@ EndHint:
     Public FrmDownloadLiteLoader As PageDownloadLiteLoader
     Public FrmDownloadForge As PageDownloadForge
     Public FrmDownloadNeoForge As PageDownloadNeoForge
+    Public FrmDownloadCleanroom As PageDownloadCleanroom
     Public FrmDownloadFabric As PageDownloadFabric
+    Public FrmDownloadQuilt As PageDownloadQuilt
+    Public FrmDownloadLabyMod As PageDownloadLabyMod
     Public FrmDownloadMod As PageDownloadMod
     Public FrmDownloadPack As PageDownloadPack
     Public FrmDownloadDataPack As PageDownloadDataPack
     Public FrmDownloadShader As PageDownloadShader
     Public FrmDownloadResourcePack As PageDownloadResourcePack
+    Public FrmDownloadCompFavorites As PageDownloadCompFavorites
 
     '设置页面声明
     Public FrmSetupLeft As PageSetupLeft
@@ -421,29 +492,42 @@ EndHint:
     Public FrmSetupUI As PageSetupUI
     Public FrmSetupSystem As PageSetupSystem
     Public FrmSetupLink As PageSetupLink
+    Public FrmSetupJava As PageSetupJava
+    Public FrmHomePageMarket As PageHomePageMarket
 
     '其他页面声明
     Public FrmOtherLeft As PageOtherLeft
     Public FrmOtherHelp As PageOtherHelp
     Public FrmOtherAbout As PageOtherAbout
     Public FrmOtherTest As PageOtherTest
+    Public FrmOtherFeedback As PageOtherFeedback
+    Public FrmOtherVote As PageOtherVote
+    Public FrmOtherLog As PageOtherLog
 
     '登录页面声明
-    Public FrmLoginLegacy As PageLoginLegacy
-    Public FrmLoginNide As PageLoginNide
-    Public FrmLoginNideSkin As PageLoginNideSkin
     Public FrmLoginAuth As PageLoginAuth
-    Public FrmLoginAuthSkin As PageLoginAuthSkin
     Public FrmLoginMs As PageLoginMs
-    Public FrmLoginMsSkin As PageLoginMsSkin
+    Public FrmLoginProfile As PageLoginProfile
+    Public FrmLoginProfileSkin As PageLoginProfileSkin
+    Public FrmLoginOffline As PageLoginOffline
 
     '版本设置页面声明
     Public FrmVersionLeft As PageVersionLeft
     Public FrmVersionOverall As PageVersionOverall
-    Public FrmVersionMod As PageVersionMod
+    Public FrmVersionMod As PageVersionCompResource
     Public FrmVersionModDisabled As PageVersionModDisabled
+    Public FrmVersionScreenshot As PageVersionScreenshot
+    Public FrmVersionSaves As PageVersionSaves
+    Public FrmVersionShader As PageVersionCompResource
+    Public FrmVersionSchematic As PageVersionCompResource
+    Public FrmVersionResourcePack As PageVersionCompResource
     Public FrmVersionSetup As PageVersionSetup
+    Public FrmVersionInstall As PageVersionInstall
     Public FrmVersionExport As PageVersionExport
+    '版本存档页面
+    Public FrmVersionSavesLeft As PageVersionSavesLeft
+    Public FrmVersionSavesInfo As PageVersionSavesInfo
+    Public FrmVersionSavesBackup As PageVersionSavesBackup
 
     '资源信息分页声明
     Public FrmDownloadCompDetail As PageDownloadCompDetail
@@ -599,7 +683,7 @@ EndHint:
             Try
 
                 '解压内置文件
-                HelpTryExtract()
+                HelpExtract()
 
                 '遍历文件
                 Dim FileList As New List(Of String)
@@ -625,11 +709,11 @@ EndHint:
                     End If
                     Log("[Help] 已扫描 PCL 文件夹下的帮助文件，目前总计 " & FileList.Count & " 条")
                     '读取自带文件
-                    For Each File In EnumerateFiles(PathTemp & "Help")
-                        '跳过非 json 文件与以 . 开头的文件夹
-                        If File.Extension.ToLower <> ".json" OrElse File.Directory.FullName.Replace(PathTemp & "Help", "").Contains("\.") Then Continue For
+                    For Each File In EnumerateFiles(PathHelpFolder)
+                        '跳过非 Json 文件与以 . 开头的文件夹
+                        If File.Extension.ToLower <> ".json" OrElse File.Directory.FullName.Replace(PathHelpFolder.TrimEnd("\"c), "").Contains("\.") Then Continue For
                         '检查忽略列表
-                        Dim RealPath As String = File.FullName.Replace(PathTemp & "Help\", "")
+                        Dim RealPath As String = File.FullName.Replace(PathHelpFolder.TrimEnd("\"c), "")
                         For Each Ignore In IgnoreList
                             If RegexCheck(RealPath, Ignore) Then
                                 If ModeDebug Then Log("[Help] 已忽略 " & RealPath & "：" & Ignore)
@@ -669,17 +753,14 @@ NextFile:
         End SyncLock
     End Sub
     ''' <summary>
-    ''' 尝试解压内置帮助文件。
+    ''' 解压内置帮助文件。
     ''' </summary>
-    Public Sub HelpTryExtract()
-        If Setup.Get("SystemHelpVersion") <> VersionCode OrElse Not File.Exists(PathTemp & "Help\启动器\备份设置.xaml") Then
-            DeleteDirectory(PathTemp & "Help")
-            Directory.CreateDirectory(PathTemp & "Help")
-            WriteFile(PathTemp & "Cache\Help.zip", GetResources("Help"))
-            ExtractFile(PathTemp & "Cache\Help.zip", PathTemp & "Help", Encoding.UTF8)
-            Setup.Set("SystemHelpVersion", VersionCode)
-            Log("[Help] 已解压内置帮助文件，目前状态：" & File.Exists(PathTemp & "Help\启动器\备份设置.xaml"), LogLevel.Debug)
-        End If
+    Public Sub HelpExtract()
+        DeleteDirectory(PathTemp & "CE\Help")
+        Directory.CreateDirectory(PathTemp & "CE\Help")
+        WriteFile(PathTemp & "CE\Cache\Help.zip", GetResources("Help"))
+        ExtractFile(PathTemp & "CE\Cache\Help.zip", PathTemp & "CE\Help", Encoding.UTF8)
+        Log("[Help] 已解压内置帮助文件，目前状态：" & File.Exists(PathTemp & "CE\Help\启动器\备份设置.xaml"), LogLevel.Debug)
     End Sub
     ''' <summary>
     ''' 对帮助文件约定的替换标记进行处理，如果遇到需要转义的字符会进行转义。
@@ -824,28 +905,34 @@ NextFile:
     ''' 将特定程序设置为使用高性能显卡启动。
     ''' 如果失败，则抛出异常。
     ''' </summary>
-    Public Sub SetGPUPreference(Executeable As String)
-        Const REG_KEY As String = "Software\Microsoft\DirectX\UserGpuPreferences"
-        Const REG_VALUE As String = "GpuPreference=2;"
+    Public Sub SetGPUPreference(Executeable As String, Optional WantHighPerformance As Boolean = True)
+        Const GPU_PERFERENCE_REG_KEY As String = "Software\Microsoft\DirectX\UserGpuPreferences"
+        Const GPU_PERFERENCE_REG_VALUE_HIGH As String = "GpuPreference=2;"
+        Const GPU_PERFERENCE_REG_VALUE_DEFAULT As String = "GpuPreference=0;"
+        'Const GPU_PERFERENCE_REG_VALUE_POWER_SAVING As String = "GpuPreference=1;"
+
+        Dim IsCurrentHighPerformance As Boolean = False
         '查看现有设置
-        Using ReadOnlyKey = My.Computer.Registry.CurrentUser.OpenSubKey(REG_KEY, False)
+        Using ReadOnlyKey = My.Computer.Registry.CurrentUser.OpenSubKey(GPU_PERFERENCE_REG_KEY, False)
             If ReadOnlyKey IsNot Nothing Then
                 Dim CurrentValue = ReadOnlyKey.GetValue(Executeable)
-                If REG_VALUE = CurrentValue?.ToString() Then
-                    Log($"[System] 无需调整显卡设置：{Executeable}")
-                    Return
+                If GPU_PERFERENCE_REG_VALUE_HIGH = CurrentValue?.ToString() Then
+                    IsCurrentHighPerformance = True
                 End If
             Else
                 '创建父级键
                 Log($"[System] 需要创建显卡设置的父级键")
-                My.Computer.Registry.CurrentUser.CreateSubKey(REG_KEY)
+                My.Computer.Registry.CurrentUser.CreateSubKey(GPU_PERFERENCE_REG_KEY)
             End If
         End Using
-        '写入新设置
-        Using WriteKey = My.Computer.Registry.CurrentUser.OpenSubKey(REG_KEY, True)
-            WriteKey.SetValue(Executeable, REG_VALUE)
-            Log($"[System] 已调整显卡设置：{Executeable}")
-        End Using
+        Log($"[System] 当前程序 ({Executeable}) 的显卡设置为高性能: {IsCurrentHighPerformance}")
+        If IsCurrentHighPerformance Xor WantHighPerformance Then
+            '写入新设置
+            Using WriteKey = My.Computer.Registry.CurrentUser.OpenSubKey(GPU_PERFERENCE_REG_KEY, True)
+                WriteKey.SetValue(Executeable, If(WantHighPerformance, GPU_PERFERENCE_REG_VALUE_HIGH, GPU_PERFERENCE_REG_VALUE_DEFAULT))
+                Log($"[System] 已调整程序 ({Executeable}) 显卡设置: {WantHighPerformance}")
+            End Using
+        End If
     End Sub
 
 #End Region

@@ -1,0 +1,34 @@
+name: Build Test
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'Plain Craft Launcher 2/**'
+      - 'Plain Craft Launcher 2.sln'
+      - '.github/workflows/**'
+      - 'PCL.Core/**'
+  pull_request:
+    paths:
+      - 'Plain Craft Launcher 2/**'
+      - 'Plain Craft Launcher 2.sln'
+      - '.github/workflows/**'
+      - 'PCL.Core/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - configuration: DebugCI
+            architecture: x64
+          - configuration: DebugCI
+            architecture: ARM64
+      fail-fast: false
+
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      configuration: ${{ matrix.configuration }}
+      architecture: ${{ matrix.architecture }}
+    secrets: inherit

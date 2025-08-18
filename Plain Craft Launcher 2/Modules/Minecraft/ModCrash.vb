@@ -1,4 +1,6 @@
-﻿Public Class CrashAnalyzer
+﻿Imports System.Text.RegularExpressions
+
+Public Class CrashAnalyzer
 
     '构造函数
     Private TempFolder As String
@@ -48,7 +50,10 @@
             Log(ex, "收集 Minecraft 隔离文件夹下的日志失败")
         End Try
         PossibleLogs.Add(VersionPathIndie & "logs\latest.log") 'Minecraft 日志
-        PossibleLogs.Add(VersionPathIndie & "logs\debug.log") 'Minecraft Debug 日志
+        Dim LaunchScript As String = ReadFile(Path & "PCL\LatestLaunch.bat")
+        If LaunchScript.ContainsF("-Dlog4j2.formatMsgNoLookups=false") Then
+            PossibleLogs.Add(VersionPathIndie & "logs\debug.log") 'Minecraft Debug 日志
+        End If
         PossibleLogs = PossibleLogs.Distinct.ToList
 
         '确定最新的日志文件
@@ -158,7 +163,7 @@ Extracted:
                    MatchName = "游戏崩溃前的输出.txt" OrElse MatchName = "rawoutput.log" Then
                 TargetType = AnalyzeFileType.MinecraftLog
                 If DirectFile Is Nothing Then DirectFile = LogFile
-            ElseIf MatchName = "启动器日志.txt" OrElse MatchName = "PCL2 启动器日志.txt" OrElse MatchName = "PCL 启动器日志.txt" OrElse MatchName = "log1.txt" Then
+            ElseIf MatchName = "启动器日志.txt" OrElse MatchName = "PCL2 启动器日志.txt" OrElse MatchName = "PCL 启动器日志.txt" OrElse MatchName = "log1.txt" OrElse MatchName = "log-ce1.log" Then
                 If LogFile.Value.Any(Function(s) s.Contains("以下为游戏输出的最后一段内容")) Then
                     TargetType = AnalyzeFileType.MinecraftLog
                     If DirectFile Is Nothing Then DirectFile = LogFile
@@ -232,7 +237,7 @@ Extracted:
                             Log("[Crash] 输出报告：" & SelectedFile.Key & "，作为 Minecraft 或启动器日志")
                         Next
                         '选择一份最佳的来自启动器的游戏日志
-                        For Each FileName As String In {"rawoutput.log", "启动器日志.txt", "log1.txt", "游戏崩溃前的输出.txt", "PCL2 启动器日志.txt", "PCL 启动器日志.txt"}
+                        For Each FileName As String In {"rawoutput.log", "启动器日志.txt", "log1.txt", "log-ce1.log", "游戏崩溃前的输出.txt", "PCL2 启动器日志.txt", "PCL 启动器日志.txt"}
                             If Not FileNameDict.ContainsKey(FileName) Then Continue For
                             Dim CurrentLog = FileNameDict(FileName)
                             '截取 “以下为游戏输出的最后一段内容” 后的内容
@@ -385,10 +390,16 @@ Extracted:
         Mod需要Java11
         Mod缺少前置或MC版本错误
     End Enum
+    
+    '暂存分析的版本供特殊用途
+    '龙猫味石山代码小记: CrashAnalyze 猛一顿分析不知道自己在分析啥版本
+    Private _version As McVersion = Nothing
+    
     ''' <summary>
     ''' 根据 AnalyzeLogs 与可能的版本信息分析崩溃原因。
     ''' </summary>
-    Public Sub Analyze(Optional Version As McVersion = Nothing)
+    Public Sub Analyze(Optional version As McVersion = Nothing)
+        _version = version
         Log("[Crash] 步骤 3：分析崩溃原因")
         LogAll = If(LogMc, If(LogMcDebug, "")) & If(LogHs, "") & If(LogCrash, "")
 
@@ -859,9 +870,14 @@ NextStack:
     Public Sub Output(IsHandAnalyze As Boolean, Optional ExtraFiles As List(Of String) = Nothing)
         '弹窗提示
         FrmMain.ShowWindowToTop()
-        Select Case MyMsgBox(GetAnalyzeResult(IsHandAnalyze), If(IsHandAnalyze, GetLang("LangModCrashDialogTitleAnalysisResult"), GetLang("LangModCrashDialogTitleMcError")),
-            GetLang("LangDialogBtnOK"), If(IsHandAnalyze OrElse DirectFile Is Nothing, "", GetLang("LangModCrashViewLog")), If(IsHandAnalyze, "", GetLang("LangModCrashExportCrashReport")),
-            Button2Action:=If(IsHandAnalyze OrElse DirectFile Is Nothing, Nothing,
+        Dim resultText = GetAnalyzeResult(IsHandAnalyze)
+        '确定是否是加载器版本不兼容问题
+        Dim isModLoaderIncompatible = _version IsNot Nothing AndAlso resultText.StartsWith("Mod 加载器版本与 Mod 不兼容")
+        Select Case MyMsgBox(resultText, If(IsHandAnalyze, GetLang("LangModCrashDialogTitleAnalysisResult"), GetLang("LangModCrashDialogTitleMcError")),
+            GetLang("LangDialogBtnOK"), 
+            If(IsHandAnalyze OrElse DirectFile Is Nothing, "", If(isModLoaderIncompatible, "前往修改", GetLang("LangModCrashViewLog"))),
+            If(IsHandAnalyze, "", GetLang("LangModCrashExportCrashReport")),
+            Button2Action:=If(IsHandAnalyze OrElse DirectFile Is Nothing OrElse isModLoaderIncompatible, Nothing,
             Sub()
                 '弹窗选择：查看日志
                 If File.Exists(DirectFile.Value.Key) Then
@@ -872,6 +888,10 @@ NextStack:
                     ShellOnly(FilePath)
                 End If
             End Sub))
+            Case 2
+                '弹窗选择：前往修改
+                PageVersionLeft.Version = _version
+                RunInUi(Sub() FrmMain.PageChange(FormMain.PageType.VersionSetup, FormMain.PageSubType.VersionInstall))
             Case 3
                 '弹窗选择：导出错误报告
                 Dim FileAddress As String = Nothing
@@ -883,7 +903,6 @@ NextStack:
                     If File.Exists(FileAddress) Then File.Delete(FileAddress)
                     '输出诊断信息
                     FeedbackInfo()
-                    LogFlush()
                     '复制文件
                     If ExtraFiles IsNot Nothing Then OutputFiles.AddRange(ExtraFiles)
                     For Each OutputFile In OutputFiles
@@ -892,13 +911,14 @@ NextStack:
                         Select Case FileName
                             Case "LatestLaunch.bat"
                                 FileName = "启动脚本.bat"
-                            Case "Log1.txt"
-                                FileName = "PCL 启动器日志.txt"
-                                FileEncoding = Encoding.UTF8
                             Case "RawOutput.log"
                                 FileName = "游戏崩溃前的输出.txt"
                                 FileEncoding = Encoding.UTF8
                         End Select
+                        If Core.Helper.LogWrapper.CurrentLogger.LogFiles.Last() = FileName Then
+                            FileName = "PCL 启动器日志.txt"
+                            FileEncoding = Encoding.UTF8
+                        End If
                         If File.Exists(OutputFile) Then
                             If FileEncoding Is Nothing Then FileEncoding = GetEncoding(ReadFileBytes(OutputFile))
                             Dim FileContent As String = ReadFile(OutputFile, FileEncoding)
@@ -908,6 +928,28 @@ NextStack:
                             Log($"[Crash] 导出文件：{FileName}，编码：{FileEncoding.HeaderName}")
                         End If
                     Next
+                    '输出环境与启动信息
+                    Dim EnvInfo As String = Nothing
+                    Dim McLauncherLog As String = Nothing
+                    McLauncherLog = ReadFile(TempFolder & "Report\PCL 启动器日志.txt").AfterLast("[Launch] ~ 基础参数 ~").BeforeFirst("开始 Minecraft 日志监控")
+                    Dim LaunchScript As String = ReadFile(TempFolder & "Report\启动脚本.bat")
+                    EnvInfo += $"PCL CE 版本：{VersionBaseName} {vbCrLf}"
+                    EnvInfo += $"识别码：{UniqueAddress}{vbCrLf}"
+                    EnvInfo += $"{vbCrLf}- 档案信息 -{vbCrLf}"
+                    EnvInfo += $"启动档案：{McLauncherLog.Between("玩家用户名：", "[").TrimEnd("[").Trim()}（验证方式：{McLauncherLog.Between("登录方式：", "[").TrimEnd("[").Trim()}）{vbCrLf}"
+                    EnvInfo += $"{vbCrLf}- 实例信息 -{vbCrLf}"
+                    EnvInfo += $"选定的 Java 虚拟机：{McLauncherLog.Between("Java 信息：", "[").TrimEnd("[").Trim()}{vbCrLf}"
+                    EnvInfo += $"Log4j2 NoLookups：{Not LaunchScript.ContainsF("-Dlog4j2.formatMsgNoLookups=false")}{vbCrLf}"
+                    EnvInfo += $"MC 文件夹：{McLauncherLog.Between("MC 文件夹：", "[").TrimEnd("[").Trim()}{vbCrLf}"
+                    EnvInfo += $"{vbCrLf}- 环境信息 -{vbCrLf}"
+                    EnvInfo += $"操作系统：{OSInfo}（64 位：{Not Is32BitSystem}, ARM64: {IsArm64System}）{vbCrLf}"
+                    EnvInfo += $"CPU：{CPUName}{vbCrLf}"
+                    EnvInfo += $"内存分配（分配的内存 / 已安装物理内存）：{McLauncherLog.Between("分配的内存：", "[").TrimEnd("[").Trim()} / {SystemMemorySize / 1024} GB （{SystemMemorySize} MB){vbCrLf}"
+                    For Each GPU In GPUs
+                        EnvInfo += $"显卡 {GPUs.IndexOf(GPU)}：{GPU.Name}（{GPU.Memory} MB, {GPU.DriverVersion}）"
+                    Next
+                    File.CreateText(TempFolder & "Report\环境与启动信息.txt").Close()
+                    WriteFile(TempFolder & "Report\环境与启动信息.txt", EnvInfo, Encoding:=Encoding.UTF8)
                     '导出报告
                     Compression.ZipFile.CreateFromDirectory(TempFolder & "Report\", FileAddress)
                     DeleteDirectory(TempFolder & "Report\")
@@ -919,6 +961,9 @@ NextStack:
                 OpenExplorer(FileAddress)
         End Select
     End Sub
+    
+    Private Shared ReadOnly PatternIncompatibleModLoader As New Regex("(incompatible[\s\S]+'Fabric Loader' \(fabricloader\)|Mod ID: '(?:neo)?forge', Requested by '([^']+)')")
+    
     ''' <summary>
     ''' 获取崩溃分析的结果描述。
     ''' </summary>
@@ -935,6 +980,7 @@ NextStack:
 
         '根据不同原因判断
         Dim Results As New List(Of String)
+        Const LoaderIncompatibleResultText = "Mod 加载器版本与 Mod 不兼容，请前往版本修改页面更换加载器版本。\n\n详细信息：\n"
         For Each Reason In CrashReasons
             Dim Additional As List(Of String) = Reason.Value
             Select Case Reason.Key
@@ -962,7 +1008,12 @@ NextStack:
                     End If
                 Case CrashReason.Mod缺少前置或MC版本错误
                     If Additional.Any Then
-                        Results.Add(GetLang("LangModCrashCrashReasonReasonAK", Join(Additional, "\n - ")))
+                        Dim info = Additional.Join("\n - ")
+                        If PatternIncompatibleModLoader.IsMatch(info) Then
+                            Results.Add(LoaderIncompatibleResultText & info)
+                        Else
+                            Results.Add(GetLang("LangModCrashCrashReasonReasonAK", info))
+                        End If
                     Else
                         Results.Add(GetLang("LangModCrashCrashReasonReasonAL"))
                     End If
@@ -1064,7 +1115,12 @@ NextStack:
                     End If
                 Case CrashReason.Mod互不兼容
                     If Additional.Count = 1 Then
-                        Results.Add(GetLang("LangModCrashCrashReasonReasonCE", Additional.First))
+                        Dim info = Additional.First
+                        If PatternIncompatibleModLoader.IsMatch(info) Then
+                            Results.Add(LoaderIncompatibleResultText & info)
+                        Else
+                            Results.Add(GetLang("LangModCrashCrashReasonReasonCE", info))
+                        End If
                     Else
                         Results.Add(GetLang("LangModCrashCrashReasonReasonCF"))
                     End If

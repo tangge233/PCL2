@@ -1,8 +1,12 @@
-﻿Public Class MyMsgLogin
+Imports PCL.Core.Controls
+
+Public Class MyMsgLogin
     Private Data As JObject
     Private UserCode As String '需要用户在网页上输入的设备代码
     Private DeviceCode As String '用于轮询的设备代码
     Private Website As String '验证网页的网址
+    Private OAuthUrl As String = "" 'OAuth 轮询验证地址
+
 
 #Region "弹窗"
 
@@ -18,6 +22,7 @@
             MyConverter = Converter
             ShapeLine.StrokeThickness = GetWPFSize(1)
             Data = Converter.Content
+            OAuthUrl = Converter.AuthUrl
             Init()
         Catch ex As Exception
             Log(ex, GetLang("LangMyMsgLoginHintInitFail"), LogLevel.Hint)
@@ -28,7 +33,7 @@
         Try
             '动画
             Opacity = 0
-            AniStart(AaColor(FrmMain.PanMsg, Grid.BackgroundProperty, If(MyConverter.IsWarn, New MyColor(140, 80, 0, 0), New MyColor(90, 0, 0, 0)) - FrmMain.PanMsg.Background, 200), "PanMsg Background")
+            AniStart(AaColor(FrmMain.PanMsgBackground, BlurBorder.BackgroundProperty, If(MyConverter.IsWarn, New MyColor(140, 80, 0, 0), New MyColor(90, 0, 0, 0)) - FrmMain.PanMsgBackground.Background, 200), "PanMsgBackground Background")
             AniStart({
                 AaOpacity(Me, 1, 120, 60),
                 AaDouble(Sub(i) TransformPos.Y += i, -TransformPos.Y, 300, 60, New AniEaseOutBack(AniEasePower.Weak)),
@@ -46,7 +51,7 @@
             AaCode(
             Sub()
                 If Not WaitingMyMsgBox.Any() Then
-                    AniStart(AaColor(FrmMain.PanMsg, Grid.BackgroundProperty, New MyColor(0, 0, 0, 0) - FrmMain.PanMsg.Background, 200, Ease:=New AniEaseOutFluent(AniEasePower.Weak)))
+                    AniStart(AaColor(FrmMain.PanMsgBackground, BlurBorder.BackgroundProperty, New MyColor(0, 0, 0, 0) - FrmMain.PanMsgBackground.Background, 200, Ease:=New AniEaseOutFluent(AniEasePower.Weak)))
                 End If
             End Sub, 30),
             AaOpacity(Me, -Opacity, 80, 20),
@@ -76,16 +81,26 @@
         MyConverter.Result = Result
         RunInUi(AddressOf Close)
         Thread.Sleep(200)
-        FrmMain.ShowWindowToTop()
+        'FrmMain.ShowWindowToTop()
     End Sub
 
     Private Sub Init()
         UserCode = Data("user_code")
         DeviceCode = Data("device_code")
-        Website = Data("verification_uri")
+        If Data("verification_uri_complete") IsNot Nothing Then 
+            Website = Data("verification_uri_complete")
+            LabCaption.Text = $"登录网页将自动开启，授权码将自动填充。" & vbCrLf & vbCrLf &
+            $"如果网络环境不佳，网页可能一直加载不出来，届时请使用 VPN 并重试。" & vbCrLf &
+            $"如果没有自动填充，请在页面内粘贴此授权码 {UserCode} （将自动复制）" & vbCrLf &
+            $"你也可以用其他设备打开 {Website} 并输入授权码。"
+        Else
+            Website = Data("verification_uri")
+            LabCaption.Text = $"登录网页将自动开启，请在网页中输入授权码 {UserCode}（将自动复制）。" & vbCrLf & vbCrLf &
+            $"如果网络环境不佳，网页可能一直加载不出来，届时请使用 VPN 并重试。" & vbCrLf &
+            $"你也可以用其他设备打开 {Website} 并输入上述授权码。"
+        End If
         '设置 UI
-        LabTitle.Text = GetLang("LangMyMsgLoginDialogTitleLoginMc")
-        LabCaption.Text = GetLang("LangMyMsgLoginDialogContent", UserCode, Website)
+        LabTitle.Text = "登录 Minecraft"
         Btn1.EventData = Website
         Btn2.EventData = UserCode
         '启动工作线程
@@ -100,46 +115,8 @@
         Thread.Sleep((Data("interval").ToObject(Of Integer) - 1) * 1000)
         '轮询
         Dim UnknownFailureCount As Integer = 0
-        Do While Not MyConverter.IsExited
-            Try
-                Dim Result = NetRequestOnce(
-                    "https://login.microsoftonline.com/consumers/oauth2/v2.0/token", "POST",
-                    "grant_type=urn:ietf:params:oauth:grant-type:device_code" & "&" &
-                    "client_id=" & OAuthClientId & "&" &
-                    "device_code=" & DeviceCode & "&" &
-                    "scope=XboxLive.signin%20offline_access",
-                    "application/x-www-form-urlencoded", 5000 + UnknownFailureCount * 5000, MakeLog:=False)
-                '获取结果
-                Dim ResultJson As JObject = GetJson(Result)
-                McLaunchLog($"令牌过期时间：{ResultJson("expires_in")} 秒")
-                Hint(GetLang("LangMyMsgLoginHintLoginSuccess"), HintType.Finish)
-                Finished({ResultJson("access_token").ToString, ResultJson("refresh_token").ToString})
-                Return
-            Catch ex As Exception
-                If ex.Message.Contains("authorization_declined") Then
-                    Finished(New Exception("$" & GetLang("LangMyMsgLoginExceptionDecline")))
-                    Return
-                ElseIf ex.Message.Contains("expired_token") Then
-                    Finished(New Exception("$" & GetLang("LangMyMsgLoginExceptionTimeout")))
-                    Return
-                ElseIf ex.Message.Contains("service abuse") Then
-                    Finished(New Exception("$非常抱歉，该账号已被微软封禁，无法登录。"))
-                    Return
-                ElseIf ex.Message.Contains("AADSTS70000") Then '可能不能判 “invalid_grant”，见 #269
-                    Finished(New RestartException)
-                    Return
-                ElseIf ex.Message.Contains("authorization_pending") Then
-                    Thread.Sleep(2000)
-                ElseIf UnknownFailureCount <= 2 Then
-                    UnknownFailureCount += 1
-                    Log(ex, $"登录轮询第 {UnknownFailureCount} 次失败")
-                    Thread.Sleep(2000)
-                Else
-                    Finished(New Exception(GetLang("LangMyMsgLoginExceptionCheckFail"), ex))
-                    Return
-                End If
-            End Try
-        Loop
+        Finished(0)
+        Return
     End Sub
 
 End Class

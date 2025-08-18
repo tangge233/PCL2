@@ -1,10 +1,15 @@
-﻿Public Class MyCard
+Imports System.Threading.Tasks
+Imports PCL.Core.Controls
+Imports PCL.Core.Helper
+
+Public Class MyCard
 
     '控件
     Inherits Grid
     Private ReadOnly MainGrid As Grid
     Public ReadOnly Property MainChrome As MyDropShadow
-    Private ReadOnly MainBorder As Border
+    Private ReadOnly MainBorder As BlurBorder
+    Private IsThemeChanging As Boolean = False
     Public Property BorderChild As UIElement
         Get
             Return MainBorder.Child
@@ -61,13 +66,23 @@
     End Property
     Public Shared ReadOnly TitleProperty As DependencyProperty = DependencyProperty.Register("Title", GetType(String), GetType(MyCard), New PropertyMetadata(""))
 
+    Private Async Sub _ThemeChanged(sender As Object, e As Boolean)
+        Dim bgBrush As SolidColorBrush = Application.Current.Resources("ColorBrushSemiWhite")
+        IsThemeChanging = True
+        AniStart({AaColor(MainBorder, BlurBorder.BackgroundProperty, New MyColor(bgBrush) - MainBorder.Background, 300)}, "MyCard Theme " & Uuid)
+        Await Task.Delay(300)
+        MainBorder.Background = bgBrush
+        IsThemeChanging = False
+    End Sub
+
+
     'UI 建立
     Public Sub New()
         MainChrome = New MyDropShadow With {
             .Margin = New Thickness(-3, -3, -3, -3 - GetWPFSize(1)), .ShadowRadius = 3, .Opacity = DropShadowIdleOpacity, .CornerRadius = New CornerRadius(5)}
         MainChrome.SetResourceReference(MyDropShadow.ColorProperty, "ColorObject1")
         Children.Insert(0, MainChrome)
-        MainBorder = New Border With {.Background = New SolidColorBrush(Color.FromArgb(245, 255, 255, 255)), .CornerRadius = New CornerRadius(5), .IsHitTestVisible = False}
+        MainBorder = New BlurBorder With {.CornerRadius = New CornerRadius(5), .IsHitTestVisible = False}
         Children.Insert(1, MainBorder)
         MainGrid = New Grid
         Children.Add(MainGrid)
@@ -76,6 +91,7 @@
     Private Sub Init() Handles Me.Loaded
         If IsLoad Then Return
         IsLoad = True
+        AddHandler ThemeChanged, AddressOf _ThemeChanged
         '初次加载限定
         If MainTextBlock Is Nothing Then
             MainTextBlock = New TextBlock With {.HorizontalAlignment = HorizontalAlignment.Left, .VerticalAlignment = VerticalAlignment.Top, .Margin = New Thickness(15, 12, 0, 0), .FontWeight = FontWeights.Bold, .FontSize = 13, .IsHitTestVisible = False}
@@ -89,6 +105,8 @@
             MainSwap.SetResourceReference(Shapes.Path.FillProperty, "ColorBrush1")
             MainGrid.Children.Add(MainSwap)
         End If
+        '更新背景色
+        MainBorder.Background = Application.Current.Resources("ColorBrushSemiWhite")
         '改变默认的折叠
         If IsSwaped AndAlso SwapControl IsNot Nothing Then
             MainSwap.RenderTransform = New RotateTransform(If(SwapLogoRight, 270, 0))
@@ -101,88 +119,22 @@
             RunInUi(Sub() UseAnimation = RawUseAnimation, True)
         End If
     End Sub
+    Private Sub Dispose() Handles Me.Unloaded
+        If Parent Is Nothing Then
+            RemoveHandler ThemeChanged, AddressOf _ThemeChanged
+        End If
+    End Sub
     Public Sub StackInstall()
-        StackInstall(SwapControl, SwapType, Title)
+        StackInstall(SwapControl, InstallMethod)
         TriggerForceResize()
     End Sub
-    Public Shared Sub StackInstall(ByRef Stack As StackPanel, Type As Integer, Optional CardTitle As String = "")
-        '这一部分的代码是好几年前留下的究极屎坑，当时还不知道该咋正确调用这种方法，就写了这么一坨屎
-        '但是现在……反正勉强能用……懒得改了就这样吧.jpg
-        '别骂了别骂了.jpg
-        If IsNothing(Stack.Tag) Then Return
-        '排序
-        Select Case Type
-            Case 3
-                Stack.Tag = CType(Stack.Tag, List(Of DlOptiFineListEntry)).Sort(Function(a, b) VersionSortBoolean(a.NameDisplay, b.NameDisplay))
-            Case 4, 10
-                Stack.Tag = CType(Stack.Tag, List(Of DlLiteLoaderListEntry)).Sort(Function(a, b) VersionSortBoolean(a.Inherit, b.Inherit))
-            Case 6
-                Stack.Tag = CType(Stack.Tag, List(Of DlForgeVersionEntry)).Sort(Function(a, b) a.Version > b.Version)
-            Case 8, 9
-                Stack.Tag = CType(Stack.Tag, List(Of CompFile)).Sort(Function(a, b) a.ReleaseDate > b.ReleaseDate)
-        End Select
-        '控件转换
-        Select Case Type
-            Case 5
-                Dim LoadingPickaxe As New MyLoading With {.Text = GetLang("LangSelectGettingVersion"), .Margin = New Thickness(5)}
-                Dim Loader = New LoaderTask(Of String, List(Of DlForgeVersionEntry))("DlForgeVersion Main", AddressOf DlForgeVersionMain)
-                LoadingPickaxe.State = Loader
-                Loader.Start(Stack.Tag)
-                AddHandler LoadingPickaxe.StateChanged, AddressOf FrmDownloadForge.Forge_StateChanged
-                AddHandler LoadingPickaxe.Click, AddressOf FrmDownloadForge.Forge_Click
-                Stack.Children.Add(LoadingPickaxe)
-            Case 6
-                ForgeDownloadListItemPreload(Stack, Stack.Tag, AddressOf ForgeSave_Click, True)
-            Case 8
-                CompFilesCardPreload(Stack, Stack.Tag)
-        End Select
-        '实现控件虚拟化
-        For Each Data As Object In Stack.Tag
-            Select Case Type
-                Case 0
-                    Stack.Children.Add(PageSelectRight.McVersionListItem(Data))
-                Case 2
-                    Stack.Children.Add(McDownloadListItem(Data, AddressOf McDownloadMenuSave, True))
-                Case 3
-                    Stack.Children.Add(OptiFineDownloadListItem(Data, AddressOf OptiFineSave_Click, True))
-                Case 4
-                    Stack.Children.Add(LiteLoaderDownloadListItem(Data, AddressOf FrmDownloadLiteLoader.DownloadStart, False))
-                Case 5
-                Case 6
-                    Stack.Children.Add(ForgeDownloadListItem(Data, AddressOf ForgeSave_Click, True))
-                Case 7
-                    '不能使用 AddressOf，这导致了 #535，原因完全不明，疑似是编译器 Bug
-                    Stack.Children.Add(McDownloadListItem(Data, Sub(sender, e) FrmDownloadInstall.MinecraftSelected(sender, e), False))
-                Case 8
-                    If CType(Stack.Tag, List(Of CompFile)).Distinct(Function(a, b) a.DisplayName = b.DisplayName).Count <>
-                       CType(Stack.Tag, List(Of CompFile)).Count Then
-                        '存在重复的名称（#1344）
-                        Stack.Children.Add(CType(Data, CompFile).ToListItem(AddressOf FrmDownloadCompDetail.Save_Click, BadDisplayName:=True))
-                    Else
-                        '不存在重复的名称，正常加载
-                        Stack.Children.Add(CType(Data, CompFile).ToListItem(AddressOf FrmDownloadCompDetail.Save_Click))
-                    End If
-                Case 9
-                    If CType(Stack.Tag, List(Of CompFile)).Distinct(Function(a, b) a.DisplayName = b.DisplayName).Count <>
-                       CType(Stack.Tag, List(Of CompFile)).Count Then
-                        '存在重复的名称（#1344）
-                        Stack.Children.Add(CType(Data, CompFile).ToListItem(AddressOf FrmDownloadCompDetail.Install_Click, AddressOf FrmDownloadCompDetail.Save_Click, BadDisplayName:=True))
-                    Else
-                        '不存在重复的名称，正常加载
-                        Stack.Children.Add(CType(Data, CompFile).ToListItem(AddressOf FrmDownloadCompDetail.Install_Click, AddressOf FrmDownloadCompDetail.Save_Click))
-                    End If
-                Case 10
-                    Stack.Children.Add(LiteLoaderDownloadListItem(Data, AddressOf LiteLoaderSave_Click, True))
-                Case 11
-                    Stack.Children.Add(CType(Data, HelpEntry).ToListItem)
-                Case 12
-                    Stack.Children.Add(FabricDownloadListItem(CType(Data, JObject), AddressOf FrmDownloadInstall.Fabric_Selected))
-                Case 13
-                    Stack.Children.Add(NeoForgeDownloadListItem(Data, AddressOf NeoForgeSave_Click, True))
-                Case Else
-                    Log("未知的虚拟化种类：" & Type, LogLevel.Feedback)
-            End Select
-        Next
+    Public Shared Sub StackInstall(ByRef Stack As StackPanel, InstallMethod As Action(Of StackPanel))
+        If Stack.Tag Is Nothing Then Exit Sub
+        Try
+            InstallMethod(Stack)
+        Catch ex As Exception
+            Log(ex, "[MyCard] InstallMethod 调用失败")
+        End Try
         Stack.Children.Add(New FrameworkElement With {.Height = 18}) '下边距，同时适应折叠
         Stack.Tag = Nothing
     End Sub
@@ -200,7 +152,7 @@
             AaColor(MainChrome, MyDropShadow.ColorProperty, "ColorObject4", 90),
             AaOpacity(MainChrome, DropShadowHoverOpacity - MainChrome.Opacity, 90)
         })
-        AniStart(AniList, "MyCard Mouse " & Uuid)
+        If Not IsThemeChanging Then AniStart(AniList, "MyCard Mouse " & Uuid)
     End Sub
     Private Sub MyCard_MouseLeave(sender As Object, e As MouseEventArgs) Handles Me.MouseLeave
         If Not HasMouseAnimation Then Return
@@ -211,7 +163,7 @@
             AaColor(MainChrome, MyDropShadow.ColorProperty, "ColorObject1", 90),
             AaOpacity(MainChrome, DropShadowIdleOpacity - MainChrome.Opacity, 90)
         })
-        AniStart(AniList, "MyCard Mouse " & Uuid)
+        If Not IsThemeChanging Then AniStart(AniList, "MyCard Mouse " & Uuid)
     End Sub
 
 #Region "高度改变动画"
@@ -293,10 +245,13 @@
     '这是因为不能直接在 XAML 中设置 SwapControl
     Public SwapControl As Object
     Public Property CanSwap As Boolean = False
+
     ''' <summary>
-    ''' 被折叠的种类，用于控件虚拟化。
+    ''' 数据转为列表项的转换方法
     ''' </summary>
-    Public Property SwapType As Integer
+    ''' <returns></returns>
+    Public Property InstallMethod As Action(Of StackPanel)
+
     ''' <summary>
     ''' 是否已被折叠。
     ''' </summary>
@@ -309,7 +264,7 @@
             _IsSwaped = value
             If SwapControl Is Nothing Then Return
             '展开
-            If Not IsSwaped AndAlso TypeOf SwapControl Is StackPanel Then StackInstall(SwapControl, SwapType, Title)
+            If Not IsSwaped AndAlso TypeOf SwapControl Is StackPanel Then StackInstall(SwapControl, InstallMethod)
             '若尚未加载，会在 Loaded 事件中触发无动画的折叠，不需要在这里进行
             If Not IsLoaded Then Return
             '更新高度

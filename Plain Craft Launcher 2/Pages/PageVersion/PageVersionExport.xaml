@@ -217,8 +217,8 @@
                         <local:MyCheckBox x:Name="CheckOptionsPcl">
                             <local:MyCheckBox.Tag>
                                 <local:ExportOption 
-                                Title="{StaticResource LangPageVersionExportPCL}"
-                                Description="{StaticResource LangPageVersionExportPCLDesc}"
+                                Title="PCL 启动器程序"
+                                Description="打包社区版 PCL，以便没有启动器的玩家安装整合包"
                                 DefaultChecked="True" />
                             </local:MyCheckBox.Tag>
                         </local:MyCheckBox>

@@ -49,7 +49,12 @@
     ''' <summary>
     ''' 勾选事件改变页面。
     ''' </summary>
-    Private Sub PageCheck(sender As MyListItem, e As RouteEventArgs) Handles ItemAbout.Check, ItemHelp.Check, ItemTest.Check
+    Private Sub PageCheck(sender As MyListItem, e As RouteEventArgs) Handles ItemAbout.Check,
+        ItemHelp.Check,
+        ItemTest.Check,
+        ItemFeedback.Check,
+        ItemVote.Check,
+        ItemLog.Check
         '尚未初始化控件属性时，sender.Tag 为 Nothing，会导致切换到页面 0
         '若使用 IsLoaded，则会导致模拟点击不被执行（模拟点击切换页面时，控件的 IsLoaded 为 False）
         If sender.Tag IsNot Nothing Then PageChange(Val(sender.Tag))
@@ -67,6 +72,15 @@
             Case FormMain.PageSubType.OtherTest
                 If FrmOtherTest Is Nothing Then FrmOtherTest = New PageOtherTest
                 Return FrmOtherTest
+            Case FormMain.PageSubType.OtherFeedback
+                If FrmOtherFeedback Is Nothing Then FrmOtherFeedback = New PageOtherFeedback
+                Return FrmOtherFeedback
+            Case FormMain.PageSubType.OtherVote
+                If FrmOtherVote Is Nothing Then FrmOtherVote = New PageOtherVote
+                Return FrmOtherVote
+            Case FormMain.PageSubType.OtherLog
+                If FrmOtherLog Is Nothing Then FrmOtherLog = New PageOtherLog
+                Return FrmOtherLog
             Case Else
                 Throw New Exception("未知的更多子页面种类：" & ID)
         End Select
@@ -115,40 +129,47 @@
             Case FormMain.PageSubType.OtherHelp
                 RefreshHelp()
                 ItemHelp.Checked = True
+            Case FormMain.PageSubType.OtherFeedback
+                If FrmOtherFeedback IsNot Nothing Then
+                    FrmOtherFeedback.Loader.Start(IsForceRestart:=True)
+                End If
+                ItemFeedback.Checked = True
+            Case FormMain.PageSubType.OtherVote
+                If FrmOtherVote IsNot Nothing Then
+                    FrmOtherVote.Loader.Start(IsForceRestart:=True)
+                End If
+                ItemVote.Checked = True
+            Case FormMain.PageSubType.OtherLog
+                If FrmOtherLog IsNot Nothing Then
+                    FrmOtherLog.LoadList()
+                End If
+                ItemLog.Checked = True
         End Select
         Hint(GetLang("LangPageOtherRefreshing"), Log:=False)
     End Sub
     Public Shared Sub RefreshHelp()
-        Setup.Set("SystemHelpVersion", 0) '强制重新解压文件
         FrmOtherHelp.PageLoaderRestart()
         FrmOtherHelp.SearchBox.Text = ""
     End Sub
 
     '打开网页
-    Private Sub TryFeedback(sender As Object, e As RouteEventArgs) Handles ItemFeedback.Changed
-        If Not ItemFeedback.Checked Then Return
-        TryFeedback()
-        e.Handled = True
+    Public Shared Sub TryFeedback() 'Handles ItemFeedback.Click
+        RunInNewThread(Sub()
+                           If Not CanFeedback(True) Then Return
+                           Select Case MyMsgBox("在提交新反馈前，建议先搜索反馈列表，以避免重复提交。" & vbCrLf & "如果无法打开该网页，请尝试使用加速器或 VPN。",
+                                       "反馈", "提交新反馈", "查看反馈列表", "取消")
+                               Case 1
+                                   Feedback(True, False)
+                               Case 2
+                                   OpenWebsite("https://github.com/PCL-Community/PCL2-CE/issues/")
+                           End Select
+                       End Sub)
+
     End Sub
-    Public Shared Sub TryFeedback()
-        If Not CanFeedback(True) Then Return
-        Select Case MyMsgBox(GetLang("LangPageOtherDialogFeedbackContent"),
-                    GetLang("LangPageOtherDialogFeedbackTitle"), GetLang("LangPageOtherDialogFeedbackBtn1"), GetLang("LangPageOtherDialogFeedbackBtn2"), GetLang("LangDialogBtnCancel"))
-            Case 1
-                Feedback(True, False)
-            Case 2
-                OpenWebsite("https://github.com/Hex-Dragon/PCL2/issues/")
-        End Select
-    End Sub
-    Private Sub TryVote(sender As Object, e As RouteEventArgs) Handles ItemVote.Changed
-        If Not ItemVote.Checked Then Return
-        TryVote()
-        e.Handled = True
-    End Sub
-    Public Shared Sub TryVote()
-        If MyMsgBox(GetLang("LangPageOtherDialogVoteContent"),
-                    GetLang("LangPageOtherDialogVoteTitle"), GetLang("LangPageOtherDialogVoteBtn1"), GetLang("LangDialogBtnCancel")) = 2 Then Return
-        OpenWebsite("https://github.com/Hex-Dragon/PCL2/discussions/categories/%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8?discussions_q=category%3A%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8+sort%3Adate_created")
+    Public Shared Sub TryVote() 'Handles ItemVote.Click
+        If MyMsgBox("是否要打开新功能投票网页？" & vbCrLf & "如果无法打开该网页，请尝试使用加速器或 VPN。",
+                    "新功能投票", "打开", "取消") = 2 Then Return
+        OpenWebsite("https://github.com/Meloong-Git/PCL/discussions/categories/%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8?discussions_q=category%3A%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8+sort%3Adate_created")
     End Sub
 
 End Class

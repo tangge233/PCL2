@@ -11,7 +11,7 @@
     ''' <summary>
     ''' 勾选事件改变页面。
     ''' </summary>
-    Private Sub PageCheck(sender As MyListItem, e As RouteEventArgs) Handles ItemInstall.Check, ItemClient.Check, ItemOptiFine.Check, ItemForge.Check, ItemNeoForge.Check, ItemLiteLoader.Check, ItemMod.Check, ItemFabric.Check, ItemPack.Check, ItemResourcePack.Check, ItemShader.Check, ItemDataPack.Check
+    Private Sub PageCheck(sender As MyListItem, e As RouteEventArgs) Handles ItemInstall.Check, ItemClient.Check, ItemOptiFine.Check, ItemForge.Check, ItemNeoForge.Check, ItemLiteLoader.Check, ItemMod.Check, ItemFabric.Check, ItemQuilt.Check, ItemLabyMod.Check, ItemPack.Check, ItemResourcePack.Check, ItemShader.Check, ItemDataPack.Check, ItemCleanroom.Check, ItemFavorites.Check
         '尚未初始化控件属性时，sender.Tag 为 Nothing，会导致切换到页面 0
         '若使用 IsLoaded，则会导致模拟点击不被执行（模拟点击切换页面时，控件的 IsLoaded 为 False）
         If sender.Tag IsNot Nothing Then PageChange(Val(sender.Tag))
@@ -35,12 +35,21 @@
             Case FormMain.PageSubType.DownloadNeoForge
                 If FrmDownloadNeoForge Is Nothing Then FrmDownloadNeoForge = New PageDownloadNeoForge
                 Return FrmDownloadNeoForge
+            Case FormMain.PageSubType.DownloadCleanroom
+                If FrmDownloadCleanroom Is Nothing Then FrmDownloadCleanroom = New PageDownloadCleanroom
+                Return FrmDownloadCleanroom
             Case FormMain.PageSubType.DownloadLiteLoader
                 If FrmDownloadLiteLoader Is Nothing Then FrmDownloadLiteLoader = New PageDownloadLiteLoader
                 Return FrmDownloadLiteLoader
             Case FormMain.PageSubType.DownloadFabric
                 If FrmDownloadFabric Is Nothing Then FrmDownloadFabric = New PageDownloadFabric
                 Return FrmDownloadFabric
+            Case FormMain.PageSubType.DownloadQuilt
+                If FrmDownloadQuilt Is Nothing Then FrmDownloadQuilt = New PageDownloadQuilt
+                Return FrmDownloadQuilt
+            Case FormMain.PageSubType.DownloadLabyMod
+                If FrmDownloadLabyMod Is Nothing Then FrmDownloadLabyMod = New PageDownloadLabyMod
+                Return FrmDownloadLabyMod
             Case FormMain.PageSubType.DownloadMod
                 If FrmDownloadMod Is Nothing Then FrmDownloadMod = New PageDownloadMod
                 Return FrmDownloadMod
@@ -53,6 +62,9 @@
             Case FormMain.PageSubType.DownloadShader
                 If FrmDownloadShader Is Nothing Then FrmDownloadShader = New PageDownloadShader
                 Return FrmDownloadShader
+            Case FormMain.PageSubType.DownloadCompFavorites
+                If FrmDownloadCompFavorites Is Nothing Then FrmDownloadCompFavorites = New PageDownloadCompFavorites
+                Return FrmDownloadCompFavorites
             Case FormMain.PageSubType.DownloadDataPack
                 If FrmDownloadDataPack Is Nothing Then FrmDownloadDataPack = New PageDownloadDataPack
                 Return FrmDownloadDataPack
@@ -113,10 +125,14 @@
                 DlOptiFineListLoader.Start(IsForceRestart:=True)
                 DlForgeListLoader.Start(IsForceRestart:=True)
                 DlNeoForgeListLoader.Start(IsForceRestart:=True)
+                DlCleanroomListLoader.Start(IsForceRestart:=True)
                 DlLiteLoaderListLoader.Start(IsForceRestart:=True)
                 DlFabricListLoader.Start(IsForceRestart:=True)
                 DlFabricApiLoader.Start(IsForceRestart:=True)
+                DlQuiltListLoader.Start(IsForceRestart:=True)
+                DlQSLLoader.Start(IsForceRestart:=True)
                 DlOptiFabricLoader.Start(IsForceRestart:=True)
+                DlLabyModListLoader.Start(IsForceRestart:=True)
                 ItemInstall.Checked = True
             Case FormMain.PageSubType.DownloadMod
                 CompProjectCache.Clear()
@@ -175,12 +191,24 @@
             Case FormMain.PageSubType.DownloadNeoForge
                 DlNeoForgeListLoader.Start(IsForceRestart:=True)
                 ItemNeoForge.Checked = True
+            Case FormMain.PageSubType.DownloadCleanroom
+                DlCleanroomListLoader.Start(IsForceRestart:=True)
+                ItemCleanroom.Checked = True
             Case FormMain.PageSubType.DownloadLiteLoader
                 DlLiteLoaderListLoader.Start(IsForceRestart:=True)
                 ItemLiteLoader.Checked = True
             Case FormMain.PageSubType.DownloadFabric
                 DlFabricListLoader.Start(IsForceRestart:=True)
                 ItemFabric.Checked = True
+            Case FormMain.PageSubType.DownloadQuilt
+                DlQuiltListLoader.Start(IsForceRestart:=True)
+                ItemQuilt.Checked = True
+            Case FormMain.PageSubType.DownloadLabyMod
+                DlLabyModListLoader.Start(IsForceRestart:=True)
+                ItemLabyMod.Checked = True
+            Case FormMain.PageSubType.DownloadCompFavorites
+                If FrmDownloadCompFavorites IsNot Nothing Then FrmDownloadCompFavorites.PageLoaderRestart()
+                ItemFavorites.Checked = True
         End Select
         Hint(GetLang("LangPageOtherRefreshing"), Log:=False)
     End Sub
@@ -210,9 +238,12 @@
         ItemClient.Visibility = Visibility.Visible
         ItemOptiFine.Visibility = Visibility.Visible
         ItemFabric.Visibility = Visibility.Visible
+        ItemQuilt.Visibility = Visibility.Visible
         ItemForge.Visibility = Visibility.Visible
         ItemNeoForge.Visibility = Visibility.Visible
+        ItemCleanroom.Visibility = Visibility.Visible
         ItemLiteLoader.Visibility = Visibility.Visible
+        ItemLabyMod.Visibility = Visibility.Visible
         RunInThread(
         Sub()
             Thread.Sleep(20)
@@ -230,9 +261,12 @@
         ItemClient.Visibility = Visibility.Collapsed
         ItemOptiFine.Visibility = Visibility.Collapsed
         ItemNeoForge.Visibility = Visibility.Collapsed
+        ItemCleanroom.Visibility = Visibility.Collapsed
         ItemFabric.Visibility = Visibility.Collapsed
+        ItemQuilt.Visibility = Visibility.Collapsed
         ItemForge.Visibility = Visibility.Collapsed
         ItemLiteLoader.Visibility = Visibility.Collapsed
+        ItemLabyMod.Visibility = Visibility.Collapsed
         RunInThread(
         Sub()
             Thread.Sleep(20)

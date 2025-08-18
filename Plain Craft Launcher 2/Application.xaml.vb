@@ -1,9 +1,10 @@
-﻿Imports System.Reflection
-Imports System.Windows.Threading
+﻿Imports System.Windows.Threading
+Imports System.IO.Compression
+Imports PCL.Core.LifecycleManagement
 
 Public Class Application
 
-#If DEBUG Then
+#If DEBUGRESERVED Then
     ''' <summary>
     ''' 用于开始程序时的一些测试。
     ''' </summary>
@@ -16,8 +17,13 @@ Public Class Application
     End Sub
 #End If
 
+    Public Sub New()
+        '注册生命周期事件
+        Lifecycle.When(LifecycleState.Loaded, AddressOf Application_Startup)
+    End Sub
+
     '开始
-    Private Sub Application_Startup(sender As Object, e As StartupEventArgs) Handles Me.Startup
+    Private Sub Application_Startup() '(sender As Object, e As StartupEventArgs) Handles Me.Startup
         '刷新语言
         Try
             Application.Current.Resources.MergedDictionaries(1) = New ResourceDictionary With {.Source = New Uri("pack://application:,,,/Resources/Language/" & Lang & ".xaml", UriKind.RelativeOrAbsolute)}
@@ -44,22 +50,26 @@ Public Class Application
         SwitchApplicationFont(LaunchFont)
 
         Try
+            '创建自定义跟踪监听器，用于检测是否存在 Binding 失败
+            PresentationTraceSources.DataBindingSource.Listeners.Add(New BindingErrorTraceListener())
+            PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Error
             SecretOnApplicationStart()
             '检查参数调用
-            If e.Args.Length > 0 Then
-                If e.Args(0) = "--update" Then
+            Dim args = Environment.GetCommandLineArgs.Skip(1).ToArray()
+            If args.Length > 0 Then
+                If args(0) = "--update" Then
                     '自动更新
-                    UpdateReplace(e.Args(1), e.Args(2).Trim(""""), e.Args(3).Trim(""""), e.Args(4))
+                    UpdateReplace(args(1), args(2).Trim(""""), args(3).Trim(""""), args(4))
                     Environment.Exit(ProcessReturnValues.TaskDone)
-                ElseIf e.Args(0) = "--gpu" Then
+                ElseIf args(0) = "--gpu" Then
                     '调整显卡设置
                     Try
-                        SetGPUPreference(e.Args(1).Trim(""""))
+                        SetGPUPreference(args(1).Trim(""""))
                         Environment.Exit(ProcessReturnValues.TaskDone)
                     Catch ex As Exception
                         Environment.Exit(ProcessReturnValues.Fail)
                     End Try
-                ElseIf e.Args(0).StartsWithF("--memory") Then
+                ElseIf args(0).StartsWithF("--memory") Then
                     '内存优化
                     Dim Ram = My.Computer.Info.AvailablePhysicalMemory
                     Try
@@ -73,13 +83,13 @@ Public Class Application
                     Else
                         Environment.Exit((My.Computer.Info.AvailablePhysicalMemory - Ram) / 1024) '返回清理的内存量（K）
                     End If
-#If DEBUG Then
+#If DEBUGRESERVED Then
                     '制作更新包
-                ElseIf e.Args(0) = "--edit1" Then
-                    ExeEdit(e.Args(1), True)
+                ElseIf args(0) = "--edit1" Then
+                    ExeEdit(args(1), True)
                     Environment.Exit(ProcessReturnValues.TaskDone)
-                ElseIf e.Args(0) = "--edit2" Then
-                    ExeEdit(e.Args(1), False)
+                ElseIf args(0) = "--edit2" Then
+                    ExeEdit(args(1), False)
                     Environment.Exit(ProcessReturnValues.TaskDone)
 #End If
                 End If
@@ -103,12 +113,12 @@ Public Class Application
             Directory.CreateDirectory(PathTemp & "Download")
             Directory.CreateDirectory(PathAppdata)
             '检测单例
-#If Not DEBUG Then
-            Dim ShouldWaitForExit As Boolean = e.Args.Length > 0 AndAlso e.Args(0) = "--wait" '要求等待已有的 PCL 退出
+#If Not DEBUGRESERVED Then
+            Dim ShouldWaitForExit As Boolean = args.Length > 0 AndAlso args(0) = "--wait" '要求等待已有的 PCL 退出
             Dim WaitRetryCount As Integer = 0
 WaitRetry:
-            Dim WindowHwnd As IntPtr = FindWindow(Nothing, "Plain Craft Launcher　")
-            If WindowHwnd = IntPtr.Zero Then FindWindow(Nothing, "Plain Craft Launcher 2　")
+            Dim WindowHwnd As IntPtr = FindWindow(Nothing, "Plain Craft Launcher Community Edition ")
+            If WindowHwnd = IntPtr.Zero Then FindWindow(Nothing, "Plain Craft Launcher 2 Community Edition ")
             If WindowHwnd <> IntPtr.Zero Then
                 If ShouldWaitForExit AndAlso WaitRetryCount < 20 Then '至多等待 10 秒
                     WaitRetryCount += 1
@@ -134,18 +144,11 @@ WaitRetry:
                 FrmStart = New SplashScreen("Images\icon.ico")
                 FrmStart.Show(False, True)
             End If
-            '动态 DLL 调用
-            AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf AssemblyResolve
-            '日志初始化
-            LogStart()
             '添加日志
-            Log($"[Start] 程序版本：{VersionDisplayName} ({VersionCode}{If(CommitHash = "", "", $"，#{CommitHash}")})")
-#If RELEASE Then
-            Log($"[Start] 识别码：{UniqueAddress}{If(ThemeCheckOne(9), "，正式版", "")}")
-#Else
-            Log($"[Start] 识别码：{UniqueAddress}{If(ThemeCheckOne(9), "，已解锁反馈主题", "")}")
-#End If
+            Log($"[Start] 程序版本：{VersionBaseName} (Channel: {VersionBranchName},Code: {VersionCode}{If(CommitHash = "", "", $"，#{CommitHash}")})")
+            Log($"[Start] 识别码：{UniqueAddress}")
             Log($"[Start] 程序路径：{PathWithName}")
+            Log($"[Start] 系统版本：{Environment.OSVersion.Version}, 架构：{Runtime.InteropServices.RuntimeInformation.OSArchitecture}")
             Log($"[Start] 系统编码：{Encoding.Default.HeaderName} ({Encoding.Default.CodePage}, GBK={IsGBKEncoding})")
             Log($"[Start] 管理员权限：{IsAdmin()}")
             Log("[Location] 启动器语言：" & Lang)
@@ -157,21 +160,103 @@ WaitRetry:
             If Is32BitSystem Then
                 MyMsgBox(GetLang("LangApplicationDialogContent32BitWarn"), GetLang("LangApplicationDialogTitleRunInTemp"), GetLang("LangDialogThemeUnlockGameAccept"), IsWarn:=True)
             End If
+            Dim IS_WINDOWS_MEET_REQUIRE As Boolean = Environment.OSVersion.Version.Major >= 10
+            Dim IS_FRAMEWORK_MEET_REQUIRE As Boolean
+            Using key = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
+                Using ndpKey = key.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\")
+                    If ndpKey IsNot Nothing AndAlso ndpKey.GetValue("Release") IsNot Nothing Then
+                        Dim rt = ndpKey.GetValue("Release")
+                        IS_FRAMEWORK_MEET_REQUIRE = Val(rt) >= 528040
+                        Log($"[Runtime] 检测到运行时版本为 {Val(rt)}")
+                    Else
+                        Log("[Runtime] 检测不到运行时")
+                    End If
+                End Using
+            End Using
+            Dim ProblemList As New List(Of String)
+            If Not IS_WINDOWS_MEET_REQUIRE Then ProblemList.Add("Windows 版本不满足最低要求，最低需要 Windows 10 20H2")
+            If Not IS_FRAMEWORK_MEET_REQUIRE Then ProblemList.Add(".NET Framework 版本不满足要求，需要 .NET Framework 4.8.1")
+            If ProblemList.Count <> 0 Then
+                MyMsgBox("PCL CE 在启动时检测到环境问题：" & vbCrLf & vbCrLf &
+                         ProblemList.Join(vbCrLf) & vbCrLf & vbCrLf &
+                         "需要解决这些问题才能正常使用启动器……",
+                        Button2:=If(IS_WINDOWS_MEET_REQUIRE, String.Empty, "升级系统"),
+                        Button2Action:=Sub() OpenWebsite("https://www.microsoft.com/zh-cn/software-download/windows10"),
+                        Button3:=If(IS_FRAMEWORK_MEET_REQUIRE, String.Empty, "安装框架"),
+                        Button3Action:=Sub() OpenWebsite("https://dotnet.microsoft.com/zh-cn/download/dotnet-framework/thank-you/net481-offline-installer"))
+            End If
+            Dim IS_WINDOWS_MEET_REQUIRE As Boolean = Environment.OSVersion.Version.Major >= 10
+            Dim IS_FRAMEWORK_MEET_REQUIRE As Boolean
+            Using key = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
+                Using ndpKey = key.OpenSubKey("SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\")
+                    If ndpKey IsNot Nothing AndAlso ndpKey.GetValue("Release") IsNot Nothing Then
+                        Dim rt = ndpKey.GetValue("Release")
+                        IS_FRAMEWORK_MEET_REQUIRE = Val(rt) >= 528040
+                        Log($"[Runtime] 检测到运行时版本为 {Val(rt)}")
+                    Else
+                        Log("[Runtime] 检测不到运行时")
+                    End If
+                End Using
+            End Using
+            Dim ProblemList As New List(Of String)
+            If Not IS_WINDOWS_MEET_REQUIRE Then ProblemList.Add("Windows 版本不满足最低要求，最低需要 Windows 10 20H2")
+            If Not IS_FRAMEWORK_MEET_REQUIRE Then ProblemList.Add(".NET Framework 版本不满足要求，需要 .NET Framework 4.8.1")
+            If ProblemList.Count <> 0 Then
+                MyMsgBox("PCL CE 在启动时检测到环境问题：" & vbCrLf & vbCrLf &
+                         ProblemList.Join(vbCrLf) & vbCrLf & vbCrLf &
+                         "需要解决这些问题才能正常使用启动器……",
+                        Button2:=If(IS_WINDOWS_MEET_REQUIRE, String.Empty, "升级系统"),
+                        Button2Action:=Sub() OpenWebsite("https://www.microsoft.com/zh-cn/software-download/windows10"),
+                        Button3:=If(IS_FRAMEWORK_MEET_REQUIRE, String.Empty, "安装框架"),
+                        Button3Action:=Sub() OpenWebsite("https://dotnet.microsoft.com/zh-cn/download/dotnet-framework/thank-you/net481-offline-installer"))
+            End If
             '设置初始化
             Setup.Load("SystemDebugMode")
             Setup.Load("SystemDebugAnim")
             Setup.Load("ToolDownloadThread")
             Setup.Load("ToolDownloadCert")
             Setup.Load("ToolDownloadSpeed")
-            '网络配置初始化
-            ServicePointManager.Expect100Continue = True
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 Or SecurityProtocolType.Tls Or SecurityProtocolType.Tls11 Or SecurityProtocolType.Tls12
-            ServicePointManager.DefaultConnectionLimit = 1024
+            '删除旧日志
+            For i = 1 To 5
+                Dim oldLogFile = $"{Path}PCL\Log-CE{i}.log"
+                If File.Exists(oldLogFile) Then File.Delete(oldLogFile)
+            Next
+            '释放资源
+            Directory.CreateDirectory(PathPure & "CE")
+            SetDllDirectory(PathPure & "CE")
+            Dim WebpPath = $"{PathPure}CE\libwebp.dll"
+            If Not File.Exists(WebpPath) Then WriteFile(WebpPath, GetResources("libwebp64"))
+            WriteFile(PathPure & "CE\" & "msalruntime.zip", GetResources("msalruntime"))
+            If Not File.Exists(PathPure & "CE\msalruntime.dll") Then
+                If Directory.Exists(PathPure & "CE\runtimes") Then DeleteDirectory(PathPure & "CE\runtimes")
+                Using fs = New FileStream(PathPure & "CE\" & "msalruntime.zip", FileMode.Open, FileAccess.Read)
+                    Using fszip = New ZipArchive(fs, ZipArchiveMode.Read)
+                        fszip.ExtractToDirectory(PathPure & "CE\")
+                    End Using
+                End Using
+            End If
+            'Pipe RPC 初始化
+            StartEchoPipe()
+            '设置字体
+            Dim TargetFont As String = Setup.Get("UiFont")
+            If Not String.IsNullOrEmpty(TargetFont) Then
+                Try
+                    Dim Font = Fonts.SystemFontFamilies.FirstOrDefault(Function(x) x.FamilyNames.Values.Contains(TargetFont))
+                    If Font Is Nothing Then
+                        Setup.Reset("UiFont")
+                    Else
+                        SetLaunchFont(TargetFont)
+                    End If
+                Catch ex As Exception
+                    Log(ex, "字体加载失败", LogLevel.Hint)
+                    Setup.Reset("UiFont")
+                End Try
+            End If
             '计时
             Log("[Start] 第一阶段加载用时：" & GetTimeTick() - ApplicationStartTick & " ms")
             ApplicationStartTick = GetTimeTick()
             '执行测试
-#If DEBUG Then
+#If DEBUGRESERVED Then
             Test()
 #End If
             AniControlEnabled += 1
@@ -200,108 +285,20 @@ WaitRetry:
         Dim Detail As String = GetExceptionDetail(e.Exception, True)
         If Detail.Contains("System.Windows.Threading.Dispatcher.Invoke") OrElse Detail.Contains("MS.Internal.AppModel.ITaskbarList.HrInit") OrElse Detail.Contains("未能加载文件或程序集") OrElse
            Detail.Contains(".NET Framework") Then ' “自动错误判断” 的结果分析
-            OpenWebsite("https://dotnet.microsoft.com/zh-cn/download/dotnet-framework/thank-you/net462-offline-installer")
+            OpenWebsite("https://dotnet.microsoft.com/zh-cn/download/dotnet-framework/thank-you/net481-offline-installer")
             Log(e.Exception, GetLang("LangApplicationDialogContentNETWarn"), LogLevel.Critical, GetLang("LangApplicationDialogTitleNETWarn"))
         Else
             Log(e.Exception, GetLang("LangApplicationDialogContentUnknownError"), LogLevel.Critical, GetLang("LangApplicationDialogTitleUnknownError"))
         End If
     End Sub
 
-    '动态 DLL 调用
-    Private Shared AssemblyNAudio As Assembly
-    Private Shared AssemblyJson As Assembly
-    Private Shared AssemblyDialog As Assembly
-    Private Shared AssemblyImazenWebp As Assembly
-    Private Shared ReadOnly AssemblyNAudioLock As New Object
-    Private Shared ReadOnly AssemblyJsonLock As New Object
-    Private Shared ReadOnly AssemblyDialogLock As New Object
-    Private Shared ReadOnly AssemblyImazenWebpLock As New Object
     Private Declare Function SetDllDirectory Lib "kernel32" Alias "SetDllDirectoryA" (lpPathName As String) As Boolean
-    Public Shared Function AssemblyResolve(sender As Object, args As ResolveEventArgs) As Assembly
-        If args.Name.StartsWithF("NAudio") Then
-            SyncLock AssemblyNAudioLock
-                If AssemblyNAudio Is Nothing Then
-                    Log("[Start] 加载 DLL：NAudio")
-                    AssemblyNAudio = Assembly.Load(GetResources("NAudio"))
-                End If
-                Return AssemblyNAudio
-            End SyncLock
-        ElseIf args.Name.StartsWithF("Newtonsoft.Json") Then
-            SyncLock AssemblyJsonLock
-                If AssemblyJson Is Nothing Then
-                    Log("[Start] 加载 DLL：Json")
-                    AssemblyJson = Assembly.Load(GetResources("Json"))
-                End If
-                Return AssemblyJson
-            End SyncLock
-        ElseIf args.Name.StartsWithF("Ookii.Dialogs.Wpf") Then
-            SyncLock AssemblyDialogLock
-                If AssemblyDialog Is Nothing Then
-                    Log("[Start] 加载 DLL：Dialogs")
-                    AssemblyDialog = Assembly.Load(GetResources("Dialogs"))
-                End If
-                Return AssemblyDialog
-            End SyncLock
-        ElseIf args.Name.StartsWithF("Imazen.WebP") Then
-            SyncLock AssemblyImazenWebpLock
-                If AssemblyImazenWebp Is Nothing Then
-                    Log("[Start] 加载 DLL：Imazen.WebP")
-                    AssemblyImazenWebp = Assembly.Load(GetResources("Imazen_WebP"))
-                    SetDllDirectory(PathPure.TrimEnd("\"))
-                    WriteFile(PathPure & "libwebp.dll", GetResources("libwebp64"))
-                End If
-                Return AssemblyImazenWebp
-            End SyncLock
-        Else
-            Return Nothing
-        End If
-    End Function
+
 
     '切换窗口
 
     '控件模板事件
     Private Sub MyIconButton_Click(sender As Object, e As EventArgs)
-        Select Case Setup.Get("LoginType")
-            Case McLoginType.Ms
-                '微软
-                Dim MsJson As JObject = GetJson(Setup.Get("LoginMsJson"))
-                MsJson.Remove(sender.Tag)
-                Setup.Set("LoginMsJson", MsJson.ToString(Newtonsoft.Json.Formatting.None))
-                If FrmLoginMs.ComboAccounts.SelectedItem Is sender.Parent Then FrmLoginMs.ComboAccounts.SelectedIndex = 0
-                FrmLoginMs.ComboAccounts.Items.Remove(sender.Parent)
-            Case McLoginType.Legacy
-                '离线
-                Dim Names As New List(Of String)
-                Names.AddRange(Setup.Get("LoginLegacyName").ToString.Split("¨"))
-                Names.Remove(sender.Tag)
-                Setup.Set("LoginLegacyName", Join(Names, "¨"))
-                FrmLoginLegacy.ComboName.ItemsSource = Names
-                FrmLoginLegacy.ComboName.Text = If(Names.Any, Names(0), "")
-            Case Else
-                '第三方
-                Dim Token As String = GetStringFromEnum(Setup.Get("LoginType"))
-                Dim Dict As New Dictionary(Of String, String)
-                Dim Names As New List(Of String)
-                Dim Passs As New List(Of String)
-                If Not Setup.Get("Login" & Token & "Email") = "" Then Names.AddRange(Setup.Get("Login" & Token & "Email").ToString.Split("¨"))
-                If Not Setup.Get("Login" & Token & "Pass") = "" Then Passs.AddRange(Setup.Get("Login" & Token & "Pass").ToString.Split("¨"))
-                For i = 0 To Names.Count - 1
-                    Dict.Add(Names(i), Passs(i))
-                Next
-                Dict.Remove(sender.Tag)
-                Setup.Set("Login" & Token & "Email", Join(Dict.Keys, "¨"))
-                Setup.Set("Login" & Token & "Pass", Join(Dict.Values, "¨"))
-                Select Case Token
-                    Case "Nide"
-                        FrmLoginNide.ComboName.ItemsSource = Dict.Keys
-                        FrmLoginNide.ComboName.Text = If(Dict.Keys.Any, Dict.Keys(0), "")
-                        FrmLoginNide.TextPass.Password = If(Dict.Values.Any, Dict.Values(0), "")
-                    Case "Auth"
-                        FrmLoginAuth.ComboName.ItemsSource = Dict.Keys
-                        FrmLoginAuth.ComboName.Text = If(Dict.Keys.Any, Dict.Keys(0), "")
-                        FrmLoginAuth.TextPass.Password = If(Dict.Values.Any, Dict.Values(0), "")
-                End Select
-        End Select
     End Sub
 
     Public Shared ShowingTooltips As New List(Of Border)
@@ -311,5 +308,18 @@ WaitRetry:
     Private Sub TooltipUnloaded(sender As Border, e As RoutedEventArgs)
         ShowingTooltips.Remove(sender)
     End Sub
+
+    ' 自定义监听器类
+    Public Class BindingErrorTraceListener
+        Inherits TraceListener
+
+        Public Overrides Sub Write(message As String)
+            Log($"警告，检测到 Binding 失败：{message}")
+        End Sub
+
+        Public Overrides Sub WriteLine(message As String)
+            Log($"警告，检测到 Binding 失败：{message}")
+        End Sub
+    End Class
 
 End Class

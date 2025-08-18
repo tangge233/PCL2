@@ -29,11 +29,6 @@
     End Sub
     Public Sub Reload()
         Try
-
-            '离线皮肤
-            CType(FindName("RadioSkinType" & Setup.Load("LaunchSkinType")), MyRadioBox).Checked = True
-            TextSkinID.Text = Setup.Get("LaunchSkinID")
-
             '启动参数
             TextArgumentTitle.Text = Setup.Get("LaunchArgumentTitle")
             TextArgumentInfo.Text = Setup.Get("LaunchArgumentInfo")
@@ -44,7 +39,9 @@
             TextArgumentWindowWidth.Text = Setup.Get("LaunchArgumentWindowWidth")
             TextArgumentWindowHeight.Text = Setup.Get("LaunchArgumentWindowHeight")
             CheckArgumentRam.Checked = Setup.Get("LaunchArgumentRam")
-            RefreshJavaComboBox()
+            ComboMsAuthType.SelectedIndex = Setup.Get("LoginMsAuthType")
+            ComboPreferredIpStack.SelectedIndex = Setup.Get("LaunchPreferredIpStack")
+            'CheckArgumentJavaTraversal.Checked = Setup.Get("LaunchArgumentJavaTraversal")
 
             '游戏内存
             CType(FindName("RadioRamType" & Setup.Load("LaunchRamType")), MyRadioBox).Checked = True
@@ -55,8 +52,15 @@
             TextAdvanceGame.Text = Setup.Get("LaunchAdvanceGame")
             TextAdvanceRun.Text = Setup.Get("LaunchAdvanceRun")
             CheckAdvanceRunWait.Checked = Setup.Get("LaunchAdvanceRunWait")
-            CheckAdvanceDisableJLW.Checked = Setup.Get("LaunchAdvanceDisableJLW")
+            CheckAdvanceDisableRW.Checked = Setup.Get("LaunchAdvanceDisableRW")
             CheckAdvanceGraphicCard.Checked = Setup.Get("LaunchAdvanceGraphicCard")
+            If IsArm64System Then
+                CheckAdvanceDisableJLW.Checked = True
+                CheckAdvanceDisableJLW.IsEnabled = False
+                CheckAdvanceDisableJLW.ToolTip = "在启动游戏时不使用 Java Wrapper 进行包装。&#xa;由于系统为 ARM64 架构，Java Wrapper 已被强制禁用。"
+            Else
+                CheckAdvanceDisableJLW.Checked = Setup.Get("LaunchAdvanceDisableJLW")
+            End If
 
         Catch ex As NullReferenceException
             Log(ex, GetLang("LangPageSetupLaunchReloadByError"), LogLevel.Msgbox)
@@ -77,20 +81,19 @@
             Setup.Reset("LaunchArgumentWindowWidth")
             Setup.Reset("LaunchArgumentWindowHeight")
             Setup.Reset("LaunchArgumentPriority")
+            Setup.Reset("LaunchPreferredIpStack")
             Setup.Reset("LaunchArgumentRam")
             Setup.Reset("LaunchRamType")
             Setup.Reset("LaunchRamCustom")
-            Setup.Reset("LaunchSkinType")
-            Setup.Reset("LaunchSkinID")
             Setup.Reset("LaunchAdvanceJvm")
             Setup.Reset("LaunchAdvanceGame")
             Setup.Reset("LaunchAdvanceRun")
             Setup.Reset("LaunchAdvanceRunWait")
             Setup.Reset("LaunchAdvanceDisableJLW")
             Setup.Reset("LaunchAdvanceGraphicCard")
-            Setup.Reset("LaunchArgumentJavaAll")
+            Setup.Reset("LoginMsAuthType")
+            Setup.Reset("LaunchArgumentJavaUser")
             Setup.Reset("LaunchArgumentJavaSelect")
-            JavaSearchLoader.Start(IsForceRestart:=True)
 
             Log("[Setup] 已初始化启动设置")
             Hint(GetLang("LangPageSetupLaunchInit"), HintType.Finish, False)
@@ -102,87 +105,21 @@
     End Sub
 
     '将控件改变路由到设置改变
-    Private Shared Sub RadioBoxChange(sender As MyRadioBox, e As Object) Handles RadioSkinType0.Check, RadioSkinType1.Check, RadioSkinType2.Check, RadioSkinType3.Check, RadioSkinType4.Check, RadioRamType0.Check, RadioRamType1.Check
+    Private Shared Sub RadioBoxChange(sender As MyRadioBox, e As Object) Handles RadioRamType0.Check, RadioRamType1.Check
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag.ToString.Split("/")(0), Val(sender.Tag.ToString.Split("/")(1)))
     End Sub
-    Private Shared Sub TextBoxChange(sender As MyTextBox, e As Object) Handles TextSkinID.ValidatedTextChanged, TextArgumentWindowHeight.ValidatedTextChanged, TextArgumentWindowWidth.ValidatedTextChanged, TextArgumentInfo.ValidatedTextChanged, TextAdvanceGame.ValidatedTextChanged, TextAdvanceJvm.ValidatedTextChanged, TextArgumentTitle.ValidatedTextChanged, TextAdvanceRun.ValidatedTextChanged
+    Private Shared Sub TextBoxChange(sender As MyTextBox, e As Object) Handles TextArgumentWindowHeight.ValidatedTextChanged, TextArgumentWindowWidth.ValidatedTextChanged, TextArgumentInfo.ValidatedTextChanged, TextAdvanceGame.ValidatedTextChanged, TextAdvanceJvm.ValidatedTextChanged, TextArgumentTitle.ValidatedTextChanged, TextAdvanceRun.ValidatedTextChanged
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Text)
     End Sub
     Private Shared Sub SliderChange(sender As MySlider, e As Object) Handles SliderRamCustom.Change
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Value)
     End Sub
-    Private Shared Sub ComboChange(sender As MyComboBox, e As Object) Handles ComboArgumentIndieV2.SelectionChanged, ComboArgumentVisibie.SelectionChanged, ComboArgumentWindowType.SelectionChanged, ComboArgumentPriority.SelectionChanged
+    Private Shared Sub ComboChange(sender As MyComboBox, e As Object) Handles ComboArgumentIndieV2.SelectionChanged, ComboArgumentVisibie.SelectionChanged, ComboArgumentWindowType.SelectionChanged, ComboArgumentPriority.SelectionChanged, ComboMsAuthType.SelectionChanged, ComboPreferredIpStack.SelectionChanged
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.SelectedIndex)
     End Sub
-    Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckAdvanceRunWait.Change, CheckArgumentRam.Change, CheckAdvanceDisableJLW.Change, CheckAdvanceGraphicCard.Change
+    Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckAdvanceRunWait.Change, CheckArgumentRam.Change, CheckAdvanceDisableJLW.Change, CheckAdvanceGraphicCard.Change, CheckAdvanceDisableRW.Change
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Checked)
     End Sub
-
-#Region "离线皮肤"
-
-    Private Sub BtnSkinChange_Click(sender As Object, e As EventArgs) Handles BtnSkinChange.Click
-        Dim SkinInfo As McSkinInfo = McSkinSelect()
-        If Not SkinInfo.IsVaild Then Return
-        ChangeSkin(SkinInfo)
-    End Sub
-    Private Sub RadioSkinType3_Check(sender As Object, e As RouteEventArgs) Handles RadioSkinType4.PreviewCheck
-        If Not (AniControlEnabled = 0 AndAlso e.RaiseByMouse) Then Return
-        '已有图片则不再选择
-        If File.Exists(PathAppdata & "CustomSkin.png") Then Return
-        '没有图片则要求选择
-        Dim SkinInfo As McSkinInfo = McSkinSelect()
-        If Not SkinInfo.IsVaild Then
-            e.Handled = True
-            Return
-        End If
-        '正式改变
-        If Not ChangeSkin(SkinInfo) Then e.Handled = True
-    End Sub
-    '返回是否成功改变
-    Private Function ChangeSkin(SkinInfo As McSkinInfo) As Boolean
-        Try
-            '拷贝文件
-            File.Delete(PathAppdata & "CustomSkin.png")
-            CopyFile(SkinInfo.LocalFile, PathAppdata & "CustomSkin.png")
-            '将单层皮肤扩展到双层
-            Dim Bitmap As New MyBitmap(PathAppdata & "CustomSkin.png")
-            If Bitmap.Pic.Width = 64 AndAlso Bitmap.Pic.Height = 32 Then
-                Dim Img As System.Drawing.Image = Bitmap
-                Dim NewBitmap As New System.Drawing.Bitmap(64, 64)
-                Using g As System.Drawing.Graphics = System.Drawing.Graphics.FromImage(NewBitmap)
-                    g.DrawImageUnscaled(Img, New System.Drawing.Point(0, 0))
-                End Using
-                File.Delete(PathAppdata & "CustomSkin.png")
-                NewBitmap.Save(PathAppdata & "CustomSkin.png")
-            End If
-            '更新设置
-            Setup.Set("LaunchSkinSlim", SkinInfo.IsSlim)
-            ChangeSkin = True
-        Catch ex As Exception
-            Log(ex, GetLang("LangPageSetupLaunchSkinChangeFail"), LogLevel.Msgbox)
-            ChangeSkin = False
-        Finally
-            '设置当前显示
-            PageLaunchLeft.SkinLegacy.Start(IsForceRestart:=True)
-        End Try
-    End Function
-    Private Sub BtnSkinDelete_Click(sender As Object, e As EventArgs) Handles BtnSkinDelete.Click
-        Try
-            File.Delete(PathAppdata & "CustomSkin.png")
-            RadioSkinType0.SetChecked(True, True)
-            Hint(GetLang("LangPageSetupLaunchSkinEmptied"), HintType.Finish)
-        Catch ex As Exception
-            Log(ex, GetLang("LangPageSetupLaunchSkinEmptyFail"), LogLevel.Msgbox)
-        End Try
-    End Sub
-    Private Sub BtnSkinSave_Click(sender As Object, e As EventArgs) Handles BtnSkinSave.Click
-        MySkin.Save(PageLaunchLeft.SkinLegacy)
-    End Sub
-    Private Sub BtnSkinCache_Click(sender As Object, e As EventArgs) Handles BtnSkinCache.Click
-        MySkin.RefreshCache(Nothing)
-    End Sub
-
-#End Region
 
 #Region "游戏内存"
 
@@ -218,7 +155,8 @@
                           If(RamGame <> RamGameActual, " (" & GetLang("LangPageSetupLaunchMemAvailable") & " " & If(RamGameActual = Math.Floor(RamGameActual), RamGameActual & ".0", RamGameActual) & " GB)", "")
         LabRamUsed.Text = If(RamUsed = Math.Floor(RamUsed), RamUsed & ".0", RamUsed) & " GB"
         LabRamTotal.Text = " / " & If(RamTotal = Math.Floor(RamTotal), RamTotal & ".0", RamTotal) & " GB"
-        LabRamWarn.Visibility = If(RamGame = 1 AndAlso Not JavaIs64Bit() AndAlso Not Is32BitSystem AndAlso JavaList.Any, Visibility.Visible, Visibility.Collapsed)
+        LabRamWarn.Visibility = If(RamGame = 1 AndAlso Not IsGameSet64BitJava() AndAlso Not Is32BitSystem AndAlso Javas.JavaList.Any, Visibility.Visible, Visibility.Collapsed)
+        HintRamTooHigh.Visibility = If(RamGame / RamTotal > 0.75, Visibility.Visible, Visibility.Collapsed)
         If ShowAnim Then
             '宽度动画
             AniStart({
@@ -399,119 +337,9 @@ PreFin:
             End If
         End If
         '若使用 32 位 Java，则限制为 1G
-        If If(Is32BitJava, Not JavaIs64Bit(If(UseVersionJavaSetup, Version, Nothing))) Then RamGive = Math.Min(1, RamGive)
+        If If(Is32BitJava, Not IsGameSet64BitJava(If(UseVersionJavaSetup, Version, Nothing))) Then RamGive = Math.Min(1, RamGive)
         Return RamGive
     End Function
-
-#End Region
-
-#Region "Java 选择"
-
-    '刷新 Java 下拉框显示
-    Public Sub RefreshJavaComboBox()
-        If ComboArgumentJava Is Nothing Then Return
-        '初始化列表
-        ComboArgumentJava.Items.Clear()
-        ComboArgumentJava.Items.Add(New MyComboBoxItem With {.Content = GetLang("LangPageSetupLaunchJavaAutoChoice"), .Tag = "自动选择"})
-        '更新列表
-        Dim SelectedItem As MyComboBoxItem = Nothing
-        Dim SelectedBySetup As String = Setup.Get("LaunchArgumentJavaSelect")
-        Try
-            For Each Java In JavaList.Clone().OrderByDescending(Function(v) v.VersionCode)
-                Dim ListItem = New MyComboBoxItem With {.Content = Java.ToString, .ToolTip = Java.PathFolder, .Tag = Java}
-                ToolTipService.SetHorizontalOffset(ListItem, 400)
-                ComboArgumentJava.Items.Add(ListItem)
-                '判断人为选中
-                If SelectedBySetup = "" Then Continue For
-                If JavaEntry.FromJson(GetJson(SelectedBySetup)).PathFolder = Java.PathFolder Then SelectedItem = ListItem
-            Next
-        Catch ex As Exception
-            Setup.Set("LaunchArgumentJavaSelect", "")
-            Log(ex, GetLang("LangPageSetupLaunchJavaUpdateListFail"), LogLevel.Feedback)
-        End Try
-        '更新选择项
-        If SelectedItem Is Nothing AndAlso JavaList.Any Then SelectedItem = ComboArgumentJava.Items(0) '选中 “自动选择”
-        ComboArgumentJava.SelectedItem = SelectedItem
-        '结束处理
-        If SelectedItem Is Nothing Then
-            ComboArgumentJava.Items.Clear()
-            ComboArgumentJava.Items.Add(New ComboBoxItem With {.Content = GetLang("LangPageSetupLaunchJavaNoAvailableJava"), .IsSelected = True})
-        End If
-        RefreshRam(True)
-    End Sub
-    '阻止在特定情况下展开下拉框
-    Private Sub ComboArgumentJava_DropDownOpened(sender As Object, e As EventArgs) Handles ComboArgumentJava.DropDownOpened
-        If ComboArgumentJava.SelectedItem Is Nothing OrElse ComboArgumentJava.Items(0).Content = GetLang("LangPageSetupLaunchJavaNoAvailableJava") OrElse ComboArgumentJava.Items(0).Content = GetLang("LangPageSetupLaunchLaunchJavaLoading") Then
-            ComboArgumentJava.IsDropDownOpen = False
-        End If
-    End Sub
-
-    '下拉框选择更改
-    Private Sub JavaSelectionUpdate() Handles ComboArgumentJava.SelectionChanged
-        If AniControlEnabled <> 0 Then Return
-        'Java 不可用时也不清空，会导致刷新时找不到对象
-        If ComboArgumentJava.SelectedItem Is Nothing OrElse ComboArgumentJava.SelectedItem.Tag Is Nothing Then Return
-        '设置新的 Java
-        Dim SelectedJava = ComboArgumentJava.SelectedItem.Tag
-        If "自动选择".Equals(SelectedJava) Then
-            '选择 “自动”
-            Setup.Set("LaunchArgumentJavaSelect", "")
-            Log("[Java] 修改 Java 选择设置：自动选择")
-        Else
-            '选择指定项
-            Setup.Set("LaunchArgumentJavaSelect", CType(SelectedJava.ToJson(), JObject).ToString(Newtonsoft.Json.Formatting.None))
-            Log("[Java] 修改 Java 选择设置：" & SelectedJava.ToString)
-        End If
-        RefreshRam(True)
-    End Sub
-
-    '手动选择
-    Private Sub BtnArgumentJavaSelect_Click(sender As Object, e As EventArgs) Handles BtnArgumentJavaSelect.Click
-        If JavaSearchLoader.State = LoadState.Loading Then
-            Hint(GetLang("LangPageSetupLaunchJavaSearchingJava"), HintType.Critical)
-            Return
-        End If
-        '选择 Java
-        Dim JavaSelected As String = SelectFile("javaw.exe|javaw.exe", "选择 bin 文件夹中的 javaw.exe 文件")
-        If JavaSelected = "" Then Return
-        JavaSelected = GetPathFromFullPath(JavaSelected)
-        Try
-            '验证 Java 可用
-            Dim NewEntry As New JavaEntry(JavaSelected, True)
-            NewEntry.Check()
-            '加入列表
-            Dim JavaNewList As New JArray From {NewEntry.ToJson}
-            For Each JsonEntry In GetJson(Setup.Get("LaunchArgumentJavaAll"))
-                Dim Entry = JavaEntry.FromJson(JsonEntry)
-                If Entry.PathFolder = NewEntry.PathFolder Then Continue For
-                JavaNewList.Add(JsonEntry)
-            Next
-            Setup.Set("LaunchArgumentJavaAll", JavaNewList.ToString(Newtonsoft.Json.Formatting.None))
-            '重新加载列表
-            JavaSearchLoader.Start(IsForceRestart:=True)
-            Hint(GetLang("LangPageSetupLaunchJavaAddedJava"), HintType.Finish)
-        Catch ex As Exception
-            Log(ex, GetLang("LangPageSetupLaunchJavaIncorrectJava"), LogLevel.Msgbox, "异常的 Java")
-            Return
-        End Try
-    End Sub
-    '自动查找
-    Private Sub BtnArgumentJavaSearch_Click(sender As Object, e As EventArgs) Handles BtnArgumentJavaSearch.Click
-        If JavaSearchLoader.State = LoadState.Loading Then
-            Hint(GetLang("LangPageSetupLaunchJavaSearchingJava"), HintType.Critical)
-            Return
-        End If
-        RunInThread(
-        Sub()
-            Hint(GetLang("LangPageSetupLaunchJavaSearchingJava"))
-            JavaSearchLoader.WaitForExit(IsForceRestart:=True)
-            If Not JavaList.Any() Then
-                Hint(GetLang("LangPageSetupLaunchJavaNoAvailableJava"), HintType.Critical)
-            Else
-                Hint(GetLang("LangPageSetupLaunchJavaSearchSuccess", JavaList.Count), HintType.Finish)
-            End If
-        End Sub)
-    End Sub
 
 #End Region
 
@@ -552,8 +380,13 @@ PreFin:
 
     '版本隔离提示
     Private Sub ComboArgumentIndie_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ComboArgumentIndieV2.SelectionChanged
-        If AniControlEnabled <> 0 Then Return
-        MyMsgBox("本设置仅会对之后新安装的版本生效。" & vbCrLf & "如果要修改已安装的版本的隔离方式，请在它的版本独立设置中调整。")
+        If AniControlEnabled <> 0 Then Exit Sub
+        MyMsgBox("默认策略只会对今后新安装的版本生效。" & vbCrLf & "已有版本的隔离策略需要在它的版本设置中调整。")
+    End Sub
+
+    'Java 管理跳转
+    Private Sub BtnJavaManage_Click(sender As Object, e As RouteEventArgs) Handles BtnGotoJavaManage.Click
+        FrmMain.PageChange(New FormMain.PageStackData With {.Page = FormMain.PageType.SetupJava})
     End Sub
 
 #End Region

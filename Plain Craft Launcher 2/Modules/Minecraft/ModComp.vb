@@ -1,4 +1,8 @@
-﻿Public Module ModComp
+Imports System.Threading.Tasks
+Imports System.Net.Http
+Imports LiteDB
+
+Public Module ModComp
 
     Public Enum CompType
         ''' <summary>
@@ -30,15 +34,61 @@
         ''' 服务端插件。
         ''' </summary>
         Plugin = 5
+        ''' <summary>
+        ''' 投影原理图。
+        ''' </summary>
+        Schematic = 6
     End Enum
-    Public Enum CompModLoaderType
+    Public Enum CompLoaderType
         'https://docs.curseforge.com/?http#tocS_ModLoaderType
+        ''' <summary>
+        ''' 模组加载器
+        ''' </summary>
         Any = 0
+        ''' <summary>
+        ''' 模组加载器
+        ''' </summary>
         Forge = 1
+        ''' <summary>
+        ''' 模组加载器
+        ''' </summary>
         LiteLoader = 3
+        ''' <summary>
+        ''' 模组加载器
+        ''' </summary>
         Fabric = 4
+        ''' <summary>
+        ''' 模组加载器
+        ''' </summary>
         Quilt = 5
+        ''' <summary>
+        ''' 模组加载器
+        ''' </summary>
         NeoForge = 6
+        ''' <summary>
+        ''' 材质包
+        ''' </summary>
+        Minecraft = 7
+        ''' <summary>
+        ''' 光影包
+        ''' </summary>
+        Canvas = 8
+        ''' <summary>
+        ''' 光影包
+        ''' </summary>
+        Iris = 9
+        ''' <summary>
+        ''' 光影包
+        ''' </summary>
+        OptiFine = 10
+        ''' <summary>
+        ''' 光影包
+        ''' </summary>
+        Vanilla = 11
+        ''' <summary>
+        ''' LabyMod 客户端
+        ''' </summary>
+        LabyMod = 12
     End Enum
     <Flags> Public Enum CompSourceType
         CurseForge = 1
@@ -48,64 +98,60 @@
 
 #Region "CompDatabase | Mod 数据库"
 
-    Private _CompDatabase As List(Of CompDatabaseEntry) = Nothing
-    Private ReadOnly Property CompDatabase As List(Of CompDatabaseEntry)
+    Private _CompDatabase As LiteDatabase = Nothing
+    Private ReadOnly Property CompDatabase As LiteDatabase
         Get
             If _CompDatabase IsNot Nothing Then Return _CompDatabase
             '初始化数据库
-            _CompDatabase = New List(Of CompDatabaseEntry)
-            Dim i As Integer = 0
-            For Each Line In DecodeBytes(GetResources("ModData")).Replace(vbCrLf, vbLf).Replace(vbCr, "").Split(vbLf)
-                i += 1
-                If Line = "" Then Continue For
-                For Each EntryData As String In Line.Split("¨")
-                    Dim Entry = New CompDatabaseEntry
-                    Dim SplitedLine = EntryData.Split("|")
-                    If SplitedLine(0).StartsWithF("@") Then
-                        Entry.CurseForgeSlug = Nothing
-                        Entry.ModrinthSlug = SplitedLine(0).Replace("@", "")
-                    ElseIf SplitedLine(0).EndsWithF("@") Then
-                        Entry.CurseForgeSlug = SplitedLine(0).TrimEnd("@")
-                        Entry.ModrinthSlug = Entry.CurseForgeSlug
-                    ElseIf SplitedLine(0).Contains("@") Then
-                        Entry.CurseForgeSlug = SplitedLine(0).Split("@")(0)
-                        Entry.ModrinthSlug = SplitedLine(0).Split("@")(1)
-                    Else
-                        Entry.CurseForgeSlug = SplitedLine(0)
-                        Entry.ModrinthSlug = Nothing
-                    End If
-                    Entry.WikiId = i
-                    If SplitedLine.Count >= 2 Then
-                        Entry.ChineseName = SplitedLine(1)
-                        If Entry.ChineseName.Contains("*") Then '处理 *
-                            Entry.ChineseName = Entry.ChineseName.Replace("*",
-                                $" ({If(Entry.CurseForgeSlug, Entry.ModrinthSlug).Replace("-", " ").Capitalize})")
-                        End If
-                    End If
-                    _CompDatabase.Add(Entry)
-                Next
-            Next
+            Dim dbPath = $"{PathTemp}Cache\ModData.db"
+            Using compressedDbData As New MemoryStream(GetResources("ModData"))
+                Log($"[DB] 解压 ModData 中")
+                If File.Exists(dbPath) Then File.Delete(dbPath)
+                Using trueDbFile As New IO.Compression.GZipStream(compressedDbData, Compression.CompressionMode.Decompress)
+                    Using uncompressedDbFile As New FileStream(dbPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read)
+                        trueDbFile.CopyTo(uncompressedDbFile)
+                    End Using
+                End Using
+                Log($"[DB] 已更新本地 ModData {dbPath}")
+            End Using
+            _CompDatabase = New LiteDatabase(dbPath)
+            Log($"[DB] 已加载 ModData，共 {_CompDatabase.GetCollection("ModTranslation").Count()} 条数据")
             Return _CompDatabase
         End Get
     End Property
+
+    Private Class CompWikiStruct
+
+    End Class
+
+    Private Function GetCompWikiEntryBySlug(slug As String) As CompDatabaseEntry
+        Dim datas = CompDatabase.GetCollection(Of CompDatabaseEntry)("ModTranslation")
+        Dim paSlug = New BsonValue(slug)
+        Dim queryCmd = Query.Or(
+                Query.EQ("CurseForgeSlug", paSlug),
+                Query.EQ("ModrinthSlug", paSlug)
+                )
+        Dim ret = datas.Find(queryCmd)
+        Return If(ret.Any(), ret.First(), Nothing)
+    End Function
 
     Private Class CompDatabaseEntry
         ''' <summary>
         ''' McMod 的对应 ID。
         ''' </summary>
-        Public WikiId As Integer
+        Public Property WikiId As Integer
         ''' <summary>
         ''' 中文译名。空字符串代表没有翻译。
         ''' </summary>
-        Public ChineseName As String = ""
+        Public Property ChineseName As String = ""
         ''' <summary>
         ''' CurseForge Slug（例如 advanced-solar-panels）。
         ''' </summary>
-        Public CurseForgeSlug As String = Nothing
+        Public Property CurseForgeSlug As String = Nothing
         ''' <summary>
         ''' Modrinth Slug（例如 advanced-solar-panels）。
         ''' </summary>
-        Public ModrinthSlug As String = Nothing
+        Public Property ModrinthSlug As String = Nothing
 
         Public Overrides Function ToString() As String
             Return If(CurseForgeSlug, "") & "&" & If(ModrinthSlug, "") & "|" & WikiId & "|" & ChineseName
@@ -171,7 +217,7 @@
         ''' <summary>
         ''' 支持的 Mod 加载器列表。可能为空。
         ''' </summary>
-        Public ReadOnly ModLoaders As List(Of CompModLoaderType)
+        Public ReadOnly ModLoaders As List(Of CompLoaderType)
         ''' <summary>
         ''' 描述性标签的内容。已转换为中文。
         ''' </summary>
@@ -197,7 +243,7 @@
                 If Not LoadedDatabase Then
                     LoadedDatabase = True
                     If Type = CompType.Mod OrElse Type = CompType.DataPack Then
-                        _DatabaseEntry = CompDatabase.FirstOrDefault(Function(c) If(FromCurseForge, c.CurseForgeSlug, c.ModrinthSlug) = Slug)
+                        _DatabaseEntry = GetCompWikiEntryBySlug(Slug)
                     End If
                 End If
                 Return _DatabaseEntry
@@ -224,6 +270,46 @@
                 Return If(DatabaseEntry Is Nothing OrElse DatabaseEntry.ChineseName = "", RawName, DatabaseEntry.ChineseName)
             End Get
         End Property
+        ''' <summary>
+        ''' 中文描述。若为 Nothing 则没有。
+        ''' </summary>
+        Public ReadOnly Property ChineseDescription As Task(Of String)
+            Get
+                Return GetChineseDescriptionAsync()
+            End Get
+        End Property
+
+        Private Async Function GetChineseDescriptionAsync() As Task(Of String)
+            Dim from = If(FromCurseForge, "curseforge", "modrinth")
+            Dim para = If(FromCurseForge, "modId", "project_id")
+            Dim result As String = Nothing
+
+            Dim DescHash As String = $"{Id}{GetStringMD5(Description)}"
+            Dim CacheFilePath As String = $"{PathTemp}Cache\CompTranslation.ini"
+            Dim CacheTranslation As String = ReadIni(CacheFilePath, DescHash)
+            If Not String.IsNullOrWhiteSpace(CacheTranslation) Then
+                result = Base64Decode(CacheTranslation)
+                Return result
+            End If
+
+            Try
+                Dim jsonObject = Await Task.Run(Function() NetGetCodeByRequestOnce($"https://mod.mcimirror.top/translate/{from}/{Id}", Encode:=Encoding.UTF8, IsJson:=True))
+                If jsonObject.ContainsKey("translated") Then
+                    result = jsonObject("translated").ToString()
+                    WriteIni(CacheFilePath, DescHash, Base64Encode(result))
+                End If
+            Catch ex As HttpRequestException
+                If ex.Message.Contains("404") Then
+                    MyMsgBox("当前资源的简介暂无译文", "获取译文失败", Button1:="我知道了")
+                    Return Nothing
+                End If
+                Log(ex, "获取中文描述时出现错误", LogLevel.Hint)
+            Catch ex As Exception
+                Log(ex, "获取中文描述时出现错误", LogLevel.Hint)
+            End Try
+
+            Return result
+        End Function
 
         '实例化
 
@@ -244,9 +330,9 @@
                 If Data.ContainsKey("LastUpdate") Then LastUpdate = Data("LastUpdate")
                 DownloadCount = Data("DownloadCount")
                 If Data.ContainsKey("ModLoaders") Then
-                    ModLoaders = CType(Data("ModLoaders"), JArray).Select(Function(t) CType(t.ToObject(Of Integer), CompModLoaderType)).ToList
+                    ModLoaders = CType(Data("ModLoaders"), JArray).Select(Function(t) CType(t.ToObject(Of Integer), CompLoaderType)).ToList
                 Else
-                    ModLoaders = New List(Of CompModLoaderType)
+                    ModLoaders = New List(Of CompLoaderType)
                 End If
                 Tags = CType(Data("Tags"), JArray).Select(Function(t) t.ToString).ToList
                 If Data.ContainsKey("LogoUrl") Then LogoUrl = Data("LogoUrl")
@@ -290,7 +376,7 @@
                         Type = CompType.DataPack
                     End If
                     'FileIndexes / GameVersions / ModLoaders
-                    ModLoaders = New List(Of CompModLoaderType)
+                    ModLoaders = New List(Of CompLoaderType)
                     Dim Files As New List(Of KeyValuePair(Of Integer, List(Of String))) 'FileId, GameVersions
                     For Each File In If(Data("latestFiles"), New JArray)
                         Dim NewFile As New CompFile(File, Type)
@@ -413,24 +499,24 @@
                     End Select
                     'Tags & ModLoaders
                     Tags = New List(Of String)
-                    ModLoaders = New List(Of CompModLoaderType)
-                    If Data.ContainsKey("loaders") Then
+                    ModLoaders = New List(Of CompLoaderType)
+                    If Data?("loaders") IsNot Nothing Then
                         For Each Category In Data("loaders").Select(Function(t) t.ToString)
                             Select Case Category
-                                Case "forge" : ModLoaders.Add(CompModLoaderType.Forge)
-                                Case "fabric" : ModLoaders.Add(CompModLoaderType.Fabric)
-                                Case "quilt" : ModLoaders.Add(CompModLoaderType.Quilt)
-                                Case "neoforge" : ModLoaders.Add(CompModLoaderType.NeoForge)
+                                Case "forge" : ModLoaders.Add(CompLoaderType.Forge)
+                                Case "fabric" : ModLoaders.Add(CompLoaderType.Fabric)
+                                Case "quilt" : ModLoaders.Add(CompLoaderType.Quilt)
+                                Case "neoforge" : ModLoaders.Add(CompLoaderType.NeoForge)
                             End Select
                         Next
                     End If
                     For Each Category In Data("categories").Select(Function(t) t.ToString)
                         Select Case Category
                             '加载器
-                            Case "forge" : ModLoaders.Add(CompModLoaderType.Forge)
-                            Case "fabric" : ModLoaders.Add(CompModLoaderType.Fabric)
-                            Case "quilt" : ModLoaders.Add(CompModLoaderType.Quilt)
-                            Case "neoforge" : ModLoaders.Add(CompModLoaderType.NeoForge)
+                            Case "forge" : ModLoaders.Add(CompLoaderType.Forge)
+                            Case "fabric" : ModLoaders.Add(CompLoaderType.Fabric)
+                            Case "quilt" : ModLoaders.Add(CompLoaderType.Quilt)
+                            Case "neoforge" : ModLoaders.Add(CompLoaderType.NeoForge)
                             Case "datapack" : Type = CompType.DataPack '若包含数据包版本，则优先标为 DataPack
                             '共用
                             Case "technology" : Tags.Add("科技")
@@ -579,8 +665,8 @@
             End If
             '获取 Mod 加载器描述
             Dim ModLoaderDescriptionFull As String, ModLoaderDescriptionPart As String
-            Dim ModLoadersForDesc As New List(Of CompModLoaderType)(ModLoaders)
-            If Setup.Get("ToolDownloadIgnoreQuilt") Then ModLoadersForDesc.Remove(CompModLoaderType.Quilt)
+            Dim ModLoadersForDesc As New List(Of CompLoaderType)(ModLoaders)
+            If Setup.Get("ToolDownloadIgnoreQuilt") Then ModLoadersForDesc.Remove(CompLoaderType.Quilt)
             Select Case ModLoadersForDesc.Count
                 Case 0
                     If ModLoaders.Count = 1 Then
@@ -595,10 +681,10 @@
                     ModLoaderDescriptionPart = ModLoadersForDesc.Single.ToString
                 Case Else
                     Dim MaxVersion As Integer = If(GameVersions.Any, GameVersions.Max, 99)
-                    If ModLoaders.Contains(CompModLoaderType.Forge) AndAlso
-                       (MaxVersion < 14 OrElse ModLoaders.Contains(CompModLoaderType.Fabric)) AndAlso
-                       (MaxVersion < 20 OrElse ModLoaders.Contains(CompModLoaderType.NeoForge)) AndAlso
-                       (MaxVersion < 14 OrElse ModLoaders.Contains(CompModLoaderType.Quilt) OrElse Setup.Get("ToolDownloadIgnoreQuilt")) Then
+                    If ModLoaders.Contains(CompLoaderType.Forge) AndAlso
+                       (MaxVersion < 14 OrElse ModLoaders.Contains(CompLoaderType.Fabric)) AndAlso
+                       (MaxVersion < 20 OrElse ModLoaders.Contains(CompLoaderType.NeoForge)) AndAlso
+                       (MaxVersion < 14 OrElse ModLoaders.Contains(CompLoaderType.Quilt) OrElse Setup.Get("ToolDownloadIgnoreQuilt")) Then
                         ModLoaderDescriptionFull = GetLang("LangModCompVersionAny")
                         ModLoaderDescriptionPart = ""
                     Else
@@ -646,6 +732,15 @@
             End If
             NewItem.LabDownload.Text = GetLocationNum(DownloadCount)
             Return NewItem
+        End Function
+        Public Function ToListItem() As MyListItem
+            Dim Result As New MyListItem()
+            Result.Title = TranslatedName
+            Result.Info = Description.Replace(vbCr, "").Replace(vbLf, "")
+            Result.Logo = LogoUrl
+            Result.Tags = Tags
+            Result.Tag = Me
+            Return Result
         End Function
         Public Function GetControlLogo() As String
             If String.IsNullOrEmpty(LogoUrl) Then
@@ -715,14 +810,14 @@
                         Ex.ToLower.Contains("forge") OrElse Ex.ToLower.Contains("fabric") OrElse Ex.ToLower.Contains("quilt")
                     '是否显示 ModLoader 信息
                     If Not HasModLoaderDescription AndAlso IsModLoaderDescription Then Continue For
-                    '去除 “Forge/Fabric” 这一无意义提示
+                    '去除 "Forge/Fabric" 这一无意义提示
                     If Ex.Length < 16 AndAlso Ex.ToLower.Contains("fabric") AndAlso Ex.ToLower.Contains("forge") Then Continue For
-                    '将 “Forge” 等提示改为 “Forge 版”
+                    '将 "Forge" 等提示改为 "Forge 版"
                     If IsModLoaderDescription AndAlso Not Ex.Contains("版") AndAlso
                         Ex.ToLower.Replace("forge", "").Replace("fabric", "").Replace("quilt", "").Length <= 3 Then
                         Ex = GetLang("LangModCompEdition", Ex.Replace("Edition", "").Replace("edition", "").Trim.Capitalize)
                     End If
-                    '将 “forge” 等词语的首字母大写
+                    '将 "forge" 等词语的首字母大写
                     Ex = Ex.Replace("forge", "Forge").Replace("neo", "Neo").Replace("fabric", "Fabric").Replace("quilt", "Quilt")
                     Subtitle &= "  |  " & Ex.Trim
                 Next
@@ -826,7 +921,7 @@ NoSubtitle:
         ''' <summary>
         ''' 筛选 Mod 加载器类别。
         ''' </summary>
-        Public ModLoader As CompModLoaderType = CompModLoaderType.Any
+        Public ModLoader As CompLoaderType = CompLoaderType.Any
         ''' <summary>
         ''' 筛选 MC 版本。
         ''' </summary>
@@ -872,7 +967,7 @@ NoSubtitle:
                     Address += "&classId=12"
             End Select
             Address += "&categoryId=" & If(Tag = "", "0", Tag.BeforeFirst("/"))
-            If ModLoader <> CompModLoaderType.Any Then Address += "&modLoaderType=" & CType(ModLoader, Integer)
+            If ModLoader <> CompLoaderType.Any Then Address += "&modLoaderType=" & CType(ModLoader, Integer)
             If Not String.IsNullOrEmpty(GameVersion) Then Address += "&gameVersion=" & GameVersion
             If Not String.IsNullOrEmpty(SearchText) Then Address += "&searchFilter=" & Net.WebUtility.UrlEncode(SearchText)
             If Storage.CurseForgeOffset > 0 Then Address += "&index=" & Storage.CurseForgeOffset
@@ -893,7 +988,7 @@ NoSubtitle:
             Dim Facets As New List(Of String)
             Facets.Add($"[""project_type:{GetStringFromEnum(Type).ToLower}""]")
             If Not String.IsNullOrEmpty(Tag) Then Facets.Add($"[""categories:'{Tag.AfterLast("/")}'""]")
-            If ModLoader <> CompModLoaderType.Any Then Facets.Add($"[""categories:'{GetStringFromEnum(ModLoader).ToLower}'""]")
+            If ModLoader <> CompLoaderType.Any Then Facets.Add($"[""categories:'{GetStringFromEnum(ModLoader).ToLower}'""]")
             If Not String.IsNullOrEmpty(GameVersion) Then Facets.Add($"[""versions:'{GameVersion}'""]")
             Address += "&facets=[" & String.Join(",", Facets) & "]"
             Return Address
@@ -966,7 +1061,7 @@ NoSubtitle:
 
 #Region "拒绝 1.13- Quilt（这个版本根本没有 Quilt）"
 
-        If Request.ModLoader = CompModLoaderType.Quilt AndAlso VersionSortInteger(If(Request.GameVersion, "1.15"), "1.14") = -1 Then
+        If Request.ModLoader = CompLoaderType.Quilt AndAlso VersionSortInteger(If(Request.GameVersion, "1.15"), "1.14") = -1 Then
             Throw New Exception("Quilt 不支持 Minecraft " & Request.GameVersion)
         End If
 
@@ -984,12 +1079,19 @@ NoSubtitle:
         If IsChineseSearch AndAlso (Request.Type = CompType.Mod OrElse Request.Type = CompType.DataPack) Then
             '构造搜索请求
             Dim SearchEntries As New List(Of SearchEntry(Of CompDatabaseEntry))
-            For Each Entry In CompDatabase
-                If Entry.ChineseName.Contains("动态的树") Then Continue For '这玩意儿附属太多了
+            Dim datas = CompDatabase.GetCollection(Of CompDatabaseEntry)("ModTranslation")
+            Dim queryCmd = Query.Or(
+                Query.Contains("ChineseName", RawFilter),
+                Query.Contains("CurseForgeSlug", RawFilter),
+                Query.Contains("ModrinthSlug", RawFilter)
+                )
+            Dim searchRes = datas.Find(queryCmd)
+            For Each searchItem In searchRes
+                If searchItem.ChineseName.Contains("动态的树") Then Continue For
                 SearchEntries.Add(New SearchEntry(Of CompDatabaseEntry) With {
-                    .Item = Entry,
+                    .Item = searchItem,
                     .SearchSource = New List(Of KeyValuePair(Of String, Double)) From {
-                        New KeyValuePair(Of String, Double)(Entry.ChineseName & If(Entry.CurseForgeSlug, "") & If(Entry.ModrinthSlug, ""), 1)
+                        New KeyValuePair(Of String, Double)(searchItem.ChineseName & If(searchItem.CurseForgeSlug, "") & If(searchItem.ModrinthSlug, ""), 1)
                     }
                 })
             Next
@@ -1059,11 +1161,11 @@ Retry:
 
         '在 1.14-，部分老 Mod 没有设置支持的加载器，因此添加 Forge 筛选就会出现遗漏
         '所以，在发起请求时不筛选加载器，然后在返回的结果中自行筛除不是 Forge 的 Mod
-        Dim IsOldForgeRequest = Request.ModLoader = CompModLoaderType.Forge AndAlso Request.GameVersion?.Contains(".") AndAlso Val(Request.GameVersion.Split(".")(1)) < 14
-        If IsOldForgeRequest Then Request.ModLoader = CompModLoaderType.Any
+        Dim IsOldForgeRequest = Request.ModLoader = CompLoaderType.Forge AndAlso Request.GameVersion?.Contains(".") AndAlso Val(Request.GameVersion.Split(".")(1)) < 14
+        If IsOldForgeRequest Then Request.ModLoader = CompLoaderType.Any
         Dim CurseForgeUrl As String = Request.GetCurseForgeAddress()
         Dim ModrinthUrl As String = Request.GetModrinthAddress()
-        If IsOldForgeRequest Then Request.ModLoader = CompModLoaderType.Forge '设置回去
+        If IsOldForgeRequest Then Request.ModLoader = CompLoaderType.Forge '设置回去
 
         Try
 
@@ -1168,7 +1270,7 @@ Retry:
 
         '筛除不是 Forge 的 Mod
         If IsOldForgeRequest Then
-            RawResults = RawResults.Where(Function(p) Not p.ModLoaders.Any() OrElse p.ModLoaders.Contains(CompModLoaderType.Forge)).ToList
+            RawResults = RawResults.Where(Function(p) Not p.ModLoaders.Any() OrElse p.ModLoaders.Contains(CompLoaderType.Forge)).ToList
         End If
 
 #End Region
@@ -1293,7 +1395,7 @@ Retry:
         ''' <summary>
         ''' 支持的 Mod 加载器列表。可能为空。
         ''' </summary>
-        Public ReadOnly ModLoaders As List(Of CompModLoaderType)
+        Public ReadOnly ModLoaders As List(Of CompLoaderType)
         ''' <summary>
         ''' 支持的游戏版本列表。类型包括："1.18.5"，"1.18"，"1.18 预览版"，"21w15a"，"未知版本"。
         ''' </summary>
@@ -1373,7 +1475,7 @@ Retry:
                 Status = CType(Data("Status").ToObject(Of Integer), CompFileStatus)
                 If Data.ContainsKey("FileName") Then FileName = Data("FileName").ToString
                 If Data.ContainsKey("DownloadUrls") Then DownloadUrls = Data("DownloadUrls").ToObject(Of List(Of String))
-                If Data.ContainsKey("ModLoaders") Then ModLoaders = Data("ModLoaders").ToObject(Of List(Of CompModLoaderType))
+                If Data.ContainsKey("ModLoaders") Then ModLoaders = Data("ModLoaders").ToObject(Of List(Of CompLoaderType))
                 If Data.ContainsKey("Hash") Then Hash = Data("Hash").ToString
                 If Data.ContainsKey("GameVersions") Then GameVersions = Data("GameVersions").ToObject(Of List(Of String))
                 If Data.ContainsKey("RawDependencies") Then RawDependencies = Data("RawDependencies").ToObject(Of List(Of String))
@@ -1411,18 +1513,18 @@ Retry:
                     GameVersions = RawVersions.Where(Function(v) v.StartsWithF("1.")).Select(Function(v) v.Replace("-snapshot", " " & GetLang("LangModCompVersionSnapshot"))).ToList
                     If GameVersions.Count > 1 Then
                         GameVersions = GameVersions.Sort(AddressOf VersionSortBoolean).ToList
-                        If Type = CompType.ModPack Then GameVersions = New List(Of String) From {GameVersions(0)} '整合包理应只 “支持” 一个版本
+                        If Type = CompType.ModPack Then GameVersions = New List(Of String) From {GameVersions(0)} '整合包理应只 "支持" 一个版本
                     ElseIf GameVersions.Count = 1 Then
                         GameVersions = GameVersions.ToList
                     Else
                         GameVersions = New List(Of String) From {GetLang("LangModCompVersionUnknownVersion")}
                     End If
                     'ModLoaders
-                    ModLoaders = New List(Of CompModLoaderType)
-                    If RawVersions.Contains("forge") Then ModLoaders.Add(CompModLoaderType.Forge)
-                    If RawVersions.Contains("fabric") Then ModLoaders.Add(CompModLoaderType.Fabric)
-                    If RawVersions.Contains("quilt") Then ModLoaders.Add(CompModLoaderType.Quilt)
-                    If RawVersions.Contains("neoforge") Then ModLoaders.Add(CompModLoaderType.NeoForge)
+                    ModLoaders = New List(Of CompLoaderType)
+                    If RawVersions.Contains("forge") Then ModLoaders.Add(CompLoaderType.Forge)
+                    If RawVersions.Contains("fabric") Then ModLoaders.Add(CompLoaderType.Fabric)
+                    If RawVersions.Contains("quilt") Then ModLoaders.Add(CompLoaderType.Quilt)
+                    If RawVersions.Contains("neoforge") Then ModLoaders.Add(CompLoaderType.NeoForge)
 #End Region
                 Else
 #Region "Modrinth"
@@ -1441,20 +1543,20 @@ Retry:
                     'ModLoaders
                     '结果可能混杂着 Mod、数据包和服务端插件
                     Dim RawLoaders As List(Of String) = Data("loaders").Select(Function(v) v.ToString).ToList
-                    ModLoaders = New List(Of CompModLoaderType)
+                    ModLoaders = New List(Of CompLoaderType)
                     If Type = CompType.Mod Then '以尽量宽容的方式检测加载器，以免同时兼容两种的项被删除
                         If RawLoaders.Intersect({"bukkit", "folia", "paper", "purpur", "spigot"}).Any() Then Type = CompType.Plugin 'Veinminer Enchantment 同时支持服务端与 Fabric
                         If RawLoaders.Contains("datapack") Then Type = CompType.DataPack
-                        If RawLoaders.Contains("forge") Then ModLoaders.Add(CompModLoaderType.Forge) : Type = CompType.Mod
-                        If RawLoaders.Contains("neoforge") Then ModLoaders.Add(CompModLoaderType.NeoForge) : Type = CompType.Mod
-                        If RawLoaders.Contains("fabric") Then ModLoaders.Add(CompModLoaderType.Fabric) : Type = CompType.Mod
-                        If RawLoaders.Contains("quilt") Then ModLoaders.Add(CompModLoaderType.Quilt) : Type = CompType.Mod
+                        If RawLoaders.Contains("forge") Then ModLoaders.Add(CompLoaderType.Forge) : Type = CompType.Mod
+                        If RawLoaders.Contains("neoforge") Then ModLoaders.Add(CompLoaderType.NeoForge) : Type = CompType.Mod
+                        If RawLoaders.Contains("fabric") Then ModLoaders.Add(CompLoaderType.Fabric) : Type = CompType.Mod
+                        If RawLoaders.Contains("quilt") Then ModLoaders.Add(CompLoaderType.Quilt) : Type = CompType.Mod
                     ElseIf Type = CompType.DataPack Then
                         If RawLoaders.Intersect({"bukkit", "folia", "paper", "purpur", "spigot"}).Any() Then Type = CompType.Plugin
-                        If RawLoaders.Contains("forge") Then ModLoaders.Add(CompModLoaderType.Forge) : Type = CompType.Mod
-                        If RawLoaders.Contains("neoforge") Then ModLoaders.Add(CompModLoaderType.NeoForge) : Type = CompType.Mod
-                        If RawLoaders.Contains("fabric") Then ModLoaders.Add(CompModLoaderType.Fabric) : Type = CompType.Mod
-                        If RawLoaders.Contains("quilt") Then ModLoaders.Add(CompModLoaderType.Quilt) : Type = CompType.Mod
+                        If RawLoaders.Contains("forge") Then ModLoaders.Add(CompLoaderType.Forge) : Type = CompType.Mod
+                        If RawLoaders.Contains("neoforge") Then ModLoaders.Add(CompLoaderType.NeoForge) : Type = CompType.Mod
+                        If RawLoaders.Contains("fabric") Then ModLoaders.Add(CompLoaderType.Fabric) : Type = CompType.Mod
+                        If RawLoaders.Contains("quilt") Then ModLoaders.Add(CompLoaderType.Quilt) : Type = CompType.Mod
                         If RawLoaders.Contains("datapack") Then Type = CompType.DataPack
                     End If
                     'Dependencies
@@ -1471,7 +1573,7 @@ Retry:
                                                Select(Function(v) If(v.Contains("-"), v.BeforeFirst("-") & " " & GetLang("LangModCompVersionSnapshot"), If(v.StartsWithF("b1."), GetLang("LangDownloadAncientVersion"), v))).ToList
                     If GameVersions.Count > 1 Then
                         GameVersions = GameVersions.Sort(AddressOf VersionSortBoolean).ToList
-                        If Type = CompType.ModPack Then GameVersions = New List(Of String) From {GameVersions(0)} '整合包理应只 “支持” 一个版本
+                        If Type = CompType.ModPack Then GameVersions = New List(Of String) From {GameVersions(0)} '整合包理应只 "支持" 一个版本
                     ElseIf GameVersions.Count = 1 Then
                         '无需处理
                     ElseIf RawVersions.Any(Function(v) RegexCheck(v, "[0-9]{2}w[0-9]{2}[a-z]{1}")) Then
@@ -1489,12 +1591,13 @@ Retry:
         ''' </summary>
         Public Shared Function HandleCurseForgeDownloadUrls(Url As String) As List(Of String)
             Return {
-                Url.Replace("-service.overwolf.wtf", ".forgecdn.net").Replace("://edge.", "://mediafilez.").Replace("://media.", "://mediafilez."),
-                Url.Replace("://edge.", "://mediafilez.").Replace("://media.", "://mediafilez."),
-                Url.Replace("-service.overwolf.wtf", ".forgecdn.net").Replace("://edge.", "://media."),
-                Url.Replace("-service.overwolf.wtf", ".forgecdn.net"),
-                Url.Replace("://edge.", "://media."),
-                Url
+                Url.Replace("://media.", "://edge."),
+                Url.Replace("://media.", "://mediafilez."),
+                Url.Replace("://edge.", "://mediafilez."),
+                Url,
+                Url.Replace("-service.overwolf.wtf", ".forgecdn.net").Replace("://media.", "://edge."),
+                Url.Replace("-service.overwolf.wtf", ".forgecdn.net").Replace("://media.", "://edge.").Replace("://edge.", "://mediafilez."),
+                Url.Replace("-service.overwolf.wtf", ".forgecdn.net")
             }.Distinct.ToList
         End Function
 
@@ -1671,6 +1774,350 @@ Retry:
         Stack.Children.Add(New TextBlock With {.Text = GetLang("LangModCompModAlternateVersion"), .FontSize = 14, .HorizontalAlignment = HorizontalAlignment.Left, .Margin = New Thickness(6, 12, 0, 5)})
     End Sub
 
+#End Region
+
+#Region "CompFavorites | 收藏"
+    Class CompFavorites
+
+        Public Shared Function GetShareCode(Data As List(Of String)) As String
+            Try
+                Return New JArray(Data).ToString(Newtonsoft.Json.Formatting.None)
+            Catch ex As Exception
+                Log(ex, "[CompFavorites] 生成分享出错")
+            End Try
+            Return ""
+        End Function
+
+        Public Shared Function GetIdsByShareCode(Code As String) As List(Of String)
+            Try
+                Return JArray.Parse(Code).ToObject(Of List(Of String))()
+            Catch ex As Exception
+                Log(ex, "[CompFavorites] 通过分享获取 ID 出错")
+            End Try
+            Return New List(Of String)
+        End Function
+
+        ''' <summary>
+        ''' 显示收藏菜单。
+        ''' </summary>
+        ''' <param name="Project"></param>
+        ''' <param name="Pos"></param>
+        Public Shared Sub ShowMenu(Project As CompProject, Pos As UIElement)
+            Dim Body As New ContextMenu()
+            For Each i In FavoritesList
+                Dim Item As New MyMenuItem
+                Item.MaxWidth = 240
+                Dim HasFavs As Boolean = i.Favs.Contains(Project.Id)
+                If HasFavs Then
+                    Item.Header = $"取消收藏 {i.Name}"
+                    Item.Icon = Logo.IconButtonLikeFill
+                Else
+                    Item.Header = $"收藏到 {i.Name}"
+                    Item.Icon = Logo.IconButtonLikeLine
+                End If
+                AddHandler Item.Click, Sub()
+                                           Try
+                                               If HasFavs Then
+                                                   i.Favs.Remove(Project.Id)
+                                                   Hint($"已将 {Project.TranslatedName} 从 {i.Name} 中删除", HintType.Finish)
+                                               Else
+                                                   i.Favs.Add(Project.Id)
+                                                   i.Favs = i.Favs.Distinct().ToList()
+                                                   Hint($"已将 {Project.TranslatedName} 添加到 {i.Name} 中", HintType.Finish)
+                                               End If
+                                               Save()
+                                           Catch ex As Exception
+                                               Log(ex, "[CompFavorites] 改变收藏项出错")
+                                           End Try
+                                       End Sub
+                Body.Items.Add(Item)
+            Next
+            Body.Placement = Primitives.PlacementMode.Bottom
+            Body.PlacementTarget = Pos
+            Body.IsOpen = True
+        End Sub
+        ''' <summary>
+        ''' 显示收藏菜单。
+        ''' </summary>
+        Public Shared Sub ShowMenu(Project As List(Of CompProject), Pos As UIElement)
+            Dim Body As New ContextMenu
+            For Each i In FavoritesList
+                Dim Item As New MyMenuItem With {
+                    .MaxWidth = 240,
+                    .Header = $"收藏到 {i.Name}"
+                }
+                AddHandler Item.Click, Sub()
+                                           Try
+                                               Dim Count As Integer = i.Favs.Count
+                                               i.Favs.AddRange(Project.Select(Function(p) p.Id).AsEnumerable)
+                                               i.Favs = i.Favs.Distinct.ToList()
+                                               Save()
+                                               Dim SuccessCount As Integer = i.Favs.Count - Count
+                                               Dim FailedCount As Integer = Project.Count - SuccessCount
+                                               Hint($"已将 {SuccessCount} 个资源添加到 {i.Name} 中{If(FailedCount > 0, $"，{FailedCount} 个资源已添加", "")}！", HintType.Finish)
+                                           Catch ex As Exception
+                                               Log(ex, "[CompFavorites] 改变收藏项出错")
+                                           End Try
+                                       End Sub
+                Body.Items.Add(Item)
+            Next
+            Body.Placement = Primitives.PlacementMode.Bottom
+            Body.PlacementTarget = Pos
+            Body.IsOpen = True
+        End Sub
+
+        Public Class FavData
+            ''' <summary>
+            ''' 收藏夹名称
+            ''' </summary>
+            ''' <returns></returns>
+            Property Name As String
+            ''' <summary>
+            ''' Guid
+            ''' </summary>
+            ''' <returns></returns>
+            Property Id As String
+            ''' <summary>
+            ''' 收藏的工程 ID 列表
+            ''' </summary>
+            ''' <returns></returns>
+            Property Favs As New List(Of String)
+            ''' <summary>
+            ''' 备注
+            ''' </summary>
+            ''' <returns></returns>
+            Property Notes As New Dictionary(Of String, String)
+        End Class
+
+        Private Shared _FavoritesList As List(Of FavData)
+        ''' <summary>
+        ''' 收藏的工程列表
+        ''' </summary>
+        Public Shared Property FavoritesList As List(Of FavData)
+            Get
+                If _FavoritesList Is Nothing Then
+                    Dim RawData As String = Setup.Get("CompFavorites")
+                    Dim RawList As List(Of FavData) = Nothing
+                    Dim Migrate As List(Of String) = Nothing
+                    Try
+                        Migrate = JArray.Parse(RawData).ToObject(Of List(Of String)) ' 从旧版本迁移
+                    Catch ex As Exception
+                    End Try
+                    If Migrate IsNot Nothing Then
+                        RawList = New List(Of FavData)
+                        RawList.Add(GetNewFav("默认", Migrate))
+                    Else
+                        RawList = JArray.Parse(RawData).ToObject(Of List(Of FavData))
+                        If RawList.Count = 0 Then
+                            RawList.Add(GetNewFav("默认", Nothing)) ' 确保无论如何都要至少有一个
+                        End If
+                    End If
+                    _FavoritesList = RawList
+                    Save()
+                End If
+                Return _FavoritesList
+            End Get
+            Set
+                _FavoritesList = Value
+                For Each item In _FavoritesList
+                    item.Notes = item.Notes.Where(Function(n) Not String.IsNullOrWhiteSpace(n.Value)).ToDictionary(Function(n) n.Key, Function(n) n.Value)
+                Next
+                Dim RawList = JArray.FromObject(_FavoritesList)
+                Setup.Set("CompFavorites", RawList.ToString(Newtonsoft.Json.Formatting.None))
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' 保存收藏夹数据
+        ''' </summary>
+        Public Shared Sub Save()
+            FavoritesList = _FavoritesList
+        End Sub
+
+        ''' <summary>
+        ''' 获取一个新的收藏夹
+        ''' </summary>
+        ''' <param name="Name"></param>
+        ''' <param name="FavList">没有传 Nothing</param>
+        ''' <returns></returns>
+        Public Shared Function GetNewFav(Name As String, FavList As List(Of String)) As FavData
+            Dim res As New FavData With {.Name = Name, .Id = Guid.NewGuid.ToString()}
+            If FavList Is Nothing Then
+                res.Favs = New List(Of String)
+            Else
+                res.Favs = FavList
+            End If
+            Return res
+        End Function
+    End Class
+
+#End Region
+
+#Region "CompProject | 项目信息"
+
+    Class CompRequest
+        ''' <summary>
+        ''' 通过项目 Id 判断是否来自 CurseForge
+        ''' </summary>
+        ''' <param name="Id"></param>
+        ''' <returns></returns>
+        Public Shared Function IsFromCurseForge(Id As String) As Boolean
+            Dim res As Integer = 0
+            Return Integer.TryParse(Id, res) 'CurseForge 数字 ID Modrinth 乱序 ID
+        End Function
+
+        ''' <summary>
+        ''' 通过一堆 ID 从 Modrinth 那获取项目信息 
+        ''' </summary>
+        ''' <param name="Ids"></param>
+        ''' <returns></returns>
+        Public Shared Function GetListByIdsFromModrinth(Ids As List(Of String)) As List(Of CompProject)
+            Dim Res As New List(Of CompProject)
+            Dim RawProjectsData = DlModRequest($"https://api.modrinth.com/v2/projects?ids=[""{Ids.Join(""",""")}""]", IsJson:=True)
+            For Each RawData In RawProjectsData
+                Res.Add(New CompProject(RawData))
+            Next
+            Return Res
+        End Function
+
+        ''' <summary>
+        ''' 通过一堆 ID 从 CurseForge 那获取项目信息 
+        ''' </summary>
+        ''' <param name="Ids"></param>
+        ''' <returns></returns>
+        Public Shared Function GetListByIdsFromCurseforge(Ids As List(Of String)) As List(Of CompProject)
+            Dim Res As New List(Of CompProject)
+            Dim RawProjectsData = GetJson(DlModRequest("https://api.curseforge.com/v1/mods",
+                                       "POST", "{""modIds"": [" & Ids.Join(",") & "]}", "application/json"))("data")
+            For Each RawData In RawProjectsData
+                Res.Add(New CompProject(RawData))
+            Next
+            Return Res
+        End Function
+
+        Public Shared Function GetCompProjectsByIds(Input As List(Of String)) As List(Of CompProject)
+            If Not Input.Any() Then Return New List(Of CompProject)
+            Dim RawList As List(Of String) = Input
+            Dim ModrinthProjectIds As New List(Of String)
+            Dim CurseForgeProjectIds As New List(Of String)
+            Dim Res As List(Of CompProject) = New List(Of CompProject)
+            For Each Id In RawList
+                If IsFromCurseForge(Id) Then
+                    CurseForgeProjectIds.Add(Id)
+                Else
+                    ModrinthProjectIds.Add(Id)
+                End If
+            Next
+            '在线信息获取
+            Dim FinishedTask = 0
+            Dim NeedCompleteTask = 0
+            If CurseForgeProjectIds.Any() Then
+                NeedCompleteTask += 1
+                RunInNewThread(Sub()
+                                   Try
+                                       Res.AddRange(CompRequest.GetListByIdsFromCurseforge(CurseForgeProjectIds))
+                                   Catch ex As Exception
+                                       Log(ex, "[Favorites] 获取 CurseForge 数据失败", LogLevel.Hint)
+                                   Finally
+                                       FinishedTask += 1
+                                   End Try
+                               End Sub, "Favorites CurseForge")
+            End If
+            If ModrinthProjectIds.Any() Then
+                NeedCompleteTask += 1
+                RunInNewThread(Sub()
+                                   Try
+                                       Res.AddRange(CompRequest.GetListByIdsFromModrinth(ModrinthProjectIds))
+                                   Catch ex As Exception
+                                       Log(ex, "[Favorites] 获取 Modrinth 数据失败", LogLevel.Hint)
+                                   Finally
+                                       FinishedTask += 1
+                                   End Try
+                               End Sub, "Favorites Modrinth")
+            End If
+            Do Until FinishedTask = NeedCompleteTask
+                Thread.Sleep(50)
+            Loop
+            Return Res
+        End Function
+    End Class
+#End Region
+
+#Region "CompClipboard | 剪贴板识别"
+    Class CompClipboard
+        '剪贴板已读取内容
+        Public Shared CurrentText As String = Nothing
+        '识别剪贴板内容
+        Public Shared Sub GetClipboardResource()
+            Dim Text As String = Nothing
+            Dim Slug As String = Nothing
+            Dim ProjectId As String = Nothing
+            Dim CategoryURL As String = Nothing
+            Dim ReturnData = Nothing
+            RunInUiWait(Sub()
+                            Text = My.Computer.Clipboard.GetText()
+                        End Sub)
+            If Text = CurrentText Then Exit Sub
+            CurrentText = Text
+            Text = Text.Replace("https://", "").Replace("http://", "")
+
+            If Text.Contains("curseforge.com/minecraft/") Then 'e.g. www.curseforge.com/minecraft/mc-mods/jei
+                Dim ClassIds As List(Of String) = New List(Of String) From {"6", "4471", "12", "6552"}
+                Try
+                    CategoryURL = Text.Split("/")(2)
+                    Slug = Text.Split("/")(3)
+                    ReturnData = DlModRequest("https://api.curseforge.com/v1/mods/search?gameId=432&slug=" + Slug, IsJson:=True) '获取资源信息
+                    Dim ReceivedClassId As String = ReturnData("data")(0)("categories")(0)("classId") '获取资源的 ClassId
+
+                    '判断资源的分类是否匹配，不在支持的资源类型中的就直接显示
+                    Dim IsCategoryMatched As Boolean = True
+                    Dim ResClassId As String = Nothing
+                    If CategoryURL = "mc-mods" AndAlso Not ReceivedClassId = "6" Then
+                        IsCategoryMatched = False
+                        ResClassId = "6"
+                    ElseIf CategoryURL = "modpacks" AndAlso Not ReceivedClassId = "4471" Then
+                        IsCategoryMatched = False
+                        ResClassId = "4471"
+                    ElseIf CategoryURL = "texture-packs" AndAlso Not ReceivedClassId = "12" Then
+                        IsCategoryMatched = False
+                        ResClassId = "12"
+                    ElseIf CategoryURL = "shaders" AndAlso Not ReceivedClassId = "6552" Then
+                        IsCategoryMatched = False
+                        ResClassId = "6552"
+                    End If
+
+                    If Not IsCategoryMatched Then
+                        ReturnData = DlModRequest("https://api.curseforge.com/v1/mods/search?gameId=432&slug=" + Slug + "&classId=" + ResClassId, IsJson:=True)
+                    End If
+
+                    ProjectId = ReturnData("data")(0)("id")
+                Catch ex As Exception
+                    Log("[Clipboard] 获取剪贴板 CurseForge 资源链接 ID 失败: " + ex.ToString(), LogLevel.Normal)
+                    Exit Sub
+                End Try
+            ElseIf Text.Contains("modrinth.com/") Then 'e.g. modrinth.com/mod/fabric-api
+                Try
+                    Slug = Text.Split("/")(2)
+                    ProjectId = DlModRequest("https://api.modrinth.com/v2/project/" + Slug, IsJson:=True)("id")
+                Catch ex As Exception
+                    Log("[Clipboard] 获取剪贴板 Modrinth 资源链接 ID 失败: " + ex.ToString(), LogLevel.Normal)
+                    Exit Sub
+                End Try
+            Else
+                Exit Sub
+            End If
+
+            Log("[Clipboard] 剪贴板资源 ProjectId: " + ProjectId)
+
+            If MyMsgBox("PCL 在剪贴板中识别到了资源链接，是否要跳转到该资源的详细信息页面？", "识别到剪贴板资源", "确定", "取消", ForceWait:=True) = 1 Then
+                Hint("正在获取资源信息，请稍等...")
+                Dim Ids As New List(Of String)({ProjectId})
+                Dim CompProjects = CompRequest.GetCompProjectsByIds(Ids)
+                RunInUi(Sub() FrmMain.PageChange(New FormMain.PageStackData With {.Page = FormMain.PageType.CompDetail,
+                               .Additional = {CompProjects.First(), New List(Of String), String.Empty, CompLoaderType.Any, CompType.Any}}))
+            End If
+        End Sub
+    End Class
 #End Region
 
 End Module

@@ -47,16 +47,6 @@
         '重复加载部分
         PanBack.ScrollToHome()
 
-#If BETA Then
-        PanDonate.Visibility = Visibility.Collapsed
-#Else
-        PanDonate.Visibility = Visibility.Visible
-        ItemSystemUpdateDownload.Content = GetLang("LangPageSetupSystemSystemLaunchUpdateE")
-#End If
-
-        '语言
-        SelectCurrentLanguage()
-
         '非重复加载部分
         If IsLoaded Then Return
         IsLoaded = True
@@ -74,13 +64,15 @@
         SliderDownloadSpeed.Value = Setup.Get("ToolDownloadSpeed")
         ComboDownloadSource.SelectedIndex = Setup.Get("ToolDownloadSource")
         ComboDownloadVersion.SelectedIndex = Setup.Get("ToolDownloadVersion")
-        CheckDownloadCert.Checked = Setup.Get("ToolDownloadCert")
+        CheckDownloadAutoSelectVersion.Checked = Setup.Get("ToolDownloadAutoSelectVersion")
+        CheckFixAuthlib.Checked = Setup.Get("ToolFixAuthlib")
 
         'Mod 与整合包
         ComboDownloadTranslateV2.SelectedIndex = Setup.Get("ToolDownloadTranslateV2")
-        'ComboDownloadMod.SelectedIndex = Setup.Get("ToolDownloadMod")
+        ComboDownloadMod.SelectedIndex = Setup.Get("ToolDownloadMod")
         ComboModLocalNameStyle.SelectedIndex = Setup.Get("ToolModLocalNameStyle")
         CheckDownloadIgnoreQuilt.Checked = Setup.Get("ToolDownloadIgnoreQuilt")
+        CheckDownloadClipboard.Checked = Setup.Get("ToolDownloadClipboard")
 
         'Minecraft 更新提示
         CheckUpdateRelease.Checked = Setup.Get("ToolUpdateRelease")
@@ -91,8 +83,26 @@
 
         '系统设置
         ComboSystemUpdate.SelectedIndex = Setup.Get("SystemSystemUpdate")
+        If Val(Environment.OSVersion.Version.ToString().Split(".")(2)) >= 19042 Then
+            ComboSystemUpdateBranch.SelectedIndex = Setup.Get("SystemSystemUpdateBranch")
+        Else '不满足系统要求
+            ComboSystemUpdateBranch.Items.Clear()
+            ComboSystemUpdateBranch.Items.Add("Legacy")
+            ComboSystemUpdateBranch.SelectedIndex = 0
+            ComboSystemUpdateBranch.ToolTip = "由于你的 Windows 版本过低，不满足新版本要求，只能获取 Legacy 分支的更新。&#xa;升级到 Windows 10 20H2 或以上版本以获取最新更新。"
+            ComboSystemUpdateBranch.IsEnabled = False
+        End If
         ComboSystemActivity.SelectedIndex = Setup.Get("SystemSystemActivity")
         TextSystemCache.Text = Setup.Get("SystemSystemCache")
+        CheckSystemDisableHardwareAcceleration.Checked = Setup.Get("SystemDisableHardwareAcceleration")
+        SliderAniFPS.Value = Setup.Get("UiAniFPS")
+        SliderMaxLog.Value = Setup.Get("SystemMaxLog")
+        CheckSystemTelemetry.Checked = Setup.Get("SystemTelemetry")
+
+        '网络
+        TextSystemHttpProxy.Text = Setup.Get("SystemHttpProxy")
+        CheckDownloadCert.Checked = Setup.Get("ToolDownloadCert")
+        CheckUseDefaultProxy.Checked = Setup.Get("SystemUseDefaultProxy")
 
         '调试选项
         CheckDebugMode.Checked = Setup.Get("SystemDebugMode")
@@ -111,8 +121,10 @@
             Setup.Reset("ToolDownloadVersion")
             Setup.Reset("ToolDownloadTranslateV2")
             Setup.Reset("ToolDownloadIgnoreQuilt")
-            Setup.Reset("ToolDownloadCert")
+            Setup.Reset("ToolDownloadClipboard")
             Setup.Reset("ToolDownloadMod")
+            Setup.Reset("ToolDownloadAutoSelectVersion")
+            Setup.Reset("ToolFixAuthlib")
             Setup.Reset("ToolModLocalNameStyle")
             Setup.Reset("ToolUpdateRelease")
             Setup.Reset("ToolUpdateSnapshot")
@@ -124,6 +136,11 @@
             Setup.Reset("SystemSystemCache")
             Setup.Reset("SystemSystemUpdate")
             Setup.Reset("SystemSystemActivity")
+            Setup.Reset("SystemDisableHardwareAcceleration")
+            Setup.Reset("SystemHttpProxy")
+            Setup.Reset("ToolDownloadCert")
+            Setup.Reset("SystemUseDefaultProxy")
+            Setup.Reset("UiAniFPS")
 
             Log("[Setup] 已初始化启动器页设置")
             Hint(GetLang("LangPageSetupSystemLaunchResetSuccess"), HintType.Finish, False)
@@ -135,16 +152,16 @@
     End Sub
 
     '将控件改变路由到设置改变
-    Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckDebugMode.Change, CheckDebugDelay.Change, CheckDebugSkipCopy.Change, CheckUpdateRelease.Change, CheckUpdateSnapshot.Change, CheckHelpChinese.Change, CheckDownloadIgnoreQuilt.Change, CheckDownloadCert.Change
+    Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckDebugMode.Change, CheckDebugDelay.Change, CheckDebugSkipCopy.Change, CheckUpdateRelease.Change, CheckUpdateSnapshot.Change, CheckHelpChinese.Change, CheckDownloadIgnoreQuilt.Change, CheckDownloadCert.Change, CheckDownloadClipboard.Change, CheckSystemDisableHardwareAcceleration.Change, CheckUseDefaultProxy.Change, CheckDownloadAutoSelectVersion.Change, CheckSystemTelemetry.Change, CheckFixAuthlib.Change
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Checked)
     End Sub
-    Private Shared Sub SliderChange(sender As MySlider, e As Object) Handles SliderDebugAnim.Change, SliderDownloadThread.Change, SliderDownloadSpeed.Change
+    Private Shared Sub SliderChange(sender As MySlider, e As Object) Handles SliderDebugAnim.Change, SliderDownloadThread.Change, SliderDownloadSpeed.Change, SliderAniFPS.Change, SliderMaxLog.Change
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Value)
     End Sub
-    Private Shared Sub ComboChange(sender As MyComboBox, e As Object) Handles ComboDownloadVersion.SelectionChanged, ComboModLocalNameStyle.SelectionChanged, ComboDownloadTranslateV2.SelectionChanged, ComboSystemUpdate.SelectionChanged, ComboSystemActivity.SelectionChanged, ComboDownloadSource.SelectionChanged
+    Private Shared Sub ComboChange(sender As MyComboBox, e As Object) Handles ComboDownloadVersion.SelectionChanged, ComboModLocalNameStyle.SelectionChanged, ComboDownloadTranslateV2.SelectionChanged, ComboSystemUpdate.SelectionChanged, ComboSystemActivity.SelectionChanged, ComboDownloadSource.SelectionChanged, ComboSystemUpdateBranch.SelectionChanged, ComboDownloadMod.SelectionChanged
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.SelectedIndex)
     End Sub
-    Private Shared Sub TextBoxChange(sender As MyTextBox, e As Object) Handles TextSystemCache.ValidatedTextChanged
+    Private Shared Sub TextBoxChange(sender As MyTextBox, e As Object) Handles TextSystemCache.ValidatedTextChanged, TextSystemHttpProxy.TextChanged
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Text)
     End Sub
 
@@ -165,6 +182,26 @@
             End Select
         End Function
         SliderDebugAnim.GetHintText = Function(v) If(v > 29, GetLang("LangPageSetupSystemDebugAnimSpeedDisable"), (v / 10 + 0.1) & "x")
+        SliderAniFPS.GetHintText =
+            Function(v)
+                Return $"{v + 1} FPS"
+            End Function
+        SliderMaxLog.GetHintText =
+            Function(v)
+                'y = 10x + 50 (0 <= x <= 5, 50 <= y <= 100)
+                'y = 50x - 150 (5 < x <= 13, 100 < y <= 500)
+                'y = 100x - 800 (13 < x <= 28, 500 < y <= 2000)
+                Select Case v
+                    Case Is <= 5
+                        Return v * 10 + 50
+                    Case Is <= 13
+                        Return v * 50 - 150
+                    Case Is <= 28
+                        Return v * 100 - 800
+                    Case Else
+                        Return "无限制"
+                End Select
+            End Function
     End Sub
     Private Sub SliderDownloadThread_PreviewChange(sender As Object, e As RouteEventArgs) Handles SliderDownloadThread.PreviewChange
         If SliderDownloadThread.Value < 100 Then Return
@@ -174,12 +211,9 @@
         End If
     End Sub
 
-    '识别码/解锁码替代入口
-    Private Sub BtnSystemIdentify_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnSystemIdentify.Click
-        PageOtherAbout.CopyUniqueAddress()
-    End Sub
-    Private Sub BtnSystemUnlock_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnSystemUnlock.Click
-        DonateCodeInput()
+    '硬件加速
+    Private Sub Check_DisableHardwareAcceleration(sender As Object, user As Boolean) Handles CheckSystemDisableHardwareAcceleration.Change
+        Hint("此项变更将在重启 PCL 后生效")
     End Sub
 
     '调试模式
@@ -202,8 +236,34 @@
             ComboSystemUpdate.SelectedItem = e.RemovedItems(0)
         End If
     End Sub
+    Private Sub ComboSystemUpdateBranch_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ComboSystemUpdateBranch.SelectionChanged
+        If AniControlEnabled <> 0 Then Exit Sub
+        If ComboSystemUpdateBranch.SelectedIndex <> 1 Then Exit Sub
+        If MyMsgBox("你正在切换启动器更新通道到 Fast Ring。" & vbCrLf &
+                    "Fast Ring 可以提供下个版本更新内容的预览，但可能会包含未经充分测试的功能，稳定性欠佳。" & vbCrLf & vbCrLf &
+                    "在升级到 Fast Ring 版本后，如果你选择切换到 Slow Ring，需要等待下一个 Slow Ring 版本发布，在这期间不会提供更新。" & vbCrLf &
+                    "该选项仅推荐具有一定基础知识和能力的用户选择。如果你正在制作整合包，请使用 Slow Ring！", "继续之前...", "我已知晓", "取消", IsWarn:=True) = 2 Then
+            ComboSystemUpdateBranch.SelectedItem = e.RemovedItems(0)
+        Else
+            UpdateCheckByButton()
+        End If
+    End Sub
     Private Sub BtnSystemUpdate_Click(sender As Object, e As EventArgs) Handles BtnSystemUpdate.Click
         UpdateCheckByButton()
+    End Sub
+    Private Sub BtnSystemMirrorChyanKey_Click(sender As Object, e As EventArgs) Handles BtnSystemMirrorChyanKey.Click
+        Dim ret = MyMsgBoxInput("设置 Mirror 酱 CDK", $"Mirror 酱(https://mirrorchyan.com/)是一个第三方应用分发平台{vbCrLf}如果你购买了他们的服务，可以让 PCL CE 使用他们的高速下载源下载版本更新，同时也可以减轻社区更新服务器的压力……")
+        If ret Is Nothing Then Return
+        If String.IsNullOrWhiteSpace(ret) Then
+            Setup.Reset("SystemMirrorChyanKey")
+            Hint("已移除 Mirror 酱 CDK！", HintType.Finish)
+        Else
+            Setup.Set("SystemMirrorChyanKey", ret)
+            Hint("设置 Mirror 酱 CDK 成功！", HintType.Finish)
+        End If
+    End Sub
+    Private Sub BtnSystemMirrorChyanGetKey_Click(sender As Object, e As EventArgs) Handles BtnSystemMirrorChyanGetKey.Click
+        OpenWebsite("https://mirrorchyan.com/zh/projects?rid=PCL2-CE&source=pcl2ce-app")
     End Sub
     ''' <summary>
     ''' 启动器是否已经是最新版？
@@ -211,16 +271,7 @@
     ''' </summary>
     Public Shared Function IsLauncherNewest() As Boolean?
         Try
-            '确认服务器公告是否正常
-            Dim ServerContent As String = ReadFile(PathTemp & "Cache\Notice.cfg")
-            If ServerContent.Split("|").Count < 3 Then Return Nothing
-            '确认是否为最新
-#If BETA Then
-            Dim NewVersionCode As Integer = ServerContent.Split("|")(2)
-#Else
-            Dim NewVersionCode As Integer = ServerContent.Split("|")(1)
-#End If
-            Return NewVersionCode <= VersionCode
+            Return IsVerisonLatest()
         Catch ex As Exception
             Log(ex, GetLang("LangPageSetupSystemSystemLaunchUpdateFail"), LogLevel.Feedback)
             Return Nothing
@@ -230,10 +281,19 @@
 #Region "导出 / 导入设置"
 
     Private Sub BtnSystemSettingExp_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnSystemSettingExp.Click
-        Hint(GetLang("LangPageSetupSystemInDev"))
+        Dim savePath As String = SelectSaveFile("选择保存位置", "PCL 全局配置.json", "PCL 配置文件(*.json)|*.json", Path).Replace("/", "\")
+        If savePath = "" Then Exit Sub
+        File.Copy(PathAppdataConfig & "Config.json", savePath, True)
+        Hint("配置导出成功！", HintType.Finish)
+        OpenExplorer(savePath)
     End Sub
     Private Sub BtnSystemSettingImp_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnSystemSettingImp.Click
-        Hint(GetLang("LangPageSetupSystemInDev"))
+        Dim sourcePath As String = SelectFile("PCL 配置文件(*.json)|*.json", "选择配置文件")
+        If sourcePath = "" Then Exit Sub
+        File.Copy(sourcePath, PathAppdataConfig & "Config.json", True)
+        MyMsgBox("配置导入成功！请重启 PCL 以应用配置……", Button1:="重启", ForceWait:=True)
+        Process.Start(New ProcessStartInfo(PathWithName))
+        FormMain.EndProgramForce(ProcessReturnValues.Success)
     End Sub
 
 #End Region

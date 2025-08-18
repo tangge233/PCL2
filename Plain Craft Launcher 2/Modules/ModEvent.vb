@@ -149,8 +149,8 @@
             Dim LocalTemp As String = RequestTaskTempFolder() & RawFileName
             Log("[Event] 转换网络资源：" & RelativeUrl & " -> " & LocalTemp)
             Try
-                NetDownloadByClient(RelativeUrl, LocalTemp)
-                NetDownloadByClient(RelativeUrl.Replace(".json", ".xaml"), LocalTemp.Replace(".json", ".xaml"))
+                NetDownloadByClient(RelativeUrl, LocalTemp).GetAwaiter().GetResult()
+                NetDownloadByClient(RelativeUrl.Replace(".json", ".xaml"), LocalTemp.Replace(".json", ".xaml")).GetAwaiter().GetResult()
             Catch ex As Exception
                 Throw New Exception("下载指定的文件失败！" & vbCrLf &
                                     "注意，联网帮助页面须指向一个帮助 JSON 文件，并在同路径下包含相应 XAML 文件！" & vbCrLf &
@@ -164,7 +164,7 @@
 
         '确认实际路径
         Dim Location As String, WorkingDir As String = Path & "PCL"
-        HelpTryExtract()
+        HelpExtract()
         If RelativeUrl.Contains(":\") Then
             '绝对路径
             Location = RelativeUrl
@@ -178,10 +178,10 @@
             Location = Path & "PCL\Help\" & RelativeUrl
             WorkingDir = Path & "PCL\Help\"
             Log("[Control] 自定义事件中由相对 PCL 本地帮助文件夹的路径" & EventType & "：" & Location)
-        ElseIf EventType = "打开帮助" AndAlso File.Exists(PathTemp & "Help\" & RelativeUrl) Then
+        ElseIf EventType = "打开帮助" AndAlso File.Exists(PathHelpFolder & RelativeUrl) Then
             '相对 PCL 自带帮助文件夹的路径
-            Location = PathTemp & "Help\" & RelativeUrl
-            WorkingDir = PathTemp & "Help\"
+            Location = PathHelpFolder & RelativeUrl
+            WorkingDir = PathHelpFolder
             Log("[Control] 自定义事件中由相对 PCL 自带帮助文件夹的路径" & EventType & "：" & Location)
         ElseIf EventType = "打开文件" OrElse EventType = "执行命令" Then
             '直接使用原有路径启动程序

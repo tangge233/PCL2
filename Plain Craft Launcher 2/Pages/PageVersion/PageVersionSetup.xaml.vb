@@ -1,4 +1,6 @@
-﻿Public Class PageVersionSetup
+﻿Imports PCL.Core.Model
+
+Public Class PageVersionSetup
 
     Private Shadows IsLoaded As Boolean = False
 
@@ -28,9 +30,12 @@
 
             '启动参数
             TextArgumentTitle.Text = Setup.Get("VersionArgumentTitle", Version:=PageVersionLeft.Version)
+            CheckArgumentTitleEmpty.Checked = Setup.Get("VersionArgumentTitleEmpty", Version:=PageVersionLeft.Version)
             TextArgumentInfo.Text = Setup.Get("VersionArgumentInfo", Version:=PageVersionLeft.Version)
             Dim _unused = PageVersionLeft.Version.PathIndie '触发自动判定
             ComboArgumentIndieV2.SelectedIndex = If(Setup.Get("VersionArgumentIndieV2", Version:=PageVersionLeft.Version), 0, 1)
+            CheckArgumentTitleEmpty.Visibility = If(TextArgumentTitle.Text.Length > 0, Visibility.Collapsed, Visibility.Visible)
+            TextArgumentTitle.HintText = If(CheckArgumentTitleEmpty.Checked, "默认", "跟随全局设置")
             RefreshJavaComboBox()
 
             '游戏内存
@@ -40,10 +45,9 @@
 
             '服务器
             TextServerEnter.Text = Setup.Get("VersionServerEnter", Version:=PageVersionLeft.Version)
-            ComboServerLogin.SelectedIndex = Setup.Get("VersionServerLogin", Version:=PageVersionLeft.Version)
-            ComboServerLoginLast = ComboServerLogin.SelectedIndex
-            ServerLogin(ComboServerLogin.SelectedIndex)
-            TextServerNide.Text = Setup.Get("VersionServerNide", Version:=PageVersionLeft.Version)
+            ComboServerLoginRequire.SelectedIndex = Setup.Get("VersionServerLoginRequire", Version:=PageVersionLeft.Version)
+            ComboServerLoginLast = ComboServerLoginRequire.SelectedIndex
+            ServerLogin(ComboServerLoginRequire.SelectedIndex)
             TextServerAuthServer.Text = Setup.Get("VersionServerAuthServer", Version:=PageVersionLeft.Version)
             TextServerAuthName.Text = Setup.Get("VersionServerAuthName", Version:=PageVersionLeft.Version)
             TextServerAuthRegister.Text = Setup.Get("VersionServerAuthRegister", Version:=PageVersionLeft.Version)
@@ -59,8 +63,15 @@
                 Setup.Set("VersionAdvanceAssetsV2", True, Version:=PageVersionLeft.Version)
             End If
             CheckAdvanceAssetsV2.Checked = Setup.Get("VersionAdvanceAssetsV2", Version:=PageVersionLeft.Version)
+            CheckAdvanceUseProxyV2.Checked = Setup.Get("VersionAdvanceUseProxyV2", Version:=PageVersionLeft.Version)
             CheckAdvanceJava.Checked = Setup.Get("VersionAdvanceJava", Version:=PageVersionLeft.Version)
-            CheckAdvanceDisableJLW.Checked = Setup.Get("VersionAdvanceDisableJLW", Version:=PageVersionLeft.Version)
+            If IsArm64System Then
+                CheckAdvanceDisableJLW.Checked = True
+                CheckAdvanceDisableJLW.IsEnabled = False
+                CheckAdvanceDisableJLW.ToolTip = "在启动游戏时不使用 Java Wrapper 进行包装。&#xa;由于系统为 ARM64 架构，Java Wrapper 已被强制禁用。"
+            Else
+                CheckAdvanceDisableJLW.Checked = Setup.Get("VersionAdvanceDisableJLW", Version:=PageVersionLeft.Version)
+            End If
 
         Catch ex As Exception
             Log(ex, "重载版本独立设置时出错", LogLevel.Feedback)
@@ -70,13 +81,13 @@
     '初始化
     Public Sub Reset()
         Try
-
+            If Not Setup.Get("VersionServerLoginLock", PageVersionLeft.Version) Then
+                Setup.Reset("VersionServerLoginRequire", Version:=PageVersionLeft.Version)
+                Setup.Reset("VersionServerAuthServer", Version:=PageVersionLeft.Version)
+                Setup.Reset("VersionServerAuthRegister", Version:=PageVersionLeft.Version)
+                Setup.Reset("VersionServerAuthName", Version:=PageVersionLeft.Version)
+            End If
             Setup.Reset("VersionServerEnter", Version:=PageVersionLeft.Version)
-            Setup.Reset("VersionServerLogin", Version:=PageVersionLeft.Version)
-            Setup.Reset("VersionServerNide", Version:=PageVersionLeft.Version)
-            Setup.Reset("VersionServerAuthServer", Version:=PageVersionLeft.Version)
-            Setup.Reset("VersionServerAuthRegister", Version:=PageVersionLeft.Version)
-            Setup.Reset("VersionServerAuthName", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionArgumentTitle", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionArgumentInfo", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionArgumentIndieV2", Version:=PageVersionLeft.Version)
@@ -88,12 +99,13 @@
             Setup.Reset("VersionAdvanceAssets", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionAdvanceAssetsV2", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionAdvanceJava", Version:=PageVersionLeft.Version)
+            Setup.Reset("VersionAdvanceDisableJlw", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionAdvanceRun", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionAdvanceRunWait", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionAdvanceDisableJLW", Version:=PageVersionLeft.Version)
+            Setup.Reset("VersionAdvanceUseProxyV2", Version:=PageVersionLeft.Version)
 
             Setup.Reset("VersionArgumentJavaSelect", Version:=PageVersionLeft.Version)
-            JavaSearchLoader.Start(IsForceRestart:=True)
 
             Log("[Setup] 已初始化版本独立设置")
             Hint(GetLang("LangPageVersionSetupHintIndependentSetResetSuccess"), HintType.Finish, False)
@@ -108,7 +120,7 @@
     Private Shared Sub RadioBoxChange(sender As MyRadioBox, e As Object) Handles RadioRamType0.Check, RadioRamType1.Check, RadioRamType2.Check
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag.ToString.Split("/")(0), Val(sender.Tag.ToString.Split("/")(1)), Version:=PageVersionLeft.Version)
     End Sub
-    Private Shared Sub TextBoxChange(sender As MyTextBox, e As Object) Handles TextServerEnter.ValidatedTextChanged, TextArgumentInfo.ValidatedTextChanged, TextAdvanceGame.ValidatedTextChanged, TextAdvanceJvm.ValidatedTextChanged, TextServerNide.ValidatedTextChanged, TextServerAuthName.ValidatedTextChanged, TextServerAuthRegister.ValidatedTextChanged, TextServerAuthServer.ValidatedTextChanged, TextArgumentTitle.ValidatedTextChanged, TextAdvanceRun.ValidatedTextChanged
+    Private Shared Sub TextBoxChange(sender As MyTextBox, e As Object) Handles TextServerEnter.ValidatedTextChanged, TextArgumentInfo.ValidatedTextChanged, TextAdvanceGame.ValidatedTextChanged, TextAdvanceJvm.ValidatedTextChanged, TextServerAuthName.ValidatedTextChanged, TextServerAuthRegister.ValidatedTextChanged, TextServerAuthServer.ValidatedTextChanged, TextArgumentTitle.ValidatedTextChanged, TextAdvanceRun.ValidatedTextChanged
         If AniControlEnabled = 0 Then
             '#3194，不能删减 /
             'Dim HandledText As String = sender.Text
@@ -125,7 +137,7 @@
     Private Shared Sub CheckBoxLikeComboChange(sender As MyComboBox, e As Object) Handles ComboArgumentIndieV2.SelectionChanged
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.SelectedIndex = 0, Version:=PageVersionLeft.Version)
     End Sub
-    Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckAdvanceRunWait.Change, CheckAdvanceAssetsV2.Change, CheckAdvanceJava.Change, CheckAdvanceDisableJLW.Change
+    Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckArgumentTitleEmpty.Change, CheckAdvanceRunWait.Change, CheckAdvanceAssetsV2.Change, CheckAdvanceJava.Change, CheckAdvanceDisableJLW.Change, CheckAdvanceUseProxyV2.Change, CheckAdvanceDisableRW.Change
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Checked, Version:=PageVersionLeft.Version)
     End Sub
 
@@ -163,7 +175,8 @@
                           If(RamGame <> RamGameActual, " (" & GetLang("LangPageSetupLaunchMemAvailable") & " " & If(RamGameActual = Math.Floor(RamGameActual), RamGameActual & ".0", RamGameActual) & " GB)", "")
         LabRamUsed.Text = If(RamUsed = Math.Floor(RamUsed), RamUsed & ".0", RamUsed) & " GB"
         LabRamTotal.Text = " / " & If(RamTotal = Math.Floor(RamTotal), RamTotal & ".0", RamTotal) & " GB"
-        LabRamWarn.Visibility = If(RamGame = 1 AndAlso Not JavaIs64Bit(PageVersionLeft.Version) AndAlso Not Is32BitSystem AndAlso JavaList.Any, Visibility.Visible, Visibility.Collapsed)
+        LabRamWarn.Visibility = If(RamGame = 1 AndAlso Not IsGameSet64BitJava(PageVersionLeft.Version) AndAlso Not Is32BitSystem AndAlso Javas.JavaList.Any, Visibility.Visible, Visibility.Collapsed)
+        HintRamTooHigh.Visibility = If(RamGame / RamTotal > 0.75, Visibility.Visible, Visibility.Collapsed)
         If ShowAnim Then
             '宽度动画
             AniStart({
@@ -347,7 +360,7 @@ PreFin:
             End If
         End If
         '若使用 32 位 Java，则限制为 1G
-        If If(Is32BitJava, Not JavaIs64Bit(PageVersionLeft.Version)) Then RamGive = Math.Min(1, RamGive)
+        If If(Is32BitJava, Not IsGameSet64BitJava(PageVersionLeft.Version)) Then RamGive = Math.Min(1, RamGive)
         Return RamGive
     End Function
 
@@ -357,36 +370,89 @@ PreFin:
 
     '全局
     Private ComboServerLoginLast As Integer
-    Private Sub ComboServerLogin_Changed() Handles ComboServerLogin.SelectionChanged, TextServerNide.ValidatedTextChanged, TextServerAuthServer.ValidatedTextChanged, TextServerAuthRegister.ValidatedTextChanged
-        If AniControlEnabled <> 0 Then Return
-        ServerLogin(ComboServerLogin.SelectedIndex)
+    Private Sub ComboServerLogin_Changed() Handles ComboServerLoginRequire.SelectionChanged, TextServerAuthServer.ValidatedTextChanged, TextServerAuthRegister.ValidatedTextChanged
+        If AniControlEnabled <> 0 Then Exit Sub
+        ServerLogin(ComboServerLoginRequire.SelectedIndex)
         '检查是否输入正确，正确才触发设置改变
-        If ComboServerLogin.SelectedIndex = 3 AndAlso Not TextServerNide.IsValidated Then Return
-        If ComboServerLogin.SelectedIndex = 4 AndAlso Not TextServerAuthServer.IsValidated Then Return
+        If TextServerAuthServer.IsValidated Then
+            BtnServerAuthLock.IsEnabled = True
+        Else
+            BtnServerAuthLock.IsEnabled = False
+        End If
+        If (ComboServerLoginRequire.SelectedIndex = 2 OrElse ComboServerLoginRequire.SelectedIndex = 3) AndAlso Not TextServerAuthServer.IsValidated Then Exit Sub
         '检查结果是否发生改变，未改变则不触发设置改变
-        If ComboServerLoginLast = ComboServerLogin.SelectedIndex Then Return
+        If ComboServerLoginLast = ComboServerLoginRequire.SelectedIndex Then Exit Sub
         '触发
-        ComboServerLoginLast = ComboServerLogin.SelectedIndex
-        ComboChange(ComboServerLogin, Nothing)
+        ComboServerLoginLast = ComboServerLoginRequire.SelectedIndex
+        ComboChange(ComboServerLoginRequire, Nothing)
+    End Sub
+    Private Sub TextServerAuthServer_MouseLeave() Handles TextServerAuthServer.LostFocus
+        If String.IsNullOrWhiteSpace(TextServerAuthServer.Text) Then Exit Sub
+        If Not (TextServerAuthServer.Text.EndsWithF("/api/yggdrasil/") OrElse TextServerAuthServer.Text.EndsWithF("/api/yggdrasil")) Then
+            If TextServerAuthServer.Text.EndsWithF("/") Then
+                TextServerAuthServer.Text = TextServerAuthServer.Text & "api/yggdrasil"
+                Hint("已自动格式化验证服务器地址！")
+            Else
+                TextServerAuthServer.Text = TextServerAuthServer.Text & "/api/yggdrasil"
+                Hint("已自动格式化验证服务器地址！")
+            End If
+        End If
+        If TextServerAuthServer.Text.EndsWithF("/api/yggdrasil/") Then
+            TextServerAuthServer.Text = TextServerAuthServer.Text.BeforeLast("/")
+            Hint("已自动格式化验证服务器地址！")
+        End If
+        ComboServerLoginLast = ComboServerLoginRequire.SelectedIndex
+        ComboChange(ComboServerLoginRequire, Nothing)
     End Sub
     Public Sub ServerLogin(Type As Integer)
-        If LabServerNide Is Nothing Then Return
-        LabServerNide.Visibility = If(Type = 3, Visibility.Visible, Visibility.Collapsed)
-        TextServerNide.Visibility = If(Type = 3, Visibility.Visible, Visibility.Collapsed)
-        PanServerNide.Visibility = If(Type = 3, Visibility.Visible, Visibility.Collapsed)
-        LabServerAuthName.Visibility = If(Type = 4, Visibility.Visible, Visibility.Collapsed)
-        TextServerAuthName.Visibility = If(Type = 4, Visibility.Visible, Visibility.Collapsed)
-        LabServerAuthRegister.Visibility = If(Type = 4, Visibility.Visible, Visibility.Collapsed)
-        TextServerAuthRegister.Visibility = If(Type = 4, Visibility.Visible, Visibility.Collapsed)
-        LabServerAuthServer.Visibility = If(Type = 4, Visibility.Visible, Visibility.Collapsed)
-        TextServerAuthServer.Visibility = If(Type = 4, Visibility.Visible, Visibility.Collapsed)
-        BtnServerAuthLittle.Visibility = If(Type = 4, Visibility.Visible, Visibility.Collapsed)
+        LabServerAuthName.Visibility = If(Type = 2 OrElse Type = 3, Visibility.Visible, Visibility.Collapsed)
+        TextServerAuthName.Visibility = If(Type = 2 OrElse Type = 3, Visibility.Visible, Visibility.Collapsed)
+        LabServerAuthRegister.Visibility = If(Type = 2 OrElse Type = 3, Visibility.Visible, Visibility.Collapsed)
+        TextServerAuthRegister.Visibility = If(Type = 2 OrElse Type = 3, Visibility.Visible, Visibility.Collapsed)
+        LabServerAuthServer.Visibility = If(Type = 2 OrElse Type = 3, Visibility.Visible, Visibility.Collapsed)
+        TextServerAuthServer.Visibility = If(Type = 2 OrElse Type = 3, Visibility.Visible, Visibility.Collapsed)
+        BtnServerAuthLittle.Visibility = If(Type = 2 OrElse Type = 3, Visibility.Visible, Visibility.Collapsed)
+        BtnServerNewProfile.Visibility = If(Type = 2 OrElse Type = 3, Visibility.Visible, Visibility.Collapsed)
+        If Type = 0 OrElse Type = 1 Then
+            BtnServerAuthLock.Visibility = Visibility.Collapsed
+        Else
+            BtnServerAuthLock.Visibility = Visibility.Visible
+        End If
+        If Setup.Get("VersionServerLoginLock", PageVersionLeft.Version) Then
+            HintServerLoginLock.Visibility = Visibility.Visible
+            ComboServerLoginRequire.IsEnabled = False
+            TextServerAuthServer.IsEnabled = False
+            TextServerAuthName.IsEnabled = False
+            TextServerAuthRegister.IsEnabled = False
+            BtnServerAuthLittle.IsEnabled = False
+        Else
+            HintServerLoginLock.Visibility = Visibility.Collapsed
+            ComboServerLoginRequire.IsEnabled = True
+            TextServerAuthServer.IsEnabled = True
+            TextServerAuthName.IsEnabled = True
+            TextServerAuthRegister.IsEnabled = True
+            BtnServerAuthLittle.IsEnabled = True
+        End If
         CardServer.TriggerForceResize()
-    End Sub
-
-    '统一通行证
-    Private Sub BtnServerNideWeb_Click(sender As Object, e As EventArgs) Handles BtnServerNideWeb.Click
-        OpenWebsite("https://login.mc-user.com:233/server/intro")
+        '避免正版验证和离线验证出现此提示
+        If Not (Type = 2 OrElse Type = 3) Then
+            LabServerAuthServerSecurity.Visibility = Visibility.Collapsed
+            LabServerAuthServerSecurityCL.Visibility = Visibility.Collapsed
+            LabServerAuthServerSecurityVerify.Visibility = Visibility.Collapsed
+            ' 如果开头为 http:// 给予警告
+        ElseIf TextServerAuthServer.Text.StartsWithF("https://") AndAlso Setup.Get("ToolDownloadCert") = "False" Then
+            LabServerAuthServerSecurity.Visibility = Visibility.Collapsed
+            LabServerAuthServerSecurityVerify.Visibility = Visibility.Visible
+            LabServerAuthServerSecurityCL.Visibility = Visibility.Visible
+        ElseIf TextServerAuthServer.Text.StartsWithF("http://") Then
+            LabServerAuthServerSecurity.Visibility = Visibility.Visible
+            LabServerAuthServerSecurityCL.Visibility = Visibility.Visible
+            LabServerAuthServerSecurityVerify.Visibility = Visibility.Collapsed
+        Else
+            LabServerAuthServerSecurity.Visibility = Visibility.Collapsed
+            LabServerAuthServerSecurityVerify.Visibility = Visibility.Collapsed
+            LabServerAuthServerSecurityCL.Visibility = Visibility.Collapsed
+        End If
     End Sub
 
     'LittleSkin
@@ -397,6 +463,24 @@ PreFin:
         TextServerAuthServer.Text = "https://littleskin.cn/api/yggdrasil"
         TextServerAuthRegister.Text = "https://littleskin.cn/auth/register"
         TextServerAuthName.Text = GetLang("LangPageVersionSetupLittleSkinLogin")
+    End Sub
+
+    '锁定设置
+    Private Sub BtnServerAuthLock_Click() Handles BtnServerAuthLock.Click
+        If MyMsgBox($"你正在选择锁定此实例的验证方式。锁定之后，将无法再更改此实例的验证方式要求，启动此实例将必须使用指定的验证方式。{vbCrLf}此功能可能会帮助一些服主吧。{vbCrLf}是否继续？", "锁定验证方式确认", "确定", "取消", IsWarn:=True) = 1 Then
+            Setup.Set("VersionServerLoginLock", True, Version:=PageVersionLeft.Version)
+            Reload()
+        End If
+    End Sub
+
+    '跳转新建档案
+    Private Sub BtnServerNewProfile_Click() Handles BtnServerNewProfile.Click
+        FrmMain.PageChange(New FormMain.PageStackData With {.Page = FormMain.PageType.Launch})
+        PageLoginAuth.DraggedAuthServer = TextServerAuthServer.Text
+        RunInNewThread(Sub()
+                           Thread.Sleep(150)
+                           RunInUi(Sub() FrmLaunchLeft.RefreshPage(True, McLoginType.Auth))
+                       End Sub)
     End Sub
 
 #End Region
@@ -414,20 +498,20 @@ PreFin:
         Dim SelectedItem As MyComboBoxItem = Nothing
         Dim SelectedBySetup As String = Setup.Get("VersionArgumentJavaSelect", Version:=PageVersionLeft.Version)
         Try
-            For Each Java In JavaList.Clone().OrderByDescending(Function(v) v.VersionCode)
-                Dim ListItem = New MyComboBoxItem With {.Content = Java.ToString, .ToolTip = Java.PathFolder, .Tag = Java}
+            For Each CurJava In Javas.JavaList
+                Dim ListItem = New MyComboBoxItem With {.Content = CurJava.ToString, .ToolTip = CurJava.JavaFolder, .Tag = CurJava}
                 ToolTipService.SetHorizontalOffset(ListItem, 400)
                 ComboArgumentJava.Items.Add(ListItem)
                 '判断人为选中
                 If SelectedBySetup = "" OrElse SelectedBySetup = "使用全局设置" Then Continue For
-                If JavaEntry.FromJson(GetJson(SelectedBySetup)).PathFolder = Java.PathFolder Then SelectedItem = ListItem
+                If SelectedBySetup = CurJava.JavaExePath Then SelectedItem = ListItem
             Next
         Catch ex As Exception
             Setup.Set("VersionArgumentJavaSelect", "使用全局设置", Version:=PageVersionLeft.Version)
             Log(ex, GetLang("LangPageSetupLaunchJavaUpdateListFail"), LogLevel.Feedback)
         End Try
         '更新选择项
-        If SelectedItem Is Nothing AndAlso JavaList.Any Then
+        If SelectedItem Is Nothing AndAlso Javas.JavaList.Any Then
             If SelectedBySetup = "" Then
                 SelectedItem = ComboArgumentJava.Items(1) '选中 “自动选择”
             Else
@@ -466,7 +550,7 @@ PreFin:
             Log("[Java] 修改版本 Java 选择设置：自动选择")
         Else
             '选择指定项
-            Setup.Set("VersionArgumentJavaSelect", CType(SelectedJava.ToJson(), JObject).ToString(Newtonsoft.Json.Formatting.None), Version:=PageVersionLeft.Version)
+            Setup.Set("VersionArgumentJavaSelect", CType(SelectedJava, Java).JavaExePath, Version:=PageVersionLeft.Version)
             Log("[Java] 修改版本 Java 选择设置：" & SelectedJava.ToString)
         End If
         RefreshRam(True)
@@ -489,6 +573,14 @@ PreFin:
             ComboArgumentIndieV2.SelectedItem = e.RemovedItems(0)
             IsReverting = False
         End If
+    End Sub
+
+    '游戏窗口
+    Private Sub CheckArgumentTitleEmpty_Change(sender As MyCheckBox, e As Object) Handles CheckArgumentTitleEmpty.Change
+        TextArgumentTitle.HintText = If(CheckArgumentTitleEmpty.Checked, "默认", "跟随全局设置")
+    End Sub
+    Private Sub TextArgumentTitle_TextChanged(sender As Object, e As TextChangedEventArgs) Handles TextArgumentTitle.TextChanged
+        CheckArgumentTitleEmpty.Visibility = If(TextArgumentTitle.Text.Length > 0, Visibility.Collapsed, Visibility.Visible)
     End Sub
 
 #End Region

@@ -1,4 +1,6 @@
-﻿Public Class MySkin
+﻿Imports System.Drawing
+
+Public Class MySkin
 
     '事件
     Public Event Click(sender As Object, e As MouseButtonEventArgs)
@@ -96,6 +98,7 @@
                 ImgFore.Source = Nothing : ImgBack.Source = Nothing
                 Throw New Exception("图片大小不足，长为 " & Image.Pic.Height & "，宽为 " & Image.Pic.Width)
             End If
+            Dim SkinHead As MyBitmap = Nothing
             '头发层（附加层）
             If Image.Pic.Width >= 64 AndAlso Image.Pic.Height >= 32 Then
                 If (Image.Pic.GetPixel(1, 1).A = 0 OrElse '如果图片中有任何透明像素（避免纯色白底）
@@ -105,6 +108,7 @@
                     Image.Pic.GetPixel(Image.Pic.Width - 1, Image.Pic.Height - 1) <> Image.Pic.GetPixel(Scale * 41, Scale * 9) AndAlso
                     Image.Pic.GetPixel(Image.Pic.Width - 2, Image.Pic.Height / 2 - 2) <> Image.Pic.GetPixel(Scale * 41, Scale * 9)) Then
                     ImgFore.Source = Image.Clip(Scale * 40, Scale * 8, Scale * 8, Scale * 8)
+                    SkinHead = Image.Clip(Scale * 40, Scale * 8, Scale * 8, Scale * 8)
                 Else
                     ImgFore.Source = Nothing
                 End If
@@ -113,11 +117,47 @@
             End If
             '脸层
             ImgBack.Source = Image.Clip(Scale * 8, Scale * 8, Scale * 8, Scale * 8)
+            '用于显示档案列表头像的图片
+            Dim SkinHeadId As String = Address.Between({If(Address.Contains("Images/Skins/"), "Skins/", "Skin\")}(0), ".png")
+            Dim CachePath As String = PathTemp & $"Cache\Skin\Head\{SkinHeadId}.png"
+            SelectedProfile.SkinHeadId = SkinHeadId
+            SaveProfile()
+            If SkinHead Is Nothing Then
+                SkinHead.Pic = ScaleToSize(Image.Clip(Scale * 8, Scale * 8, Scale * 8, Scale * 8), 48, 48)
+            Else
+                SkinHead = New MyBitmap With {.Pic = New Bitmap(56, 56)}
+                Dim SkinHair As New MyBitmap With {.Pic = ScaleToSize(Image.Clip(Scale * 40, Scale * 8, Scale * 8, Scale * 8), 56, 56)}
+                Dim SkinFace As New MyBitmap With {.Pic = ScaleToSize(Image.Clip(Scale * 8, Scale * 8, Scale * 8, Scale * 8), 48, 48)}
+                For i = 0 To 47
+                    For j = 0 To 47
+                        SkinHead.Pic.SetPixel(i + 4, j + 4, SkinFace.Pic.GetPixel(i, j))
+
+                    Next
+                Next
+                For i = 0 To 55
+                    For j = 0 To 55
+                        If SkinHair.Pic.GetPixel(i, j).A = 0 Then Continue For
+                        SkinHead.Pic.SetPixel(i, j, SkinHair.Pic.GetPixel(i, j))
+                    Next
+                Next
+            End If
+            If Not Directory.Exists(PathTemp & "Cache\Skin\Head") Then Directory.CreateDirectory(PathTemp & "Cache\Skin\Head")
+            If Not File.Exists(CachePath) Then File.Create(CachePath).Close()
+            SkinHead.Save(CachePath)
             Log("[Skin] 载入头像成功：" & Loader.Name)
         Catch ex As Exception
             Log(ex, "载入头像失败（" & If(Address, "null") & "," & Loader.Name & "）", LogLevel.Hint)
         End Try
     End Sub
+    Private Function ScaleToSize(Bitmap As Bitmap, Width As Integer, Height As Integer)
+        Dim ScaledBitmap = New Bitmap(Width, Height)
+        Using g = Graphics.FromImage(ScaledBitmap)
+            g.InterpolationMode = Drawing2D.InterpolationMode.NearestNeighbor
+            g.PixelOffsetMode = Drawing2D.PixelOffsetMode.Half
+            g.DrawImage(Bitmap, 0, 0, Width, Height)
+        End Using
+        Return ScaledBitmap
+    End Function
     ''' <summary>
     ''' 清空皮肤。
     ''' </summary>
@@ -154,7 +194,6 @@
                     If Directory.Exists(PathTemp & "Cache\Skin") Then DeleteDirectory(PathTemp & "Cache\Skin")
                     If Directory.Exists(PathTemp & "Cache\Uuid") Then DeleteDirectory(PathTemp & "Cache\Uuid")
                     IniClearCache(PathTemp & "Cache\Skin\IndexMs.ini")
-                    IniClearCache(PathTemp & "Cache\Skin\IndexNide.ini")
                     IniClearCache(PathTemp & "Cache\Skin\IndexAuth.ini")
                     IniClearCache(PathTemp & "Cache\Uuid\Mojang.ini")
                     '刷新控件
@@ -177,8 +216,8 @@
         Sub()
             Try
                 '更新缓存
-                WriteIni(PathTemp & "Cache\Skin\IndexMs.ini", Setup.Get("CacheMsV2Uuid"), SkinAddress)
-                Log(String.Format("[Skin] 已写入皮肤地址缓存 {0} -> {1}", Setup.Get("CacheMsV2Uuid"), SkinAddress))
+                WriteIni(PathTemp & "Cache\Skin\IndexMs.ini", SelectedProfile.Uuid, SkinAddress)
+                Log(String.Format("[Skin] 已写入皮肤地址缓存 {0} -> {1}", SelectedProfile.Uuid, SkinAddress))
                 '刷新控件
                 For Each SkinLoader In {PageLaunchLeft.SkinMs, PageLaunchLeft.SkinLegacy}
                     SkinLoader.WaitForExit(IsForceRestart:=True)
@@ -223,7 +262,7 @@
             Try
 Retry:
                 '获取登录信息
-                If McLoginMsLoader.State <> LoadState.Finished Then McLoginMsLoader.WaitForExit(PageLoginMsSkin.GetLoginData())
+                If McLoginMsLoader.State <> LoadState.Finished Then McLoginMsLoader.WaitForExit(GetLoginData())
                 If McLoginMsLoader.State <> LoadState.Finished Then
                     Hint(GetLang("LangMySkinHintChangFailByLoginFail"), HintType.Critical)
                     Return
@@ -231,6 +270,23 @@ Retry:
                 Dim AccessToken As String = McLoginMsLoader.Output.AccessToken
                 Dim Uuid As String = McLoginMsLoader.Output.Uuid
                 Dim SkinData As JObject = GetJson(McLoginMsLoader.Output.ProfileJson)
+                For Each itemSkin In SkinData("capes")
+                    If itemSkin("url") Is Nothing Then Continue For
+                    Dim localFile = $"{PathTemp}Cache\Capes\{itemSkin("alias")}.png"
+                    Dim capeFrontFile = $"{PathTemp}Cache\Capes\{itemSkin("alias")}-front.png"
+                    If File.Exists(localFile) AndAlso File.Exists(capeFrontFile) Then
+                        itemSkin("url") = capeFrontFile
+                        Continue For
+                    End If
+                    NetDownloadByLoader(itemSkin("url").ToString(), localFile)
+                    Dim capeFrontRegion As New Rectangle(0, 0, 11, 17)
+                    Dim capeFront As New Bitmap(capeFrontRegion.Width, capeFrontRegion.Height)
+                    Dim capeImage = Image.FromFile(localFile)
+                    Dim gra = Graphics.FromImage(capeFront)
+                    gra.DrawImage(capeImage, capeFrontRegion, capeFrontRegion, GraphicsUnit.Pixel)
+                    capeFront.Save(capeFrontFile)
+                    itemSkin("url") = capeFrontFile
+                Next
                 '获取玩家的所有披风
                 Dim SelId As Integer? = Nothing
                 RunInUiWait(
@@ -246,11 +302,23 @@ Retry:
                             {"Mojang Office", GetLang("LangMySkinCapeNameMojangOffice")}, {"Home", GetLang("LangMySkinCapeNameHome")}, {"Menace", GetLang("LangMySkinCapeNameMenace")}, {"Yearn", GetLang("LangMySkinCapeNameYearn")},
                             {"Common", "普通披风"}, {"Pan", "薄煎饼披风"}, {"Founder's", "创始人披风"}
                         }
-                        Dim SelectionControl As New List(Of IMyRadio) From {New MyRadioBox With {.Text = GetLang("LangMySkinCapeNameNone")}}
+                        Dim SelectionControl As New List(Of IMyRadio) From {New MyListItem With {
+                            .Title = GetLang("LangMySkinCapeNameNone"),
+                            .Info = "Null"
+                        }}
                         For Each Cape In SkinData("capes")
-                            Dim CapeName As String = Cape("alias").ToString
+                            Dim CapeName As String = Cape("alias").ToString()
                             If CapeNames.ContainsKey(CapeName) Then CapeName = CapeNames(CapeName)
-                            SelectionControl.Add(New MyRadioBox With {.Text = CapeName})
+                            Dim state = Cape("state") '检测披风状态，若为 ACTIVE 则选中
+                            Dim active As Boolean = state IsNot Nothing And state.ToString().ToUpper().Equals("ACTIVE")
+                            SelectionControl.Add(New MyListItem With {
+                                                     .Title = CapeName,
+                                                     .Info = Cape("alias").ToString(),
+                                                     .Checked = active,
+                                                     .Type = MyListItem.CheckType.RadioBox,
+                                                     .Logo = Cape("url"),
+                                                     .LogoScale = 0.6
+                                                 })
                         Next
                         SelId = MyMsgBoxSelect(SelectionControl, GetLang("LangMySkinDialogChooseCape"), GetLang("LangDialogBtnOK"), GetLang("LangDialogBtnCancel"))
                     Catch ex As Exception
@@ -260,9 +328,9 @@ Retry:
                 If SelId Is Nothing Then Return
                 '发送请求
                 Dim Result As String = NetRequestRetry("https://api.minecraftservices.com/minecraft/profile/capes/active",
-                    If(SelId = 0, "DELETE", "PUT"),
-                    If(SelId = 0, "", New JObject(New JProperty("capeId", SkinData("capes")(SelId - 1)("id"))).ToString(0)),
-                    "application/json", Headers:=New Dictionary(Of String, String) From {{"Authorization", "Bearer " & AccessToken}})
+                            If(SelId = 0, "DELETE", "PUT"),
+                            If(SelId = 0, "", New JObject(New JProperty("capeId", SkinData("capes")(SelId - 1)("id"))).ToString(0)),
+                            "application/json", Headers:=New Dictionary(Of String, String) From {{"Authorization", "Bearer " & AccessToken}})
                 If Result.Contains("""errorMessage""") Then
                     Hint(GetLang("LangMySkinHintChangeCapeFail") & ":" & GetJson(Result)("errorMessage"), HintType.Critical)
                     Return

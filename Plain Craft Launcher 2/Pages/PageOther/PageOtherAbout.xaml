@@ -11,6 +11,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="45" />
                         <RowDefinition Height="45" />
+                        <RowDefinition Height="45" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40" />
@@ -18,8 +19,9 @@
                         <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
                     <local:MyListItem IsHitTestVisible="False" Title="{StaticResource LangPageOtherAboutAboutAuthor}" Margin="-5,0,15,0" Info="{StaticResource LangPageOtherAboutAboutAuthorSubtitle}" Grid.Row="0" Grid.Column="1" />
-                    <local:MyListItem IsHitTestVisible="False" Title="Plain Craft Launcher 2" Margin="-5,0,15,0" Info="{StaticResource LangPageOtherAboutAboutVersionSubtitle}" Grid.Row="1" Grid.Column="1" x:Name="ItemAboutPcl" />
-                    <Image Source="/Plain Craft Launcher 2;component/Images/Heads/Logo.png" Grid.Row="1" Margin="3">
+                    <local:MyListItem IsHitTestVisible="False" Title="PCL Community" Margin="-5,0,15,0" Info="Plain Craft Launcher 社区版的开发团队！" Grid.Row="1" Grid.Column="1" />
+                    <local:MyListItem IsHitTestVisible="False" Title="Plain Craft Launcher 2 Community Edition" Margin="-5,0,15,0" Info="当前版本: %VERSION% (%BRANCH%, %VERSIONCODE%+build.%COMMIT_HASH%, 基于 %UPSTREAM_VERSION%)" Grid.Row="2" Grid.Column="1" x:Name="ItemAboutPcl" />
+                    <Image Source="/Plain Craft Launcher 2;component/Images/Heads/Logo-CE.png" Grid.Row="2" Margin="3" x:Name="ImgPCLLogo">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
@@ -29,8 +31,10 @@
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
+                    <Image Source="/Plain Craft Launcher 2;component/Images/Heads/PCL-Community.png" Grid.Row="1" Margin="3" x:Name="ImgPCLCommunity"></Image>
                     <local:MyButton Text="{StaticResource LangPageOtherAboutAboutAuthorBtn}" Grid.Column="2" Grid.Row="0" Height="35" EventType="打开网页" EventData="https://afdian.com/a/LTCat" />
-                    <local:MyButton Text="{StaticResource LangPageOtherAboutAboutVersionBtn}" Grid.Column="2" Grid.Row="1" Height="35" EventType="打开网页" EventData="https://github.com/Hex-Dragon/PCL2" />
+                    <local:MyButton Text="GitHub 主页" Grid.Column="2" Grid.Row="1" Height="35" EventType="打开网页" EventData="https://github.com/PCL-Community" />
+                    <local:MyButton Text="查看源代码" Grid.Column="2" Grid.Row="2" Height="35" EventType="打开网页" EventData="https://github.com/PCL-Community/PCL2-CE" />
                 </Grid>
             </local:MyCard>
             <local:MyCard Margin="0,0,0,15" Title="{StaticResource LangPageOtherAboutThanks}">
@@ -44,22 +48,25 @@
                         <RowDefinition Height="45" />
                         <RowDefinition Height="45" />
                         <RowDefinition Height="45" />
+                        <RowDefinition Height="45" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40" />
                         <ColumnDefinition />
                         <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
-                    <local:MyListItem Title="bangbang93" Margin="-5,0,15,0" IsHitTestVisible="False" Info="{StaticResource LangPageOtherAboutThanksbangbang93}" Grid.Row="0" Grid.Column="1" />
-                    <local:MyButton x:Name="BtnAboutBmclapi" Text="{StaticResource LangPageOtherAboutThanksbangbang93Btn}" Grid.Row="0" Grid.Column="2" Height="35" />
-                    <local:MyListItem Title="{StaticResource LangPageOtherAboutThanksMCModTitle}" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="{StaticResource LangPageOtherAboutThanksMCMod}" Grid.Row="1" Grid.Column="1" />
-                    <local:MyButton x:Name="BtnAboutWiki" Text="{StaticResource LangPageOtherAboutThanksMCModBtn}" Grid.Row="1" Grid.Column="2" Height="35" />
-                    <local:MyListItem Title="00ll00" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="{StaticResource LangPageOtherAboutThanks00ll00}" Grid.Row="2" Grid.Column="1" />
-                    <local:MyListItem Title="z0z0r4" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="{StaticResource LangPageOtherAboutThanksz0z0r4}" Grid.Row="3" Grid.Column="1" />
-                    <local:MyListItem Title="Patrick" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="{StaticResource LangPageOtherAboutThanksPatrick}" Grid.Row="4" Grid.Column="1" />
-                    <local:MyListItem Title="Hao_Tian" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="{StaticResource LangPageOtherAboutThanksHao_Tian}" Grid.Row="5" Grid.Column="1" />
-                    <local:MyListItem Title="{StaticResource LangPageOtherAboutThanksMCBBSTitle}" Margin="-5,0,15,0" IsHitTestVisible="False" Info="{StaticResource LangPageOtherAboutThanksMCBBS}" Grid.Row="6" Grid.Column="1" />
-                    <local:MyListItem Title="{StaticResource LangPageOtherAboutThanksUsersTitle}" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="{StaticResource LangPageOtherAboutThanksUsers}" Grid.Row="7" Grid.Column="1" />
+                    <local:MyListItem Title="bangbang93" Margin="-5,0,15,0" IsHitTestVisible="False" Info="提供 BMCLAPI 镜像源和 Forge 安装工具，详见 https://bmclapi.bangbang93.com" Grid.Row="0" Grid.Column="1" />
+                    <local:MyButton x:Name="BtnAboutBmclapi" Text="赞助镜像源" Grid.Row="0" Grid.Column="2" Height="35" />
+                    <local:MyListItem Title="MC 百科" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="提供了 Mod 名称的中文翻译和更多相关信息！" Grid.Row="1" Grid.Column="1" />
+                    <local:MyButton x:Name="BtnAboutWiki" Text="打开百科" Grid.Row="1" Grid.Column="2" Height="35" />
+                    <local:MyListItem Title="00ll00" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="提供了 Java Launch Wrapper 和一些重要服务支持！" Grid.Row="2" Grid.Column="1" />
+                    <local:MyListItem Title="z0z0r4" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="提供了 MCIM 中国 Mod 下载镜像源和帮助库图床！" Grid.Row="3" Grid.Column="1" />
+                    <local:MyListItem Title="Patrick" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="设计并制作了 PCL 图标，让我从做图标的水深火热中得到了解脱……" Grid.Row="4" Grid.Column="1" />
+                    <local:MyListItem Title="Hao_Tian" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="在内测中找出了一大堆没人想得到的诡异 Bug，有非同寻常的 Bug 体质" Grid.Row="5" Grid.Column="1" />
+                    <local:MyListItem Title="Pysio" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="提供了社区版的相关云服务" Grid.Row="6" Grid.Column="1" />
+                    <local:MyButton x:Name="BtnAboutPysio" Text="转到博客" Grid.Row="6" Grid.Column="2" Height="35" />
+                    <local:MyListItem Title="Minecraft 中文论坛" Margin="-5,0,15,0" IsHitTestVisible="False" Info="虽然已经关站了，但感谢此前提供了 MCBBS 镜像源……" Grid.Row="7" Grid.Column="1" />
+                    <local:MyListItem Title="PCL 内群的各位" Margin="-5,0,0,0" IsHitTestVisible="False" Grid.ColumnSpan="2" Info="感谢内群的沙雕网友们这么久以来对我和 PCL 的支持与鼓励！" Grid.Row="8" Grid.Column="1" />
                     <Image Source="/Plain Craft Launcher 2;component/Images/Heads/bangbang93.png" Grid.Row="0" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
@@ -90,12 +97,17 @@
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
-                    <Image Source="/Plain Craft Launcher 2;component/Images/Heads/MCBBS.png" Grid.Row="6" Margin="3">
+                    <Image Source="/Plain Craft Launcher 2;component/Images/Heads/Pysio.jpg" Grid.Row="6" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
                     </Image>
-                    <Image Source="/Plain Craft Launcher 2;component/Images/Heads/PCL2.png" Grid.Row="7" Margin="3">
+                    <Image Source="/Plain Craft Launcher 2;component/Images/Heads/MCBBS.png" Grid.Row="7" Margin="3">
+                        <Image.Clip>
+                            <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
+                        </Image.Clip>
+                    </Image>
+                    <Image Source="/Plain Craft Launcher 2;component/Images/Heads/PCL2.png" Grid.Row="8" Margin="3">
                         <Image.Clip>
                             <EllipseGeometry Center="17 17" RadiusX="17" RadiusY="17" />
                         </Image.Clip>
@@ -104,7 +116,7 @@
             </local:MyCard>
             <local:MyCard Margin="0,0,0,15" Title="{StaticResource LangPageOtherAboutSponsors}">
                 <StackPanel Margin="25,40,10,20">
-                    <TextBlock HorizontalAlignment="Left" Text="{StaticResource LangPageOtherAboutSponsorsSubtitle}" Margin="0,0,25,5.5" TextTrimming="None" TextWrapping="WrapWithOverflow" />
+                    <TextBlock HorizontalAlignment="Left" Text="以下是 2025 年 5 月的高级赞助者们！感谢各位对 PCL 和伟大的咕咕咕事业的支持！" Margin="0,0,25,5.5" TextTrimming="None" TextWrapping="WrapWithOverflow" />
                     <WrapPanel Margin="0,0,0,10">
                         <TextBlock Width="120" Margin="0,1.5" Text="Alliance" />
                         <TextBlock Width="120" Margin="0,1.5" Text="风之轻语" />
@@ -364,17 +376,6 @@
                         <TextBlock Width="120" Margin="0,1.5" Text="憨憨剑踏" />
                         <TextBlock Width="120" Margin="0,1.5" Text="SinceCN" />
                     </WrapPanel>
-                    <Grid Height="35">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
-                        </Grid.ColumnDefinitions>
-                        <local:MyButton x:Name="BtnDonateOutput" Grid.Column="0" MinWidth="140" Text="{StaticResource LangPageOtherAboutSponsorsCreateUnlockCode}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" ColorType="Highlight" Visibility="Collapsed" />
-                        <local:MyButton x:Name="BtnDonateDonate" Grid.Column="0" MinWidth="140" Text="{StaticResource LangPageOtherAboutSponsorsDonate}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" ColorType="Highlight" EventType="打开网页" EventData="https://afdian.com/a/LTCat" />
-                        <local:MyButton x:Name="BtnDonateCopy" Grid.Column="1" MinWidth="140" Text="{StaticResource LangPageOtherAboutSponsorsCopyUUID}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" />
-                        <local:MyButton x:Name="BtnDonateInput" Grid.Column="2" MinWidth="140" Text="{StaticResource LangPageOtherAboutSponsorsSetUnlockCode}" Padding="13,0" Margin="0,0,20,0" HorizontalAlignment="Left" />
-                    </Grid>
                 </StackPanel>
             </local:MyCard>
             <local:MyCard Margin="0,0,0,15" Title="{StaticResource LangPageOtherAboutLawInfo}" IsSwaped="True" CanSwap="True">
@@ -385,7 +386,8 @@
                     <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{StaticResource LangPageOtherAboutLawInfoOtherContent}" TextWrapping="Wrap" />
                     <StackPanel Orientation="Horizontal" Height="35" HorizontalAlignment="Left" Margin="0,12,0,0">
                         <local:MyButton Text="{StaticResource LangPageOtherAboutLawInfoAgreement}" Width="170" Padding="13,0" Margin="0,0,20,0" ColorType="Highlight" EventType="打开网页" EventData="https://shimo.im/docs/rGrd8pY8xWkt6ryW" />
-                        <local:MyButton Text="{StaticResource LangPageOtherAboutAboutVersionBtn}" Width="140" Padding="13,0" EventType="打开网页" EventData="https://github.com/Hex-Dragon/PCL2" />
+                        <local:MyButton Text="{StaticResource LangPageOtherAboutAboutVersionBtn}" Width="140" Padding="13,0" Margin="0,0,20,0" EventType="打开网页" EventData="https://github.com/Meloong-Git/PCL" />
+                        <local:MyButton Text="开源代码（社区版）" Width="140" Padding="13,0" EventType="打开网页" EventData="https://github.com/PCL-Community/PCL2-CE" />
                     </StackPanel>
                 </StackPanel>
             </local:MyCard>
@@ -413,6 +415,33 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="60" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Java Launch Wrapper" TextWrapping="Wrap" FontWeight="Bold" />
                     <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2022 00ll00&#xa;Licensed under the MIT License." TextWrapping="Wrap" />
@@ -461,6 +490,103 @@
                     <local:MyButton Grid.Row="13" Grid.Column="2" MinWidth="140" Text="{StaticResource LangPageOtherAboutLicenseWeb}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     EventType="打开网页" EventData="https://www.iconfont.cn/" />
 
+                    <TextBlock Grid.Row="14" Grid.Column="0" Text="Fody" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="14" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © Simon Cropp" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="15" Grid.Column="2" MinWidth="140" Text="查看原网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/Fody/Fody" />
+                    <local:MyButton Grid.Row="15" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    EventType="打开网页" EventData="https://github.com/Fody/Fody/blob/master/License.txt" />
+
+                    <TextBlock Grid.Row="16" Grid.Column="0" Text="Makaretu.Nat" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="16" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2018 Richard Schneider" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="17" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    EventType="打开网页" EventData="https://github.com/richardschneider/net-nat" />
+                    <local:MyButton Grid.Row="17" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                    EventType="打开网页" EventData="https://github.com/richardschneider/net-nat/blob/master/LICENSE" />
+
+                    <TextBlock Grid.Row="18" Grid.Column="0" Text="IPNetwork" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="18" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2015, lduchosal" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="19" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    EventType="打开网页" EventData="https://github.com/lduchosal/ipnetwork" />
+                    <local:MyButton Grid.Row="19" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                    EventType="打开网页" EventData="https://github.com/lduchosal/ipnetwork/blob/master/LICENSE" />
+
+                    <TextBlock Grid.Row="20" Grid.Column="0" Text="STUN" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="20" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2019 Moien007" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="21" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/moien007/stun" />
+                    <local:MyButton Grid.Row="21" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://github.com/moien007/STUN/blob/master/LICENSE" />
+
+                    <TextBlock Grid.Row="22" Grid.Column="0" Text="Open.NAT" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="22" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2006 Alan McGovern&#xa;Copyright © 2007 Ben Motmans&#xa;Copyright © 2014 Lucas Ontivero" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="23" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/lontivero/Open.NAT" />
+                    <local:MyButton Grid.Row="23" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://github.com/lontivero/Open.NAT/blob/master/LICENSE" />
+
+                    <TextBlock Grid.Row="24" Grid.Column="0" Text="TagLibSharp" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="24" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2006-2007 Brian Nickel.&#xa;Copyright © 2009-2020 Other contributors" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="25" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/mono/taglib-sharp" />
+                    <local:MyButton Grid.Row="25" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://github.com/mono/taglib-sharp/blob/main/COPYING" />
+
+                    <TextBlock Grid.Row="26" Grid.Column="0" Text="Microsoft.Identity.Client" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="26" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © Microsoft Corporation" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="27" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://go.microsoft.com/fwlink/?linkid=844761" />
+                    <local:MyButton Grid.Row="27" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://licenses.nuget.org/MIT" />
+
+                    <TextBlock Grid.Row="28" Grid.Column="0" Text="Microsoft.Identity.Client.Broker" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="28" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © Microsoft Corporation" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="29" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://go.microsoft.com/fwlink/?linkid=844761" />
+                    <local:MyButton Grid.Row="29" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://licenses.nuget.org/MIT" />
+
+                    <TextBlock Grid.Row="30" Grid.Column="0" Text="EntityFramework" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="30" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © Microsoft Corporation" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="31" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    EventType="打开网页" EventData="https://github.com/dotnet/efcore" />
+                    <local:MyButton Grid.Row="31" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    EventType="打开网页" EventData="https://licenses.nuget.org/Apache-2.0" />
+
+                    <TextBlock Grid.Row="32" Grid.Column="0" Text="PCL.Core" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="32" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © PCL Community" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="33" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/PCL-Community/PCL.Core" />
+                    <local:MyButton Grid.Row="33" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://github.com/PCL-Community/PCL.Core/blob/main/LICENCE" />
+
+                    <TextBlock Grid.Row="34" Grid.Column="0" Text="EleCho.WpfSuite" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="34" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © EleCho" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="35" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/OrgEleCho/EleCho.WpfSuite" />
+                    <local:MyButton Grid.Row="35" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://github.com/OrgEleCho/EleCho.WpfSuite/blob/master/LICENSE.txt" />
+
+                    <TextBlock Grid.Row="36" Grid.Column="0" Text="LiteDB" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="36" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2014-2022 Mauricio David" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="37" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/litedb-org/LiteDB" />
+                    <local:MyButton Grid.Row="37" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://github.com/litedb-org/LiteDB/blob/master/LICENSE" />
+
+                    <TextBlock Grid.Row="38" Grid.Column="0" Text="Markdig.Wpf" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="38" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2016-2021 Nicolas Musset" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="39" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/Kryptos-FR/markdig.wpf" />
+                    <local:MyButton Grid.Row="39" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://github.com/Kryptos-FR/markdig.wpf/blob/main/LICENSE.md" />
+
+                    <TextBlock Grid.Row="40" Grid.Column="0" Text="CacheCow" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="40" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2013 Ali Kheyrollahi" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="41" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                EventType="打开网页" EventData="https://github.com/aliostad/CacheCow" />
+                    <local:MyButton Grid.Row="41" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+EventType="打开网页" EventData="https://github.com/aliostad/CacheCow/blob/master/LICENSE.txt" />
                 </Grid>
             </local:MyCard>
         </StackPanel>

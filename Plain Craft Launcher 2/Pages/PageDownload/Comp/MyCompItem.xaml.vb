@@ -1,4 +1,4 @@
-﻿Public Class MyCompItem
+Public Class MyCompItem
 
 #Region "基础属性"
     Public Uuid As Integer = GetUuid()
@@ -113,27 +113,32 @@
         '打开详情页
         Dim TargetType As CompType
         Dim TargetVersion As String = Nothing
-        Dim TargetLoader As CompModLoaderType = CompModLoaderType.Any
+        Dim TargetLoader As CompLoaderType = CompLoaderType.Any
         If FrmMain.PageCurrent.Page = FormMain.PageType.Download Then
-            '从下载页进入
-            Select Case FrmMain.PageCurrentSub
-                Case FormMain.PageSubType.DownloadMod
-                    TargetType = CompType.Mod
-                    TargetVersion = FrmDownloadMod.Content.Loader.Input.GameVersion
-                    TargetLoader = FrmDownloadMod.Content.Loader.Input.ModLoader
-                Case FormMain.PageSubType.DownloadPack
-                    TargetType = CompType.ModPack
-                    TargetVersion = FrmDownloadPack.Content.Loader.Input.GameVersion
-                Case FormMain.PageSubType.DownloadDataPack
-                    TargetType = CompType.DataPack
-                    TargetVersion = FrmDownloadDataPack.Content.Loader.Input.GameVersion
-                Case FormMain.PageSubType.DownloadResourcePack
-                    TargetType = CompType.ResourcePack
-                    TargetVersion = FrmDownloadResourcePack.Content.Loader.Input.GameVersion
-                Case FormMain.PageSubType.DownloadShader
-                    TargetType = CompType.Shader
-                    TargetVersion = FrmDownloadShader.Content.Loader.Input.GameVersion
-            End Select
+            If FrmMain.PageCurrentSub = FormMain.PageSubType.DownloadCompFavorites Then
+                TargetVersion = ""
+                TargetLoader = CompLoaderType.Any
+            Else
+                '从下载页进入
+                Select Case FrmMain.PageCurrentSub
+                    Case FormMain.PageSubType.DownloadMod
+                        TargetType = CompType.Mod
+                        TargetVersion = FrmDownloadMod.Content.Loader.Input.GameVersion
+                        TargetLoader = FrmDownloadMod.Content.Loader.Input.ModLoader
+                    Case FormMain.PageSubType.DownloadPack
+                        TargetType = CompType.ModPack
+                        TargetVersion = FrmDownloadPack.Content.Loader.Input.GameVersion
+                    Case FormMain.PageSubType.DownloadDataPack
+                        TargetType = CompType.DataPack
+                        TargetVersion = FrmDownloadDataPack.Content.Loader.Input.GameVersion
+                    Case FormMain.PageSubType.DownloadResourcePack
+                        TargetType = CompType.ResourcePack
+                        TargetVersion = FrmDownloadResourcePack.Content.Loader.Input.GameVersion
+                    Case FormMain.PageSubType.DownloadShader
+                        TargetType = CompType.Shader
+                        TargetVersion = FrmDownloadShader.Content.Loader.Input.GameVersion
+                End Select
+            End If
         Else
             '从详情页进入（查看前置）
             TargetType = CompType.Any '允许任意类别
@@ -177,7 +182,7 @@
                 SetRowSpan(Rect, 999)
                 Children.Insert(0, Rect)
                 _RectBack = Rect
-                '<!--<Border x:Name = "RectBack" CornerRadius="3" RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True" 
+                '<!--<corelocal:BlurBorder x:Name = "RectBack" CornerRadius="3" RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True" 
                 'IsHitTestVisible = "False" Opacity="0" BorderThickness="1" 
                 'Grid.ColumnSpan = "4" Background="{DynamicResource ColorBrush7}" BorderBrush="{DynamicResource ColorBrush6}"/>-->
             End If

@@ -1,6 +1,6 @@
-﻿Imports System.Windows.Forms
+Imports System.Windows.Forms
 
-Public Class MyLocalModItem
+Public Class MyLocalCompItem
 
 #Region "基础属性"
     Public Uuid As Integer = GetUuid()
@@ -24,11 +24,11 @@ Public Class MyLocalModItem
         Set(value As String)
             Dim RawValue = value
             Select Case Entry.State
-                Case McMod.McModState.Fine
+                Case LocalCompFile.LocalFileStatus.Fine
                     LabTitle.TextDecorations = Nothing
-                Case McMod.McModState.Disabled
+                Case LocalCompFile.LocalFileStatus.Disabled
                     LabTitle.TextDecorations = TextDecorations.Strikethrough
-                Case McMod.McModState.Unavailable
+                Case LocalCompFile.LocalFileStatus.Unavailable
                     LabTitle.TextDecorations = TextDecorations.Strikethrough
                     value &= " [错误]"
             End Select
@@ -77,7 +77,7 @@ Public Class MyLocalModItem
                 }
                 Dim TagTextBlock As New TextBlock With {
                     .Text = TagText,
-                    .Foreground = New SolidColorBrush(Color.FromRgb(136, 136, 136)),
+                    .Foreground = New SolidColorBrush(If(IsDarkMode, Color.FromArgb(88, 255, 255, 255), Color.FromArgb(88, 136, 136, 136))),
                     .FontSize = 11
                 }
                 NewTag.Child = TagTextBlock
@@ -87,11 +87,11 @@ Public Class MyLocalModItem
     End Property
 
     '相关联的 Mod
-    Public Property Entry As McMod
+    Public Property Entry As LocalCompFile
         Get
             Return Tag
         End Get
-        Set(value As McMod)
+        Set(value As LocalCompFile)
             Tag = value
         End Set
     End Property
@@ -123,46 +123,53 @@ Public Class MyLocalModItem
     End Sub
 
     '滑动选中
-    Private Shared SwipeStart As Integer, SwipeEnd As Integer
-    Private Shared _Swiping As Boolean = False
-    Private Shared Property Swiping As Boolean
-        Get
-            Return _Swiping
-        End Get
-        Set(value As Boolean)
-            _Swiping = value
-            FrmVersionMod.CardSelect.IsHitTestVisible = Not value
-        End Set
-    End Property
-    Private Shared SwipToState As Boolean '被滑动到的目标应将 Checked 改为此值
+    Public Class SwipeSelect
+        Public Property Start As Integer
+        Public Property [End] As Integer
+        Private _Swiping As Boolean = False
+        Public Property Swiping As Boolean
+            Get
+                Return _Swiping
+            End Get
+            Set(value As Boolean)
+                _Swiping = value
+                TargetFrm.CardSelect.IsHitTestVisible = Not value
+            End Set
+        End Property
+        Public Property SwipeToState As Boolean
+        Public Property TargetFrm As PageVersionCompResource
+    End Class
+
+    Public Property CurrentSwipe As SwipeSelect
+
     Private Sub Button_MouseSwipeStart(sender As Object, e As Object) Handles Me.MouseLeftButtonDown
         If Parent Is Nothing Then Return 'Mod 可能已被删除（#3824）
         '开始滑动
         Dim Index = CType(Parent, StackPanel).Children.IndexOf(Me)
-        SwipeStart = Index
-        SwipeEnd = Index
-        Swiping = True
-        SwipToState = Not Checked
+        CurrentSwipe.Start = Index
+        CurrentSwipe.End = Index
+        CurrentSwipe.Swiping = True
+        CurrentSwipe.SwipeToState = Not Checked
     End Sub
     Private Sub Button_MouseSwipe(sender As Object, e As Object) Handles Me.MouseEnter, Me.MouseLeave, Me.MouseLeftButtonUp
         If Parent Is Nothing Then Return 'Mod 可能已被删除（#3824）
         '结束滑动
         If Mouse.LeftButton <> MouseButtonState.Pressed OrElse
-           TypeOf Mouse.DirectlyOver IsNot MyLocalModItem Then '#5771
-            Swiping = False
+           TypeOf Mouse.DirectlyOver IsNot MyLocalCompItem Then '#5771
+            CurrentSwipe.Swiping = False
             Return
         End If
         '计算滑动范围
         Dim Elements = CType(Parent, StackPanel).Children
         Dim Index As Integer = Elements.IndexOf(Me)
-        SwipeStart = MathClamp(Math.Min(SwipeStart, Index), 0, Elements.Count - 1)
-        SwipeEnd = MathClamp(Math.Max(SwipeEnd, Index), 0, Elements.Count - 1)
+        CurrentSwipe.Start = MathClamp(Math.Min(CurrentSwipe.Start, Index), 0, Elements.Count - 1)
+        CurrentSwipe.End = MathClamp(Math.Max(CurrentSwipe.End, Index), 0, Elements.Count - 1)
         '勾选所有范围中的项
-        If SwipeStart = SwipeEnd Then Return
-        For i = SwipeStart To SwipeEnd
-            Dim Item As MyLocalModItem = Elements(i)
+        If CurrentSwipe.Start = CurrentSwipe.End Then Return
+        For i = CurrentSwipe.Start To CurrentSwipe.End
+            Dim Item As MyLocalCompItem = Elements(i)
             Item.InitLate(Item, e)
-            Item.Checked = SwipToState
+            Item.Checked = CurrentSwipe.SwipeToState
         Next
     End Sub
 
@@ -204,7 +211,7 @@ Public Class MyLocalModItem
                         Anim.Add(AaOpacity(RectCheck, 1 - RectCheck.Opacity, 30))
                         RectCheck.VerticalAlignment = VerticalAlignment.Center
                         RectCheck.Margin = New Thickness(-3, 0, 0, 0)
-                        Anim.Add(AaColor(LabTitle, TextBlock.ForegroundProperty, If(Entry.State = McMod.McModState.Fine, "ColorBrush2", "ColorBrush5"), 200))
+                        Anim.Add(AaColor(LabTitle, TextBlock.ForegroundProperty, If(Entry.State = LocalCompFile.LocalFileStatus.Fine, "ColorBrush2", "ColorBrush5"), 200))
                     Else
                         '由有变无
                         Anim.Add(AaHeight(RectCheck, -RectCheck.ActualHeight, 120,, New AniEaseInFluent(AniEasePower.Weak)))
@@ -212,7 +219,7 @@ Public Class MyLocalModItem
                         RectCheck.VerticalAlignment = VerticalAlignment.Center
                         Anim.Add(AaColor(LabTitle, TextBlock.ForegroundProperty, If(LabTitle.TextDecorations Is Nothing, "ColorBrush1", "ColorBrushGray4"), 120))
                     End If
-                    AniStart(Anim, "MyLocalModItem Checked " & Uuid)
+                    AniStart(Anim, "MyLocalCompItem Checked " & Uuid)
                 Else
                     '不在窗口上时直接设置
                     RectCheck.VerticalAlignment = VerticalAlignment.Center
@@ -220,13 +227,13 @@ Public Class MyLocalModItem
                     If Checked Then
                         RectCheck.Height = 32
                         RectCheck.Opacity = 1
-                        LabTitle.SetResourceReference(TextBlock.ForegroundProperty, If(Entry.State = McMod.McModState.Fine, "ColorBrush2", "ColorBrush5"))
+                        LabTitle.SetResourceReference(TextBlock.ForegroundProperty, If(Entry.State = LocalCompFile.LocalFileStatus.Fine, "ColorBrush2", "ColorBrush5"))
                     Else
                         RectCheck.Height = 0
                         RectCheck.Opacity = 0
-                        LabTitle.SetResourceReference(TextBlock.ForegroundProperty, If(Entry.State = McMod.McModState.Fine, "ColorBrush1", "ColorBrushGray4"))
+                        LabTitle.SetResourceReference(TextBlock.ForegroundProperty, If(Entry.State = LocalCompFile.LocalFileStatus.Fine, "ColorBrush1", "ColorBrushGray4"))
                     End If
-                    AniStop("MyLocalModItem Checked " & Uuid)
+                    AniStop("MyLocalCompItem Checked " & Uuid)
                 End If
             Catch ex As Exception
                 Log(ex, "设置 Checked 失败")
@@ -263,7 +270,7 @@ Public Class MyLocalModItem
                 SetRowSpan(Rect, 999)
                 Children.Insert(0, Rect)
                 _RectBack = Rect
-                '<!--<Border x:Name = "RectBack" CornerRadius="3" RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True" 
+                '<!--<corelocal:BlurBorder x:Name = "RectBack" CornerRadius="3" RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True" 
                 'IsHitTestVisible = "False" Opacity="0" BorderThickness="1" 
                 'Grid.ColumnSpan = "4" Background="{DynamicResource ColorBrush7}" BorderBrush="{DynamicResource ColorBrush6}"/>-->
             End If
@@ -272,7 +279,7 @@ Public Class MyLocalModItem
     End Property
 
     '按钮
-    Public ButtonHandler As Action(Of MyLocalModItem, EventArgs)
+    Public ButtonHandler As Action(Of MyLocalCompItem, EventArgs)
     Public ButtonStack As FrameworkElement
     Private _Buttons As IEnumerable(Of MyIconButton)
     Public Property Buttons As IEnumerable(Of MyIconButton)
@@ -352,16 +359,25 @@ Public Class MyLocalModItem
             End If
             '标题与描述
             Dim DescFileName As String
-            Select Case Entry.State
-                Case McMod.McModState.Fine
-                    DescFileName = GetFileNameWithoutExtentionFromPath(Entry.Path)
-                Case McMod.McModState.Disabled
-                    DescFileName = GetFileNameWithoutExtentionFromPath(Entry.Path.Replace(".disabled", "").Replace(".old", ""))
-                Case Else 'McMod.McModState.Unavailable
-                    DescFileName = GetFileNameFromPath(Entry.Path)
-            End Select
+            If Entry.IsFolder Then
+                '文件夹项的特殊处理
+                DescFileName = Entry.Name
+            Else
+                Select Case Entry.State
+                    Case LocalCompFile.LocalFileStatus.Fine
+                        DescFileName = GetFileNameWithoutExtentionFromPath(Entry.Path)
+                    Case LocalCompFile.LocalFileStatus.Disabled
+                        DescFileName = GetFileNameWithoutExtentionFromPath(Entry.Path.Replace(".disabled", "").Replace(".old", ""))
+                    Case Else 'McMod.McModState.Unavailable
+                        DescFileName = GetFileNameFromPath(Entry.Path)
+                End Select
+            End If
             Dim NewDescription As String
-            If Setup.Get("ToolModLocalNameStyle") = 1 Then
+            If Entry.IsFolder Then
+                '文件夹项的特殊显示
+                Title = Entry.Name
+                NewDescription = Entry.Description
+            ElseIf Setup.Get("ToolModLocalNameStyle") = 1 Then
                 '标题显示文件名，详情显示译名
                 '标题
                 Title = DescFileName
@@ -398,14 +414,15 @@ Public Class MyLocalModItem
             End If
             Description = NewDescription
             If Checked Then
-                LabTitle.SetResourceReference(TextBlock.ForegroundProperty, If(Entry.State = McMod.McModState.Fine, "ColorBrush2", "ColorBrush5"))
+                LabTitle.SetResourceReference(TextBlock.ForegroundProperty, If(Entry.State = LocalCompFile.LocalFileStatus.Fine, "ColorBrush2", "ColorBrush5"))
             Else
-                LabTitle.SetResourceReference(TextBlock.ForegroundProperty, If(Entry.State = McMod.McModState.Fine, "ColorBrush1", "ColorBrushGray4"))
+                LabTitle.SetResourceReference(TextBlock.ForegroundProperty, If(Entry.State = LocalCompFile.LocalFileStatus.Fine, "ColorBrush1", "ColorBrushGray4"))
             End If
             '主 Logo
-            Logo = If(Entry.Comp Is Nothing, PathImage & "Icons/NoIcon.png", Entry.Comp.GetControlLogo())
+             Logo = Entry.GetLogo
+
             '图标右下角的 Logo
-            If Entry.State = McMod.McModState.Fine Then
+            If Entry.State = LocalCompFile.LocalFileStatus.Fine Then
                 If ImgState IsNot Nothing Then
                     Children.Remove(ImgState)
                     ImgState = Nothing
@@ -427,7 +444,12 @@ Public Class MyLocalModItem
                 ImgState.Source = New MyBitmap(PathImage & $"Icons/{Entry.State}.png")
             End If
             '标签
-            If Entry.Comp IsNot Nothing Then Tags = Entry.Comp.Tags
+            If Entry.IsFolder Then
+                ' 为文件夹添加标签
+                Tags = New List(Of String) From {"文件夹"}
+            ElseIf Entry.Comp IsNot Nothing Then
+                Tags = Entry.Comp.Tags
+            End If
         End Sub)
     End Sub
 
@@ -499,9 +521,13 @@ Public Class MyLocalModItem
 
     '触发更新
     Private Sub BtnUpdate_Click(sender As Object, e As EventArgs) Handles BtnUpdate.Click
-        Select Case MyMsgBox(GetLang("LangMyLocalModItemDialogContentUpdateConfirm", Entry.Name, GetUpdateCompareDescription()), GetLang("LangMyLocalModItemDialogTitleUpdateConfirm"), GetLang("LangMyLocalModItemDialogBtn1UpdateConfirm"), GetLang("LangMyLocalModItemDialogTitleOpenChangelog"),GetLang("LangDialogBtnCancel"))
+        Select Case MyMsgBox($"是否要更新 {Entry.Name}？{vbCrLf}{vbCrLf}{GetUpdateCompareDescription()}", "更新确认", "更新", "查看更新日志", "取消")
             Case 1 '更新
-                FrmVersionMod.UpdateMods({Entry})
+                Select Case Entry.Comp.Type
+                    Case CompType.Mod : FrmVersionMod.UpdateResource({Entry})
+                    Case CompType.ResourcePack : FrmVersionResourcePack.UpdateResource({Entry})
+                    Case CompType.Shader : FrmVersionShader.UpdateResource({Entry})
+                End Select
             Case 2 '查看更新日志
                 ShowUpdateLog()
             Case 3 '取消

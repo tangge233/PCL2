@@ -1,7 +1,7 @@
 name: "优化建议 | Optimizations & Suggestions"
 description: | 
-  对已有功能的小幅度优化或改进建议。
-  Minor optimizations or improvement suggestions for existing features.
+  对已有功能的小幅度优化或改进建议。请注意，建议不一定会被采纳，在提出建议前请仔细思考建议的合理性与可操作性。
+  Minor optimizations or improvement suggestions for existing features. Please note that suggestions may not be adopted, so carefully consider the reasonableness and feasibility of your suggestion before submitting.
 labels: [· 优化, 新提交]
 body:
 - type: checkboxes
@@ -13,15 +13,35 @@ body:
       Please review each of the following items individually and check to confirm.
     options:
     - label: |
-        我已在 [Issues 页面](https://github.com/Hex-Dragon/PCL2/issues?q=is%3Aissue+) 和 [常见&难检反馈及问题列表](https://github.com/Hex-Dragon/PCL2/discussions/1930) 中搜索，确认了这一建议未被提交过。
-        I have searched the [Issues page](https://github.com/Hex-Dragon/PCL2/issues?q=is%3Aissue+) and the [Common & Hard-to-Diagnose Feedback and Issue List](https://github.com/Hex-Dragon/PCL2/discussions/1930) to confirm that this suggestion has not been submitted before.
+        "我已在 [社区版 Issues 页面](https://github.com/PCL-Community/PCL2-CE/issues?q=is%3Aissue+) 中搜索，确认了这一建议未在社区版被提交过。
+        I have searched the [Issues page](https://github.com/PCL-Community/PCL2-CE/issues?q=is%3Aissue+) and the [Common & Hard-to-Diagnose Feedback and Issue List](https://github.com/Hex-Dragon/PCL2/discussions/1930) to confirm that this suggestion has not been submitted before.
       required: true
     - label: |
-        我已查看 [功能投票页面](https://github.com/Hex-Dragon/PCL2/discussions/categories/%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8/)，确认了这一建议未在投票列表中。
-        I have checked the [Feature Voting page](https://github.com/Hex-Dragon/PCL2/discussions/categories/%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8/), and confirmed that this suggestion is not on the voting list.
+        我仍想要提交，是因为我确认这个 Issue 是从官方版转交过来，或是希望由社区版处理的。
+        I still want to submit this because I confirm that this issue has been transferred from the official version or is intended to be handled by the community edition.
       required: true
-- type: textarea
+    - label: |
+        我已知悉社区不对这类 Issue 的完成时间作出任何保证，并有足够的耐心等待社区开发者的处理，同时已知悉如果我作出催促、质问或类似的举动，这个 Issue 可能会被直接关闭
+        I acknowledge that the community does not guarantee the completion time for this type of issue, and I have enough patience to wait for the community developers to address it. I also understand that if I make any demands, inquiries, or similar actions, this issue may be closed immediately.
+      required: true
+- type: input
   id: "yml-2"
+  attributes:
+    label: "官方版原 Issue 编号 Original Issue Number"
+    description: |
+      如果这个 Issue 是从官方版转交过来的，请将原 Issue 标题旁的**编号**输入到下方预设文本的`#`后，不要输入任何其他非数字字符。若不是，请清空下方输入框。
+      If this issue has been transferred from the official version, please enter the original issue number next to the title in the format `- Meloong-Git/PCL2#` without any other non-numeric characters. If it is not, please clear the input box below.
+    value: "- Meloong-Git/PCL2#"
+- type: textarea
+  id: "yml-3"
+  attributes:
+    label: "官方版原 Issue 编号 Original Issue Number"
+    description: |
+      如果这个 Issue 是从官方版转交过来的，请将原 Issue 标题旁的**编号**输入到下方预设文本的`#`后，不要输入任何其他非数字字符。若不是，请清空下方输入框。
+      If this issue has been transferred from the official version, please enter the original issue number next to the title in the format `- Meloong-Git/PCL2#` without any other non-numeric characters. If it is not, please clear the input box below.
+    value: "- Meloong-Git/PCL2#"
+- type: textarea
+  id: "yml-3"
   attributes:
     label: 描述 Description
     description: |
@@ -30,7 +50,7 @@ body:
   validations:
     required: true
 - type: textarea
-  id: "yml-3"
+  id: "yml-4"
   attributes:
     label: 原因 Reason
     description: |

@@ -39,8 +39,8 @@ Public Class PageComp
         Set(Value As String)
             If _TypeNameSpaced = Value Then Return
             _TypeNameSpaced = Value
-            PanAlways.Title = GetLang("LangDownloadCompSearchTitle", Value)
-            Load.Text = GetLang("LangDownloadCompGettingList", Value)
+            PanSearchBox.HintText = $"搜索{Value} 在输入框中按下 Enter 以进行搜索"
+            Load.Text = $"正在获取{Value}列表"
         End Set
     End Property
     Private _TypeNameSpaced As String = ""
@@ -108,11 +108,19 @@ Public Class PageComp
         Dim Request As New CompProjectRequest(PageType, Storage, (Page + 1) * PageSize)
         Dim GameVersion As String = If(TextSearchVersion.Text = GetLang("LangDownloadCompSearchVersionAll"), Nothing,
                 If(TextSearchVersion.Text.Contains(".") OrElse TextSearchVersion.Text.Contains("w"), TextSearchVersion.Text, Nothing))
+        Dim ModLoader As CompLoaderType = CompLoaderType.Any
+        If PageType = CompType.Mod Then '只有 Mod 考虑加载器
+            ModLoader = Val(ComboSearchLoader.SelectedItem.Tag)
+            If GameVersion IsNot Nothing AndAlso GameVersion.Contains(".") AndAlso Val(GameVersion.Split(".")(1)) < 14 AndAlso '1.14-
+                ModLoader = CompLoaderType.Forge Then '选择了 Forge
+                ModLoader = CompLoaderType.Any '此时，视作没有筛选 Mod Loader（因为部分老 Mod 没有设置自己支持的加载器）
+            End If
+        End If
         With Request
-            .SearchText = TextSearchName.Text
+            .SearchText = PanSearchBox.Text
             .GameVersion = GameVersion
             .Tag = ComboSearchTag.SelectedItem.Tag
-            .ModLoader = If(PageType = CompType.Mod, Val(ComboSearchLoader.SelectedItem.Tag), CompModLoaderType.Any)
+            .ModLoader = If(PageType = CompType.Mod, Val(ComboSearchLoader.SelectedItem.Tag), CompLoaderType.Any)
             .Source = CType(Val(ComboSearchSource.SelectedItem.Tag), CompSourceType)
         End With
         Return Request
@@ -136,7 +144,7 @@ Public Class PageComp
             For i = Math.Min(Page * PageSize, Storage.Results.Count - 1) To Math.Min((Page + 1) * PageSize - 1, Storage.Results.Count - 1)
                 PanProjects.Children.Add(Storage.Results(i).ToCompItem(
                     ShowMcVersionDesc:=Loader.Input.GameVersion Is Nothing,
-                    ShowLoaderDesc:=Loader.Input.ModLoader = CompModLoaderType.Any AndAlso (PageType = CompType.Mod OrElse PageType = CompType.ModPack)))
+                    ShowLoaderDesc:=Loader.Input.ModLoader = CompLoaderType.Any AndAlso (PageType = CompType.Mod OrElse PageType = CompType.ModPack)))
             Next
             '页码
             CardPages.Visibility = If(Storage.Results.Count > 40 OrElse
@@ -205,18 +213,18 @@ Public Class PageComp
 #Region "搜索"
 
     '搜索按钮
-    Private Sub StartNewSearch() Handles BtnSearchRun.Click
+    Private Sub StartNewSearch()
         Page = 0
         If Loader.ShouldStart(LoaderInput()) Then Storage = New CompProjectStorage '避免连续搜索两次使得 CompProjectStorage 引用丢失（#1311）
         Loader.Start()
     End Sub
-    Private Sub EnterTrigger(sender As Object, e As KeyEventArgs) Handles TextSearchName.KeyDown, TextSearchVersion.KeyDown
+    Private Sub EnterTrigger(sender As Object, e As KeyEventArgs) Handles PanSearchBox.KeyDown, TextSearchVersion.KeyDown
         If e.Key = Key.Enter Then StartNewSearch()
     End Sub
 
     '重置按钮
     Private Sub ResetFilter() Handles BtnSearchReset.Click
-        TextSearchName.Text = ""
+        PanSearchBox.Text = ""
         TextSearchVersion.Text = GetLang("LangDownloadCompSearchVersionAll")
         TextSearchVersion.SelectedIndex = 0
         ComboSearchSource.SelectedIndex = 0

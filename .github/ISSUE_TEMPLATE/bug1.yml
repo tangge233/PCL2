@@ -2,7 +2,7 @@ name: "Minecraft 崩溃 | Minecraft Crashed"
 description: | 
   PCL 提示 “Minecraft 出现错误”，或游戏崩溃。
   PCL hinted \"Minecraft Crashed\" or the game crashed.
-labels: [· Bug, 新提交]
+type: "崩溃"
 body:
 - type: checkboxes
   id: "yml-1"
@@ -21,8 +21,12 @@ body:
         **I have tried launching the game with other launchers, and no issues occurred.** If other launchers also fail to launch, it is not a problem caused by PCL, please **DO NOT** submit feedback. [Download HMCL](https://hmcl.huangyuhui.net/download)
       required: true
     - label: |
-        我已在 [Issues 页面](https://github.com/Hex-Dragon/PCL2/issues?q=is%3Aissue+) 和 [常见&难检反馈及问题列表](https://github.com/Hex-Dragon/PCL2/discussions/1930) 中搜索，确认了这一 Bug 未被提交过。
-        I have searched the [Issues page](https://github.com/Hex-Dragon/PCL2/issues?q=is%3Aissue+) and the [Common & Hard-to-Diagnose Feedback and Issue List](https://github.com/Hex-Dragon/PCL2/discussions/1930) to confirm that this bug has not been submitted before.
+        我已在 [Issues 页面](https://github.com/PCL-Community/PCL2-CE/issues?q=is%3Aissue+) 中搜索，确认了这一 Bug 未被提交过。
+        I have searched the [Issues page](https://github.com/PCL-Community/PCL2-CE/issues?q=is%3Aissue+) to confirm that this bug has not been submitted before.
+      required: true
+    - label: |
+        我确认正在使用的启动器版本为 Fast Ring 通道的最新版。（最新版获取方式：启动器 `设置-其他-系统` 切换至 Fast Ring 通道并单击“检查更新”，或在 [Releases](https://github.com/PCL-Community/PCL2-CE/releases) 页面的最顶部直接下载）
+        I have comfirmed that I am using the latest version of the launcher from the Fast Ring channel. (To get the latest version: switch to the Fast Ring channel in the launcher `Settings - Other - System` and click "Check for Updates", or download directly from the top of the [Releases](https://github.com/PCL-Community/PCL2-CE/releases) page)
       required: true
 - type: textarea
   id: "yml-2"
@@ -38,8 +42,8 @@ body:
   attributes:
     label: PCL 错误报告、日志与附件 Crash Reports & Logs & Attachments
     description: |
-      上传 PCL 提供的错误报告（在崩溃时选择导出错误报告）。如果没有，也可以上传 PCL 文件夹中的 Log1~5.txt。
-      Upload the crash report provided by PCL (select \"Export Crash Report\" when the crash occurs). If it is not available, you can also upload the Log1~5.txt files from the PCL folder.
+      上传 PCL 提供的错误报告（在崩溃时选择导出错误报告）。如果没有，也可以上传启动器同目录下的 PCL/Log 文件夹中的按照日期排序最新的日志文件。
+      Upload the crash report provided by PCL (select \"Export Crash Report\" when the crash occurs). If it is not available, you can also upload the log file from the PCL/Log folder in the same directory as the launcher, sorted by date.
     placeholder: |
       先点击这个文本框，然后再将文件直接拖拽到文本框中以上传。
       Click on this text box first, then drag and drop the file directly into the text box to upload.
