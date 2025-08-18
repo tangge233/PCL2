@@ -931,7 +931,8 @@
     <s:String x:Key="LangPageSetupLaunchLaunchMemMemForGame">游戏分配</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptions">高级启动选项</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMHead">Java 虚拟机参数</s:String>
-    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMHeadTops">启动 Minecraft 时使用的额外 JVM 参数，除非有确定把握，否则请不要修改</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMHeadTops">启动 Minecraft 时使用的额外 JVM 参数，除非有确定把握，否则请不要修改。
+支持 Minecraft 版本 JSON 中的字符串替换标记，例如 ${library_directory}。</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMHeadReset">还原</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMTail">游戏参数</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsJVMTailTip">文本框中的内容将会被直接拼合在启动参数的末尾。
