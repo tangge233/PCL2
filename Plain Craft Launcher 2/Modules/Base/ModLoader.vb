@@ -290,11 +290,12 @@
             '检验输入以确定情况
             If IsForceRestart Then Return True '强制要求重启
             If ((Input Is Nothing) <> (Me.Input Is Nothing)) OrElse (Input IsNot Nothing AndAlso Not Input.Equals(Me.Input)) Then Return True '输入不同
-            If (State = LoadState.Loading OrElse State = LoadState.Finished) AndAlso '正在加载或已结束
-               (IgnoreReloadTimeout OrElse ReloadTimeout = -1 OrElse LastFinishedTime = 0 OrElse GetTimeTick() - LastFinishedTime < ReloadTimeout) Then '没有超时
-                Return False '则不重试
+            If (State = LoadState.Loading OrElse State = LoadState.Finished) AndAlso '正在加载或已结束…
+               (IgnoreReloadTimeout OrElse ReloadTimeout = -1 OrElse
+               LastFinishedTime = 0 OrElse GetTimeTick() - LastFinishedTime < ReloadTimeout) Then '…且没有超时…
+                Return False '…则不重试
             Else
-                Return True '需要开始
+                Return True '否则需要重启
             End If
         End Function
         Public Overrides Sub Start(Optional Input As Object = Nothing, Optional IsForceRestart As Boolean = False)

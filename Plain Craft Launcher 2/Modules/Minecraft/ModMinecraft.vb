@@ -86,7 +86,7 @@ Public Module ModMinecraft
                     Next
                     If Not Renamed Then CacheMcFolderList.Add(New McFolder With {.Name = Name, .Path = Path, .Type = McFolderType.Custom})
                 Catch ex As Exception
-                    MyMsgBox("失效的 Minecraft 文件夹：" & vbCrLf & Path & vbCrLf & vbCrLf & GetExceptionSummary(ex), "Minecraft 文件夹失效", IsWarn:=True)
+                    MyMsgBox("失效的 Minecraft 文件夹：" & vbCrLf & Path & vbCrLf & vbCrLf & ex.GetBrief(), "Minecraft 文件夹失效", IsWarn:=True)
                     Log(ex, $"无法访问 Minecraft 文件夹 {Path}")
                 End Try
             Next
@@ -695,7 +695,7 @@ Recheck:
             Catch ex As Exception
                 Log(ex, "依赖版本检查出错（" & Name & "）")
                 State = McVersionState.Error
-                Info = "未知错误：" & GetExceptionSummary(ex)
+                Info = "未知错误：" & ex.GetBrief()
                 Return False
             End Try
 
@@ -808,7 +808,7 @@ ExitDataLoad:
                     WriteIni(Path & "PCL\Setup.ini", "VersionOriginalSub", Version.McCodeSub)
                 End If
             Catch ex As Exception
-                Info = "未知错误：" & GetExceptionSummary(ex)
+                Info = "未知错误：" & ex.GetBrief()
                 Logo = PathImage & "Blocks/RedstoneBlock.png"
                 State = McVersionState.Error
                 Log(ex, "加载版本失败（" & Name & "）", LogLevel.Feedback)
@@ -1186,6 +1186,7 @@ OnLoaded:
             If Setup.Get("SystemDebugDelay") Then Thread.Sleep(RandomInteger(200, 3000))
         Catch ex As ThreadInterruptedException
         Catch ex As Exception
+            If Loader.IsAborted Then Return '#5617
             WriteIni(Path & "PCL.ini", "VersionCache", "") '要求下次重新加载
             Log(ex, "加载 .minecraft 版本列表失败", LogLevel.Feedback)
         End Try
@@ -1592,11 +1593,11 @@ OnLoaded:
     ''' <summary>
     ''' 获取 Uuid 对应的皮肤文件地址，失败将抛出异常。
     ''' </summary>
-    Public Function McSkinGetAddress(Uuid As String, Type As String) As String
-        If Uuid = "" Then Throw New Exception("Uuid 为空。")
-        If Uuid.StartsWithF("00000") Then Throw New Exception("离线 Uuid 无正版皮肤文件。")
+    Public Function McSkinGetAddress(UUID As String, Type As String) As String
+        If UUID = "" Then Throw New Exception("UUID 为空。")
+        If UUID.StartsWithF("00000") AndAlso Type <> "Auth" Then Throw New Exception("离线 UUID 无正版皮肤文件：" & UUID)
         '尝试读取缓存
-        Dim CacheSkinAddress As String = ReadIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", Uuid)
+        Dim CacheSkinAddress As String = ReadIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", UUID)
         If Not CacheSkinAddress = "" Then Return CacheSkinAddress
         '获取皮肤地址
         Dim Url As String
@@ -1610,7 +1611,7 @@ OnLoaded:
             Case Else
                 Throw New ArgumentException("皮肤地址种类无效：" & If(Type, "null"))
         End Select
-        Dim SkinString = NetRequestByClientRetry(Url & Uuid)
+        Dim SkinString = NetRequestByClientRetry(Url & UUID, RequireJson:=True)
         If SkinString = "" Then Throw New Exception("皮肤返回值为空，可能是未设置自定义皮肤的用户")
         '处理皮肤地址
         Dim SkinValue As String
@@ -1635,8 +1636,8 @@ OnLoaded:
             SkinValue = If(SkinUrl.Contains("minecraft.net/"), SkinUrl.Replace("http://", "https://"), SkinUrl)
         End If
         '保存缓存
-        WriteIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", Uuid, SkinValue)
-        Log("[Skin] UUID " & Uuid & " 对应的皮肤文件为 " & SkinValue)
+        WriteIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", UUID, SkinValue)
+        Log("[Skin] UUID " & UUID & " 对应的皮肤文件为 " & SkinValue)
         Return SkinValue
     End Function
 
@@ -1966,7 +1967,7 @@ OnLoaded:
             Try
                 Log("[Minecraft] 开始获取统一通行证下载信息")
                 '测试链接：https://auth.mc-user.com:233/00000000000000000000000000000000/
-                DownloadInfo = GetJson(NetRequestByClientRetry("https://auth.mc-user.com:233/" & Setup.Get("VersionServerNide", Version:=Version)))
+                DownloadInfo = GetJson(NetRequestByClientRetry("https://auth.mc-user.com:233/" & Setup.Get("VersionServerNide", Version:=Version), RequireJson:=True))
             Catch ex As Exception
                 Log(ex, "获取统一通行证下载信息失败")
             End Try
@@ -1983,16 +1984,20 @@ OnLoaded:
 
         'Authlib-Injector 文件
         If Setup.Get("VersionServerLogin", Version:=Version) = 4 Then
-            Dim TargetFile = PathPure & "\authlib-injector.jar"
+            Dim TargetFile = PathPure & "authlib-injector.jar"
             Dim DownloadInfo As JObject = Nothing
             '获取下载信息
             Try
                 Log("[Minecraft] 开始获取 Authlib-Injector 下载信息")
                 DownloadInfo = GetJson(NetRequestByClientRetry(
                         "https://authlib-injector.yushi.moe/artifact/latest.json",
-                        BackupUrl:="https://bmclapi2.bangbang93.com/mirrors/authlib-injector/artifact/latest.json"))
+                        BackupUrl:="https://bmclapi2.bangbang93.com/mirrors/authlib-injector/artifact/latest.json", RequireJson:=True))
             Catch ex As Exception
-                Log(ex, "获取 Authlib-Injector 下载信息失败")
+                If File.Exists(TargetFile) Then
+                    Log(ex, "获取 Authlib-Injector 下载信息失败")
+                Else
+                    Throw New Exception("获取 Authlib-Injector 下载信息失败", ex)
+                End If
             End Try
             '校验文件
             If DownloadInfo IsNot Nothing Then
@@ -2415,7 +2420,12 @@ NextEntry:
     Public Function FilterUserName(Raw As String, FilterChar As Char) As String
         If Raw.Contains(":\Users\") Then
             For Each Token In RegexSearch(Raw, "(?<=:\\Users\\)[^\\]+")
-                Raw = Raw.Replace("\" & Token, "\" & New String(FilterChar, Token.Count))
+                Raw = Raw.Replace("\Users\" & Token, "\Users\" & New String(FilterChar, Token.Count))
+            Next
+        End If
+        If Raw.Contains(":/Users/") Then
+            For Each Token In RegexSearch(Raw, "(?<=:/Users/)[^/]+")
+                Raw = Raw.Replace("/Users/" & Token, "/Users/" & New String(FilterChar, Token.Count))
             Next
         End If
         Return Raw

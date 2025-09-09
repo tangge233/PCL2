@@ -13,13 +13,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.10.6" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.10.6." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.10.7" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.10.7." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
     Public Const VersionCode As Integer = 367 'Release
 #Else
-    Public Const VersionCode As Integer = 366 'Snapshot
+    Public Const VersionCode As Integer = 368 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -1283,7 +1283,7 @@ Re:
                 Return Nothing
             Catch ex As Exception
                 Log(ex, "检查文件出错")
-                Return GetExceptionSummary(ex)
+                Return ex.GetBrief()
             End Try
         End Function
     End Class
@@ -1329,6 +1329,14 @@ Re:
     ''' </summary>
     Public Function DeleteDirectory(Path As String, Optional IgnoreIssue As Boolean = False) As Integer
         If Not Directory.Exists(Path) Then Return 0
+        If Not Path.EndsWithF("\") Then Path &= "\"
+        If Path.EndsWith(":\") OrElse
+           Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) & "\" OrElse
+           Path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) & "\" OrElse
+           Path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & "\" Then '#7030
+            Throw New UnauthorizedAccessException("这是重要的系统文件夹，无法删除：" & Path)
+        End If
+        '实际删除
         Dim DeletedCount As Integer = 0
         Dim Files As String()
         Try
@@ -1364,6 +1372,7 @@ RetryFile:
 RetryDir:
         Try
             Directory.Delete(Path, True)
+        Catch ex As DirectoryNotFoundException
         Catch ex As Exception
             If Not RetriedDir AndAlso Not RunInUi() Then
                 RetriedDir = True
@@ -1420,10 +1429,10 @@ RetryDir:
     Public vbRQ As Char = Convert.ToChar(8221)
 
     ''' <summary>
-    ''' 提取 Exception 的具体描述与堆栈。
+    ''' 提取 Exception 与 Inner Exception 的详细描述与堆栈信息。返回内容总是多于一行。
     ''' </summary>
     ''' <param name="ShowAllStacks">是否必须显示所有堆栈。通常用于判定堆栈信息。</param>
-    Public Function GetExceptionDetail(Ex As Exception, Optional ShowAllStacks As Boolean = False) As String
+    <Extension> Public Function GetDetail(Ex As Exception, Optional ShowAllStacks As Boolean = False) As String
         If Ex Is Nothing Then Return "无可用错误信息！"
 
         '获取最底层的异常
@@ -1450,17 +1459,17 @@ RetryDir:
         Loop
 
         '构造输出信息
-        Dim CommonReason As String = AnalyzeCommonReason(InnerEx, DescList)
-        If CommonReason Is Nothing Then
+        Dim UsualReason As String = AnalyzeUsualReason(InnerEx, Ex, DescList)
+        If UsualReason Is Nothing Then
             Return DescList.Join(vbCrLf)
         Else
-            Return CommonReason & vbCrLf & vbCrLf & "————————————" & vbCrLf & "详细错误信息：" & vbCrLf & DescList.Join(vbCrLf)
+            Return UsualReason & vbCrLf & vbCrLf & "————————————" & vbCrLf & "详细错误信息：" & vbCrLf & DescList.Join(vbCrLf)
         End If
     End Function
     ''' <summary>
-    ''' 提取 Exception 描述，汇总到一行。
+    ''' 提取 Exception 与 Inner Exception 的描述，汇总到一行。
     ''' </summary>
-    Public Function GetExceptionSummary(Ex As Exception) As String
+    <Extension> Public Function GetBrief(Ex As Exception) As String
         If Ex Is Nothing Then Return "无可用错误信息！"
 
         '获取最底层的异常
@@ -1479,28 +1488,27 @@ RetryDir:
         Dim Desc As String = Join(DescList, vbCrLf & "→ ")
 
         '构造输出信息
-        Dim CommonReason As String = AnalyzeCommonReason(InnerEx, DescList)
-        If CommonReason IsNot Nothing Then
-            Return CommonReason & "详细错误：" & DescList.First
+        Dim UsualReason As String = AnalyzeUsualReason(InnerEx, Ex, DescList)
+        If UsualReason IsNot Nothing Then
+            Return UsualReason & "详细错误：" & DescList.First
         Else
             DescList.Reverse() '让最深层错误在最左边
             Return Join(DescList, " ← ")
         End If
     End Function
-    Private Function AnalyzeCommonReason(InnerEx As Exception, DescList As List(Of String)) As String
+    Private Function AnalyzeUsualReason(InnerEx As Exception, OuterEx As Exception, DescList As List(Of String)) As String
         If TypeOf InnerEx Is TypeLoadException OrElse TypeOf InnerEx Is BadImageFormatException OrElse TypeOf InnerEx Is MissingMethodException OrElse TypeOf InnerEx Is NotImplementedException OrElse TypeOf InnerEx Is TypeInitializationException Then
             Return "PCL 的运行环境存在问题。请尝试重新安装 .NET Framework 4.6.2 然后再试。若无法安装，请先卸载较新版本的 .NET Framework，然后再尝试安装。"
         ElseIf TypeOf InnerEx Is UnauthorizedAccessException Then
-            Return "PCL 的权限不足。请尝试右键 PCL，选择以管理员身份运行。"
+            Return "PCL 的权限不足。请尝试右键 PCL 选择以管理员身份运行，或将目标从 C 盘或桌面挪到其他硬盘。"
         ElseIf TypeOf InnerEx Is OutOfMemoryException Then
             Return "你的电脑运行内存不足，导致 PCL 无法继续运行。请在关闭一部分不需要的程序后再试。"
         ElseIf TypeOf InnerEx Is Runtime.InteropServices.COMException Then
             Return "由于操作系统或显卡存在问题，导致出现错误。请尝试重启 PCL。"
         ElseIf TypeOf InnerEx Is SocketException AndAlso DescList.Any(Function(l) l.Contains("WSAStartup")) Then
             Return "请尝试卸载中国移动云盘，然后再试。"
-        ElseIf {"远程主机强迫关闭了", "远程方已关闭传输流", "未能解析此远程名称", "由于目标计算机积极拒绝",
-                "操作已超时", "操作超时", "服务器超时", "连接超时"}.Any(Function(s) DescList.Any(Function(l) l.Contains(s))) Then
-            Return "你的网络环境不佳，导致难以连接到服务器。请稍后重试，或使用 VPN 以改善网络环境。"
+        ElseIf OuterEx.IsNetworkRelated() Then
+            Return "你的网络环境不佳，请稍后再试，或使用 VPN 改善网络环境。"
         Else
             Return Nothing
         End If
@@ -2981,10 +2989,10 @@ Retry:
         If TypeOf Ex Is ThreadInterruptedException Then Return
 
         '获取错误信息
-        Dim ExFull As String = Desc & "：" & GetExceptionDetail(Ex)
+        Dim ExFull As String = $"{Desc}：{Ex.GetDetail()}"
 
         '输出日志
-        Dim AppendText As String = $"[{GetTimeNow()}] <{If(Thread.CurrentThread.Name = "", "主线程", Thread.CurrentThread.Name)}> {Desc}：{GetExceptionDetail(Ex, True)}{vbCrLf}" '减轻同步锁占用
+        Dim AppendText As String = $"[{GetTimeNow()}] <{If(Thread.CurrentThread.Name = "", "主线程", Thread.CurrentThread.Name)}> {Desc}：{Ex.GetDetail(True)}{vbCrLf}" '减轻同步锁占用
         If ModeDebug Then
             SyncLock LogListLock
                 LogList.Append(AppendText)
@@ -3002,19 +3010,19 @@ Retry:
             Case LogLevel.Normal
 #If DEBUG Then
             Case LogLevel.Developer
-                Dim ExLine As String = Desc & "：" & GetExceptionSummary(Ex)
+                Dim ExLine As String = Desc & "：" & Ex.GetBrief()
                 Hint("[开发者模式] " & ExLine, HintType.Info, False)
             Case LogLevel.Debug
-                Dim ExLine As String = Desc & "：" & GetExceptionSummary(Ex)
+                Dim ExLine As String = Desc & "：" & Ex.GetBrief()
                 Hint("[调试模式] " & ExLine, HintType.Info, False)
 #Else
             Case LogLevel.Developer
             Case LogLevel.Debug
-                Dim ExLine As String = Desc & "：" & GetExceptionSummary(Ex)
+                Dim ExLine As String = Desc & "：" & Ex.GetBrief()
                 If ModeDebug Then Hint("[调试模式] " & ExLine, HintType.Info, False)
 #End If
             Case LogLevel.Hint
-                Dim ExLine As String = Desc & "：" & GetExceptionSummary(Ex)
+                Dim ExLine As String = Desc & "：" & Ex.GetBrief()
                 Hint(ExLine, HintType.Critical, False)
             Case LogLevel.Msgbox
                 MyMsgBox(ExFull, Title, IsWarn:=True)
@@ -3093,8 +3101,8 @@ Retry:
                     Url &= "&" & WebUtility.UrlEncode(Datas(i)) & "=" & WebUtility.UrlEncode(Datas(i + 1).Replace(vbCrLf, vbLf))
                 Next
                 NetRequestByClient(Url, MakeLog:=False)
-            Catch
-                Log("[System] 匿名数据上报失败", LogLevel.Debug)
+            Catch ex As Exception
+                Log(ex, "匿名数据上报失败")
             End Try
         End Sub, "Telemetry", ThreadPriority.Lowest)
     End Sub

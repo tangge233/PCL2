@@ -449,7 +449,7 @@ pause"
         '开始启动
         SyncLock InstallSyncLock
             Dim Info = New ProcessStartInfo With {
-                .FileName = Java.PathJavaw,
+                .FileName = Java.PathJava,
                 .Arguments = Arguments,
                 .UseShellExecute = False,
                 .CreateNoWindow = True,
@@ -571,7 +571,7 @@ pause"
             Dim PageData As String
             Try
                 PageData = NetRequestByClient("https://optifine.net/adloadx?f=" & DownloadInfo.NameFile,
-                    Encoding:=New UTF8Encoding(False), Timeout:=15000, Accept:="text/html", UseBrowserUserAgent:=True)
+                    Encoding:=New UTF8Encoding(False), Timeout:=15000, Accept:="text/html", SimulateBrowserHeaders:=True)
                 Task.Progress = 0.8
                 Sources.Add("https://optifine.net/" & RegexSearch(PageData, "downloadx\?f=[^""']+")(0))
                 Log("[Download] OptiFine " & DownloadInfo.NameDisplay & " 官方下载地址：" & Sources.Last)
@@ -735,7 +735,7 @@ Retry:
             Dim PageData As String
             Try
                 PageData = NetRequestByClient("https://optifine.net/adloadx?f=" & DownloadInfo.NameFile,
-                    Encoding:=New UTF8Encoding(False), Timeout:=15000, Accept:="text/html", UseBrowserUserAgent:=True)
+                    Encoding:=New UTF8Encoding(False), Timeout:=15000, Accept:="text/html", SimulateBrowserHeaders:=True)
                 Task.Progress = 0.8
                 Sources.Add("https://optifine.net/" & RegexSearch(PageData, "downloadx\?f=[^""']+")(0))
                 Log("[Download] OptiFine " & DownloadInfo.NameDisplay & " 官方下载地址：" & Sources.Last)
@@ -1120,7 +1120,7 @@ Retry:
         '开始启动
         SyncLock InstallSyncLock
             Dim Info = New ProcessStartInfo With {
-                .FileName = Java.PathJavaw,
+                .FileName = Java.PathJava,
                 .Arguments = Arguments,
                 .UseShellExecute = False,
                 .CreateNoWindow = True,
@@ -1647,7 +1647,7 @@ Retry:
         Sub()
             Try
                 Log("[Download] 刷新 Forge 推荐版本缓存开始")
-                Dim Result As String = NetRequestByClientRetry("https://bmclapi2.bangbang93.com/forge/promos")
+                Dim Result As String = NetRequestByClientRetry("https://bmclapi2.bangbang93.com/forge/promos", RequireJson:=True)
                 If Result.Length < 1000 Then Throw New Exception("获取的结果过短（" & Result & "）")
                 Dim ResultJson As JContainer = GetJson(Result)
                 '获取所有推荐版本列表
@@ -1991,7 +1991,7 @@ Retry:
             Case LoadState.Finished
                 Hint(Loader.Name & "成功！", HintType.Finish)
             Case LoadState.Failed
-                Hint(Loader.Name & "失败：" & GetExceptionSummary(Loader.Error), HintType.Critical)
+                Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Critical)
             Case LoadState.Aborted
                 Hint(Loader.Name & "已取消！", HintType.Info)
         End Select
@@ -2005,7 +2005,7 @@ Retry:
                 WriteIni(PathMcFolder & "PCL.ini", "VersionCache", "") '清空缓存（合并安装会先生成文件夹，这会在刷新时误判为可以使用缓存）
                 Hint(Loader.Name & "成功！", HintType.Finish)
             Case LoadState.Failed
-                Hint(Loader.Name & "失败：" & GetExceptionSummary(Loader.Error), HintType.Critical)
+                Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Critical)
             Case LoadState.Aborted
                 Hint(Loader.Name & "已取消！", HintType.Info)
             Case LoadState.Loading

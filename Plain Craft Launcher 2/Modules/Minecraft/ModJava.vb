@@ -10,7 +10,7 @@
 
         '路径
         ''' <summary>
-        ''' Java.exe 文件的完整路径。
+        ''' java.exe 文件的完整路径。
         ''' </summary>
         Public ReadOnly Property PathJava As String
             Get
@@ -18,15 +18,7 @@
             End Get
         End Property
         ''' <summary>
-        ''' Javaw.exe 文件的完整路径。
-        ''' </summary>
-        Public ReadOnly Property PathJavaw As String
-            Get
-                Return PathFolder & "javaw.exe"
-            End Get
-        End Property
-        ''' <summary>
-        ''' Javaw.exe 文件所在文件夹的路径，以 \ 结尾。
+        ''' java.exe 文件所在文件夹的路径，以 \ 结尾。
         ''' </summary>
         Public PathFolder As String
         ''' <summary>
@@ -102,20 +94,13 @@
             Dim Output As String = Nothing
             Try
                 '确定文件存在
-                If Not File.Exists(PathJavaw) Then
-                    Throw New FileNotFoundException("未找到 javaw.exe 文件", PathJavaw)
-                End If
-                If Not File.Exists(PathFolder & "java.exe") Then
-                    Throw New FileNotFoundException("未找到 java.exe 文件", PathFolder & "java.exe")
-                End If
-                If File.Exists(PathFolder & "pdf-bookmark") Then
-                    Throw New Exception("不兼容 PDF Bookmark 的 Java") '#5326
-                End If
+                If Not File.Exists(PathJava) Then Throw New FileNotFoundException("未找到 java.exe 文件", PathJava)
+                If File.Exists(PathFolder & "pdf-bookmark") Then Throw New Exception("不兼容 PDF Bookmark 的 Java") '#5326
                 IsJre = Not File.Exists(PathFolder & "javac.exe")
                 '运行 -version
-                Output = ShellAndGetOutput(PathFolder & "java.exe", "-version", 15000).ToLower
+                Output = ShellAndGetOutput(PathJava, "-version", 15000).ToLower
                 If Output = "" Then Throw New ApplicationException("尝试运行该 Java 失败")
-                If ModeDebug Then Log("[Java] Java 检查输出：" & PathFolder & "java.exe" & vbCrLf & Output)
+                If ModeDebug Then Log("[Java] Java 检查输出：" & PathJava & vbCrLf & Output)
                 If Output.Contains("/lib/ext exists") Then Throw New ApplicationException("无法运行该 Java，请在删除 Java 文件夹中的 /lib/ext 文件夹后再试")
                 If Output.Contains("a fatal error") Then Throw New ApplicationException("无法运行该 Java，该 Java 或系统存在问题")
                 '获取详细信息
@@ -136,17 +121,17 @@
                 End If
                 Is64Bit = Output.Contains("64-bit")
                 If Version.Minor <= 4 OrElse Version.Minor >= 100 Then Throw New ApplicationException("分析详细信息失败，获取的版本为 " & Version.ToString)
-                '基于 #3649，在 64 位系统上禁用 32 位 Java
+                '#3649：在 64 位系统上禁用 32 位 Java
                 If Not Is64Bit AndAlso Not Is32BitSystem Then Throw New Exception("该 Java 为 32 位版本，请安装 64 位的 Java")
-                '基于 #2249 发现 JRE 17 似乎也导致了 Forge 安装失败，干脆禁用更多版本的 JRE
+                '#2249：JRE 17 似乎会导致 Forge 安装失败，干脆禁用更多版本的 JRE
                 If IsJre AndAlso VersionCode >= 16 Then Throw New Exception("由于高版本 JRE 对游戏的兼容性很差，因此不再允许使用。你可以使用对应版本的 JDK，而非 JRE！")
             Catch ex As ApplicationException
                 Throw ex
             Catch ex As ThreadInterruptedException
                 Throw ex
             Catch ex As Exception
-                Log("[Java] 检查失败的 Java 输出：" & PathFolder & "java.exe" & vbCrLf & If(Output, "无程序输出"))
-                Throw New Exception("检查 Java 失败（" & If(PathJavaw, "Nothing") & "）", ex)
+                Log("[Java] 检查失败的 Java 输出：" & If(PathJava, "Nothing") & vbCrLf & If(Output, "无程序输出"))
+                Throw New Exception("检查 Java 失败（" & If(PathJava, "Nothing") & "）", ex)
             End Try
             IsChecked = True
         End Sub
@@ -689,7 +674,7 @@ Wait:
                             "应用", "运行", "前置", "mojang", "官启", "新建文件夹", "eclipse", "microsoft", "hotspot",
                             "runtime", "x86", "x64", "forge", "原版", "optifine", "官方", "启动", "hmcl", "mod", "高清",
                             "download", "launch", "程序", "path", "version", "baka", "pcl", "zulu", "local", "packages",
-                            "4297127d64ec6", "1.", "启动", "jbr-"}
+                            "4297127d64ec6", "1.", "启动", "jbr"}
             For Each FolderInfo As DirectoryInfo In OriginalPath.EnumerateDirectories
                 If FolderInfo.Attributes.HasFlag(FileAttributes.ReparsePoint) Then Continue For '跳过符号链接
                 Dim SearchEntry = GetFolderNameFromPath(FolderInfo.Name).ToLower '用于搜索的字符串

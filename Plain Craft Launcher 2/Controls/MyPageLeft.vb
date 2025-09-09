@@ -3,28 +3,15 @@
     Private Uuid As Integer = GetUuid()
 
     '执行逐个进入动画的控件
-    Public AnimatedControl As FrameworkElement
-    Public Shared ReadOnly AnimatedControlProperty As DependencyProperty = DependencyProperty.RegisterAttached("AnimatedControl", GetType(String), GetType(MyPageLeft), New PropertyMetadata(Nothing, AddressOf OnAnimatedControlChanged))
-
-    Public Shared Sub SetAnimatedControl(obj As DependencyObject, value As String)
-        obj.SetValue(AnimatedControlProperty, value)
-    End Sub
-
-    Private Shared Sub OnAnimatedControlChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
-        Dim control = TryCast(d, MyPageLeft)
-        If control IsNot Nothing Then
-            Dim handler As RoutedEventHandler
-            handler = Sub(sender, args)
-                          Dim targetName = CStr(e.NewValue)
-                          Dim target = TryCast(control.FindName(targetName), FrameworkElement)
-                          If target IsNot Nothing Then
-                              control.AnimatedControl = target
-                          End If
-                          RemoveHandler control.Loaded, handler
-                      End Sub
-            AddHandler control.Loaded, handler
-        End If
-    End Sub
+    Public Property AnimatedControl As String '需要在 Loaded 之后才能获取到控件，所以不能用 Binding 直接绑定（#6664）
+        Get
+            Return GetValue(AnimatedControlProperty)
+        End Get
+        Set(value As String)
+            SetValue(AnimatedControlProperty, value)
+        End Set
+    End Property
+    Public Shared ReadOnly AnimatedControlProperty As DependencyProperty = DependencyProperty.Register("AnimatedControl", GetType(String), GetType(MyPageLeft), New PropertyMetadata(Nothing))
 
     Public Sub TriggerShowAnimation()
         If AnimatedControl Is Nothing Then
@@ -97,7 +84,7 @@
     '遍历获取所有需要生成动画的控件
     Private Function GetAllAnimControls(Optional IgnoreInvisibility As Boolean = False) As List(Of FrameworkElement)
         Dim AllControls As New List(Of FrameworkElement)
-        GetAllAnimControls(AnimatedControl, AllControls, IgnoreInvisibility)
+        GetAllAnimControls(FindName(AnimatedControl), AllControls, IgnoreInvisibility)
         Return AllControls
     End Function
     Private Sub GetAllAnimControls(Element As FrameworkElement, ByRef AllControls As List(Of FrameworkElement), IgnoreInvisibility As Boolean)
@@ -118,7 +105,3 @@
     End Sub
 
 End Class
-
-Public Interface IRefreshable
-    Sub Refresh()
-End Interface

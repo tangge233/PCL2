@@ -681,7 +681,7 @@ Install:
                                 Hint($"已成功更新 {FinishedFileNames.Count} 个 Mod！", HintType.Finish)
                         End Select
                     Case LoadState.Failed
-                        Hint("Mod 更新失败：" & GetExceptionSummary(Loader.Error), HintType.Critical)
+                        Hint("Mod 更新失败：" & Loader.Error.GetBrief(), HintType.Critical)
                     Case LoadState.Aborted
                         Hint("Mod 更新已中止！", HintType.Info)
                     Case Else
@@ -808,7 +808,7 @@ Install:
             Dim ModEntry As McMod = CType(If(TypeOf sender Is MyIconButton, sender.Tag, sender), MyLocalModItem).Entry
             '加载失败信息
             If ModEntry.State = McMod.McModState.Unavailable Then
-                MyMsgBox("无法读取此 Mod 的信息。" & vbCrLf & vbCrLf & "详细的错误信息：" & GetExceptionDetail(ModEntry.FileUnavailableReason), "Mod 读取失败")
+                MyMsgBox("无法读取此 Mod 的信息。" & vbCrLf & vbCrLf & "详细的错误信息：" & ModEntry.FileUnavailableReason.GetDetail(), "Mod 读取失败")
                 Return
             End If
             If ModEntry.Comp IsNot Nothing Then

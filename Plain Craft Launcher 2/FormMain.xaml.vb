@@ -96,6 +96,14 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 368 Then 'Snapshot 2.10.7
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "新增：允许在版本设置中设置禁止更新 Mod，以防整合包玩家误操作"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：若整合包需要 PCL 不兼容的加载器，允许选择跳过它的安装"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "删除：由于已不再需要，删除手动安装包下载功能"))
+            FeatureCount += 19
+            BugCount += 28
+        End If
         If LastVersion < 366 Then 'Snapshot 2.10.6
             FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：启用 MCIM 社区资源镜像源，以缓解社区资源难以下载的问题"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：正版登录出错时无法给出正确的错误信息"))
@@ -1025,18 +1033,12 @@ Public Class FormMain
     ''' </summary>
     Public Enum PageSubType
         [Default] = 0
-        DownloadInstall = 1
-        DownloadClient = 4
-        DownloadOptiFine = 5
-        DownloadForge = 6
-        DownloadNeoForge = 7
-        DownloadFabric = 8
-        DownloadLiteLoader = 9
-        DownloadMod = 11
-        DownloadPack = 12
-        DownloadDataPack = 13
-        DownloadResourcePack = 14
-        DownloadShader = 15
+        DownloadInstall = 0
+        DownloadMod = 2
+        DownloadPack = 3
+        DownloadDataPack = 4
+        DownloadResourcePack = 5
+        DownloadShader = 6
         SetupLaunch = 0
         SetupUI = 1
         SetupSystem = 2
@@ -1514,7 +1516,8 @@ Public Class FormMain
     End Function
     Private Function BtnExtraBack_GetRealChild() As MyScrollViewer
         If PanMainRight.Child Is Nothing OrElse TypeOf PanMainRight.Child IsNot MyPageRight Then Return Nothing
-        Return CType(PanMainRight.Child, MyPageRight).PanScroll
+        Dim Page As MyPageRight = PanMainRight.Child
+        Return Page.FindName(Page.PanScroll)
     End Function
 
 #End Region

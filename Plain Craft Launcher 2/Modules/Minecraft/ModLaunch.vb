@@ -178,7 +178,7 @@ NextInner:
                 GoTo NextInner
             Else
                 '没有特殊处理过的错误信息
-                McLaunchLog("错误：" & GetExceptionDetail(ex))
+                McLaunchLog("错误：" & ex.GetDetail())
                 Log(ex,
                     If(IsSavingBatch, "导出启动脚本失败", "Minecraft 启动失败"), LogLevel.Msgbox,
                     If(IsSavingBatch, "导出启动脚本失败", "启动失败"))
@@ -187,7 +187,7 @@ NextInner:
                     Telemetry("Minecraft 启动失败",
                               "Version", McVersionCurrent.Version.ToString,
                               "LoginType", GetStringFromEnum(CType(Setup.Get("LoginType"), McLoginType)),
-                              "Exception", FilterUserName(FilterAccessToken(GetExceptionDetail(ex), "*"), "*"))
+                              "Exception", FilterUserName(FilterAccessToken(ex.GetDetail(), "*"), "*"))
                 End If
                 Throw
             End If
@@ -609,12 +609,8 @@ SkipLogin:
                 McLoginRequestValidate(Data)
                 GoTo LoginFinish
             Catch ex As Exception
-                Dim AllMessage = GetExceptionDetail(ex)
-                McLaunchLog("验证登录失败：" & AllMessage)
-                If (AllMessage.Contains("超时") OrElse AllMessage.Contains("imeout")) AndAlso Not AllMessage.Contains("403") Then
-                    McLaunchLog("已触发超时登录失败")
-                    Throw New Exception("$登录失败：你的网络环境不佳，导致难以连接到海外服务器。" & vbCrLf & "请稍后重试，或使用加速器或 VPN 以改善网络环境。")
-                End If
+                Log(ex, "验证登录失败")
+                If IsNetworkRelated(ex) Then Throw New Exception("$登录失败：你的网络环境不佳，导致难以连接到海外服务器。" & vbCrLf & "请稍后再试，或使用加速器、VPN 改善网络环境。")
             End Try
             Data.Progress = 0.25
             '尝试刷新登录
@@ -624,7 +620,7 @@ Refresh:
                 McLoginRequestRefresh(Data, NeedRefresh)
                 GoTo LoginFinish
             Catch ex As Exception
-                McLaunchLog("刷新登录失败：" & GetExceptionDetail(ex))
+                McLaunchLog("刷新登录失败：" & ex.GetDetail())
                 If WasRefreshed Then Throw New Exception("二轮刷新登录失败", ex)
             End Try
             Data.Progress = If(NeedRefresh, 0.85, 0.45)
@@ -634,7 +630,7 @@ Refresh:
             If Data.IsAborted Then Throw New ThreadInterruptedException
             NeedRefresh = McLoginRequestLogin(Data)
         Catch ex As Exception
-            McLaunchLog("登录失败：" & GetExceptionDetail(ex))
+            McLaunchLog("登录失败：" & ex.GetDetail())
             Throw
         End Try
         If NeedRefresh Then
@@ -699,7 +695,7 @@ LoginFinish:
         '发送登录请求
         Dim RequestData As New JObject(
             New JProperty("accessToken", AccessToken), New JProperty("clientToken", ClientToken), New JProperty("requestUser", True))
-        NetRequestByClientRetry(
+        NetRequestByClient(
             Data.Input.BaseUrl & "/validate", HttpMethod.Post,
             Content:=RequestData.ToString(Newtonsoft.Json.Formatting.None),
             Headers:={{"Accept-Language", "zh-CN"}},
@@ -726,7 +722,7 @@ LoginFinish:
                    New JProperty("requestUser", True)
                ).ToString(Newtonsoft.Json.Formatting.None),
                Headers:={{"Accept-Language", "zh-CN"}},
-               ContentType:="application/json; charset=utf-8"))
+               ContentType:="application/json; charset=utf-8", RequireJson:=True))
         '将登录结果输出
         If LoginJson("selectedProfile") Is Nothing Then Throw New Exception("选择的角色 " & Setup.Get("Cache" & Data.Input.Token & "Name") & " 无效！")
         Data.Output.AccessToken = LoginJson("accessToken").ToString
@@ -756,7 +752,7 @@ LoginFinish:
                 Data.Input.BaseUrl & "/authenticate", HttpMethod.Post,
                 Content:=RequestData.ToString(Newtonsoft.Json.Formatting.None),
                 Headers:={{"Accept-Language", "zh-CN"}},
-                ContentType:="application/json; charset=utf-8"))
+                ContentType:="application/json; charset=utf-8", RequireJson:=True))
             '检查登录结果
             If LoginJson("availableProfiles").Count = 0 Then
                 If Data.Input.ForceReselectProfile Then Hint("你还没有创建角色，无法更换！", HintType.Critical)
@@ -814,13 +810,14 @@ LoginFinish:
             McLaunchLog("登录成功（Login, " & Data.Input.Token & "）")
             Return NeedRefresh
         Catch ex As Exception
-            Dim AllMessage As String = GetExceptionSummary(ex)
+            Dim AllMessage As String = ex.GetBrief()
             Log(ex, "登录失败原始错误信息", LogLevel.Normal)
             '读取服务器返回的错误
             If TypeOf ex Is ResponsedWebException Then
                 Dim ErrorMessage As String = Nothing
                 Try
-                    ErrorMessage = GetJson(DirectCast(ex, ResponsedWebException).Response)("errorMessage")
+                    Dim Response = DirectCast(ex, ResponsedWebException).Response
+                    If ErrorMessage.ContainsF("errorMessage", True) Then ErrorMessage = GetJson(Response)("errorMessage")
                 Catch
                 End Try
                 If Not String.IsNullOrWhiteSpace(ErrorMessage) Then
@@ -838,7 +835,7 @@ LoginFinish:
                 End If
             End If
             '通用关键字检测
-            If AllMessage.Contains("403") Then
+            If AllMessage.Contains("(403)") Then
                 Select Case Data.Input.Type
                     Case McLoginType.Auth
                         Throw New Exception("$登录失败，以下为可能的原因：" & vbCrLf &
@@ -852,8 +849,8 @@ LoginFinish:
                                             If(Data.Input.UserName.Contains("@"), "", " - 登录账号应为邮箱或统一通行证账号，而非游戏角色 ID。" & vbCrLf) &
                                             " - 只注册了账号，但没有加入对应服务器。")
                 End Select
-            ElseIf AllMessage.Contains("超时") OrElse AllMessage.Contains("imeout") OrElse AllMessage.Contains("网络请求失败") OrElse AllMessage.Contains("408") OrElse AllMessage.Contains("由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败。") Then
-                Throw New Exception("$登录失败：你的网络环境不佳，导致难以连接到海外服务器。" & vbCrLf & "请稍后重试，或使用加速器或 VPN 以改善网络环境。")
+            ElseIf ex.IsNetworkRelated() Then
+                Throw New Exception("$登录失败：你的网络环境不佳，导致难以连接到海外服务器。" & vbCrLf & "请稍后再试，或使用加速器、VPN 改善网络环境。")
             ElseIf ex.Message.StartsWithF("$") Then
                 Throw
             Else
@@ -872,7 +869,7 @@ Retry:
         McLaunchLog("开始微软登录步骤 1/6（原始登录）")
         Dim PrepareJson As JObject = GetJson(NetRequestByClientRetry("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode", HttpMethod.Post,
             Content:=$"client_id={OAuthClientId}&tenant=/consumers&scope=XboxLive.signin%20offline_access",
-            ContentType:="application/x-www-form-urlencoded"))
+            ContentType:="application/x-www-form-urlencoded", RequireJson:=True))
         McLaunchLog("网页登录地址：" & PrepareJson("verification_uri").ToString)
 
         '弹窗
@@ -907,6 +904,7 @@ Retry:
                 Headers:={{"Accept-Language", "en-US,en;q=0.5"}, {"X-Requested-With", "XMLHttpRequest"}},
                 ThreadCount:=2)
         Catch ex As ResponsedWebException
+            '修改错误列表时，同时检查 MyMsgLogin.xaml.vb 中的对应代码
             Dim Response = ex.Response
             If Response.ContainsF("must sign in again", True) OrElse Response.ContainsF("password expired", True) OrElse
                (Response.Contains("refresh_token") AndAlso Response.Contains("is not valid")) Then '#269
@@ -941,7 +939,7 @@ Retry:
            ""TokenType"": ""JWT""
         }"
         Dim Result As String = NetRequestByClientMultiple("https://user.auth.xboxlive.com/user/authenticate", HttpMethod.Post,
-            Content:=Request, ContentType:="application/json")
+            Content:=Request, ContentType:="application/json", RequireJson:=True)
         Dim ResultJson As JObject = GetJson(Result)
         Dim XBLToken As String = ResultJson("Token").ToString
         Return XBLToken
@@ -963,7 +961,7 @@ Retry:
         Dim Result As String
         Try
             Result = NetRequestByClientMultiple("https://xsts.auth.xboxlive.com/xsts/authorize", HttpMethod.Post,
-                Content:=Request, ContentType:="application/json")
+                Content:=Request, ContentType:="application/json", RequireJson:=True)
         Catch ex As ResponsedWebException
             '参考 https://github.com/PrismarineJS/prismarine-auth/blob/master/src/common/Constants.js
             If ex.Response.Contains("2148916227") Then
@@ -975,7 +973,7 @@ Retry:
                 End If
                 Throw New Exception("$$")
             ElseIf ex.Response.Contains("2148916235") Then
-                MyMsgBox($"你的网络所在的国家或地区无法登录微软账号。{vbCrLf}请使用加速器或 VPN。", "登录失败", "我知道了")
+                MyMsgBox($"你的网络所在的国家或地区无法登录微软账号。{vbCrLf}请使用加速器或 VPN，然后再试。", "登录失败", "我知道了")
                 Throw New Exception("$$")
             ElseIf ex.Response.Contains("2148916238") Then
                 If MyMsgBox("该账号年龄不足，你需要先修改出生日期，然后才能登录。" & vbCrLf &
@@ -994,15 +992,11 @@ Retry:
             End If
         End Try
 
-        Try '这个 Try 块仅为了追踪 #6683 而添加
-            Dim ResultJson As JObject = GetJson(Result)
-            Dim XSTSToken As String = ResultJson("Token").ToString
-            Dim UHS As String = ResultJson("DisplayClaims")("xui")(0)("uhs").ToString
-            Return {XSTSToken, UHS}
-        Catch
-            Log("[Launch] 返回内容：" & vbCrLf & Result)
-            Throw
-        End Try
+        Dim ResultJson As JObject = GetJson(Result)
+        Return {
+            ResultJson("Token"), 'XSTSToken
+            ResultJson("DisplayClaims")("xui")(0)("uhs") 'UHS
+        }
     End Function
     '微软登录步骤 4：从 {XSTSToken, UHS} 获取 Minecraft AccessToken
     Private Function MsLoginStep4(Tokens As String()) As String
@@ -1012,9 +1006,9 @@ Retry:
         Dim Result As String
         Try
             Result = NetRequestByClientRetry("https://api.minecraftservices.com/authentication/login_with_xbox", HttpMethod.Post,
-                Content:=Request, ContentType:="application/json")
+                Content:=Request, ContentType:="application/json", RequireJson:=True)
         Catch ex As Net.WebException
-            Dim Message As String = GetExceptionSummary(ex)
+            Dim Message As String = ex.GetBrief()
             If Message.Contains("(429)") Then
                 Log(ex, "微软登录第 4 步汇报 429")
                 Throw New Exception("$登录尝试太过频繁，请等待几分钟后再试！")
@@ -1026,16 +1020,14 @@ Retry:
             End If
         End Try
 
-        Dim ResultJson As JObject = GetJson(Result)
-        Dim AccessToken As String = ResultJson("access_token").ToString
-        Return AccessToken
+        Return GetJson(Result)("access_token").ToString
     End Function
     '微软登录步骤 5：验证微软账号是否持有 MC，这也会刷新 XGP
     Private Sub MsLoginStep5(AccessToken As String)
         McLaunchLog("开始微软登录步骤 5/6")
 
         Dim Result As String = NetRequestByClientMultiple("https://api.minecraftservices.com/entitlements/mcstore",
-            ContentType:="application/json", ThreadCount:=2, Headers:={{"Authorization", "Bearer " & AccessToken}})
+            ContentType:="application/json", ThreadCount:=2, Headers:={{"Authorization", "Bearer " & AccessToken}}, RequireJson:=True)
         Try
             Dim ResultJson As JObject = GetJson(Result)
             If Not (ResultJson.ContainsKey("items") AndAlso ResultJson("items").Any) Then
@@ -1057,9 +1049,9 @@ Retry:
         Dim Result As String
         Try
             Result = NetRequestByClientMultiple("https://api.minecraftservices.com/minecraft/profile",
-                ContentType:="application/json", ThreadCount:=2, Headers:={{"Authorization", "Bearer " & AccessToken}})
-        Catch ex As Net.WebException
-            Dim Message As String = GetExceptionSummary(ex)
+                ContentType:="application/json", ThreadCount:=2, Headers:={{"Authorization", "Bearer " & AccessToken}}, RequireJson:=True)
+        Catch ex As WebException
+            Dim Message As String = ex.GetBrief()
             If Message.Contains("(429)") Then
                 Log(ex, "微软登录第 6 步汇报 429")
                 Throw New Exception("$登录尝试太过频繁，请等待几分钟后再试！")
@@ -1130,7 +1122,7 @@ Retry:
         If Len(Uuid) = 32 Then Return Uuid
         '从官网获取
         Try
-            Dim GotJson As JObject = GetJson(NetRequestByClientRetry("https://api.mojang.com/users/profiles/minecraft/" & Name))
+            Dim GotJson As JObject = GetJson(NetRequestByClientRetry("https://api.mojang.com/users/profiles/minecraft/" & Name, RequireJson:=True))
             If GotJson Is Nothing Then Throw New FileNotFoundException("正版玩家档案不存在（" & Name & "）")
             Uuid = If(GotJson("id"), "")
         Catch ex As Exception
@@ -1495,6 +1487,9 @@ Retry:
             DataList.Add(Version.JsonObject("mainClass"))
         End If
 
+        '处理 DataList 的换行符
+        DataList = DataList.Select(Function(d) d.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Replace(vbCr, " ").Trim).ToList
+
         Return Join(DataList, " ")
     End Function
     Private Function McLaunchArgumentsJvmNew(Version As McVersion) As String
@@ -1538,9 +1533,7 @@ NextVersion:
         'Authlib-Injector
         If McLoginLoader.Output.Type = "Auth" Then
             If McLaunchJavaSelected.VersionCode >= 6 Then DataList.Add("-Djavax.net.ssl.trustStoreType=WINDOWS-ROOT") '信任系统根证书（5252#）
-            Dim Server As String = If(McLoginLoader.Input.Type = McLoginType.Legacy,
-                "http://hiperauth.tech/api/yggdrasil-hiper/", 'HiPer 登录
-                Setup.Get("VersionServerAuthServer", Version:=McVersionCurrent))
+            Dim Server As String = Setup.Get("VersionServerAuthServer", Version:=McVersionCurrent)
             Try
                 Dim Response As String = NetRequestByClientRetry(Server, Encoding:=Encoding.UTF8)
                 DataList.Insert(0, "-javaagent:""" & PathPure & "authlib-injector.jar""=" & Server &
@@ -1562,7 +1555,7 @@ NextVersion:
         '如果不合并，会导致 Forge 1.17 启动无效，它有两个 --add-exports，进一步导致其中一个在后面被去重
         Dim DeDuplicateDataList As New List(Of String)
         For i = 0 To DataList.Count - 1
-            Dim CurrentEntry As String = DataList(i)
+            Dim CurrentEntry As String = DataList(i).Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Replace(vbCr, " ").Trim
             If DataList(i).StartsWithF("-") Then
                 Do While i < DataList.Count - 1
                     If DataList(i + 1).StartsWithF("-") Then
@@ -1803,7 +1796,7 @@ NextVersion:
                             File.Delete(FilePath)
                         Catch ex As UnauthorizedAccessException
                             McLaunchLog("删除原 dll 访问被拒绝，这通常代表有一个 MC 正在运行，跳过解压：" & FilePath)
-                            McLaunchLog("实际的错误信息：" & GetExceptionSummary(ex))
+                            McLaunchLog("实际的错误信息：" & ex.GetDetail())
                             Exit For
                         End Try
                     End If
@@ -1823,7 +1816,7 @@ NextVersion:
                 File.Delete(FileName)
             Catch ex As UnauthorizedAccessException
                 McLaunchLog("删除多余文件访问被拒绝，跳过删除步骤")
-                McLaunchLog("实际的错误信息：" & GetExceptionSummary(ex))
+                McLaunchLog("实际的错误信息：" & ex.GetDetail())
                 Return
             End Try
         Next
@@ -1849,7 +1842,7 @@ NextVersion:
         '要求 Java 使用高性能显卡
         If Setup.Get("LaunchAdvanceGraphicCard") Then
             Try
-                SetGPUPreference(McLaunchJavaSelected.PathJavaw)
+                SetGPUPreference(McLaunchJavaSelected.PathJava)
                 SetGPUPreference(PathWithName)
             Catch ex As Exception
                 If IsAdmin() Then
@@ -1857,7 +1850,7 @@ NextVersion:
                 Else
                     Log(ex, "直接调整显卡设置失败，将以管理员权限重启 PCL 再次尝试")
                     Try
-                        If RunAsAdmin($"--gpu ""{McLaunchJavaSelected.PathJavaw}""") = ProcessReturnValues.TaskDone Then
+                        If RunAsAdmin($"--gpu ""{McLaunchJavaSelected.PathJava}""") = ProcessReturnValues.TaskDone Then
                             McLaunchLog("以管理员权限重启 PCL 并调整显卡设置成功")
                         Else
                             Throw New Exception("调整过程中出现异常")
@@ -2218,7 +2211,7 @@ IgnoreCustomSkin:
 
         '启动信息
         Dim GameProcess = New Process()
-        Dim StartInfo As New ProcessStartInfo(McLaunchJavaSelected.PathJavaw)
+        Dim StartInfo As New ProcessStartInfo(McLaunchJavaSelected.PathJava) '使用 javaw.exe 会导致 #6263
 
         '设置环境变量
         Dim Paths As New List(Of String)(StartInfo.EnvironmentVariables("Path").Split(";"))
@@ -2231,13 +2224,13 @@ IgnoreCustomSkin:
         StartInfo.UseShellExecute = False
         StartInfo.RedirectStandardOutput = True
         StartInfo.RedirectStandardError = True
-        StartInfo.CreateNoWindow = False
+        StartInfo.CreateNoWindow = True
         StartInfo.Arguments = McLaunchArgument
         GameProcess.StartInfo = StartInfo
 
         '开始进程
         GameProcess.Start()
-        McLaunchLog("已启动游戏进程：" & McLaunchJavaSelected.PathJavaw)
+        McLaunchLog("已启动游戏进程：" & McLaunchJavaSelected.PathJava)
         If Loader.IsAborted Then
             McLaunchLog("由于取消启动，已强制结束游戏进程") '#1631
             GameProcess.Kill()

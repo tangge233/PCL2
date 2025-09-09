@@ -72,7 +72,7 @@ Public Module ModModpack
                     If FullNames(1) = "modpack.zip" OrElse FullNames(1) = "modpack.mrpack" Then PackType = 9 : Exit Try '带启动器的压缩包
                 Next
             Catch ex As Exception
-                If GetExceptionDetail(ex, True).Contains("Error.WinIOError") Then
+                If ex.GetDetail(True).Contains("Error.WinIOError") Then
                     Throw New Exception("打开整合包文件失败", ex)
                 ElseIf File.EndsWithF(".rar", True) Then
                     Throw New Exception("PCL 无法处理 rar 格式的压缩包，请在解压后重新压缩为 zip 格式再试", ex)
@@ -166,6 +166,15 @@ Retry:
         End If
         IniClearCache(VersionIni) '重置缓存，避免被安装过程中写入的 ini 覆盖
     End Sub
+    ''' <summary>
+    ''' 弹窗提示整合包中存在不兼容的加载器。
+    ''' 如果取消，则抛出 CancelledException。
+    ''' </summary>
+    ''' <exception cref="CancelledException" />
+    Private Sub NotifyIncompatibleLoader(LoaderName As String)
+        If MyMsgBox($"整合包中存在不兼容的加载器：{LoaderName}{vbCrLf}如果你知道如何手动安装它，可以先选择跳过，然后在整合包下载结束后手动安装。",
+            "不兼容的加载器", "取消", $"不安装 {LoaderName} 并继续") = 1 Then Throw New CancelledException
+    End Sub
 
 #Region "不同类型整合包的安装方法"
 
@@ -211,7 +220,8 @@ Retry:
                 Log("[ModPack] 整合包 Fabric 版本：" & Id)
                 FabricVersion = Id.Replace("fabric-", "")
             Else
-                Log("[ModPack] 未知 Mod 加载器：" & Id)
+                'ElseIf Id.StartsWithF("quilt-") Then
+                NotifyIncompatibleLoader(Id)
             End If
         Next
         '解压
@@ -376,12 +386,9 @@ Retry:
                 Case "fabric-loader" 'eg. 0.14.14
                     FabricVersion = Entry.Value.ToString
                     Log("[ModPack] 整合包 Fabric 版本：" & FabricVersion)
-                Case "quilt-loader" 'eg. 1.0.0
-                    Hint("PCL 暂不支持安装需要 Quilt 的整合包！", HintType.Critical)
-                    Throw New CancelledException
                 Case Else
-                    Hint($"无法安装整合包，其中出现了未知的 Mod 加载器 {Entry.Value}！", HintType.Critical)
-                    Throw New CancelledException
+                    'Case "quilt-loader" 'eg. 1.0.0
+                    NotifyIncompatibleLoader(Entry.Name)
             End Select
         Next
         '获取版本名
@@ -633,7 +640,8 @@ Retry:
         If PackJson("components") Is Nothing Then Throw New Exception("该 MMC 整合包未提供游戏版本信息，无法安装！")
         Dim Request As New McInstallRequest With {.TargetVersionName = VersionName, .TargetVersionFolder = $"{PathMcFolder}versions\{VersionName}\"}
         For Each Component In PackJson("components")
-            Select Case If(Component("uid"), "").ToString
+            If Not Component.Contains("uid") Then Continue For
+            Select Case Component("uid").ToString
                 Case "org.lwjgl"
                     Log("[ModPack] 已跳过 LWJGL 项")
                 Case "net.minecraft"
@@ -644,9 +652,9 @@ Retry:
                     Request.NeoForgeVersion = Component("version")
                 Case "net.fabricmc.fabric-loader"
                     Request.FabricVersion = Component("version")
-                Case "org.quiltmc.quilt-loader" 'eg. 1.0.0
-                    Hint("PCL 暂不支持安装需要 Quilt 的整合包！", HintType.Critical)
-                    Throw New CancelledException
+                Case Else
+                    'Case "org.quiltmc.quilt-loader" 'eg. 1.0.0
+                    NotifyIncompatibleLoader(Component("uid"))
             End Select
         Next
         '构造加载器

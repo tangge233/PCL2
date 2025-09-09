@@ -218,7 +218,7 @@
                     </Grid>
                 </StackPanel>
             </local:MyCard>
-            <local:MyCard Margin="0,0,0,15" Title="高级启动选项" IsSwapped="True" CanSwap="True">
+            <local:MyCard Margin="0,0,0,15" Title="高级选项" IsSwapped="True" CanSwap="True">
                 <Grid Margin="25,40,25,15">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -255,7 +255,7 @@
                         <local:MyCheckBox Height="28" Text="要求 Java 使用高性能显卡" x:Name="CheckAdvanceGraphicCard" Tag="LaunchAdvanceGraphicCard"
                             ToolTipService.Placement="Right" ToolTip="自动在 Windows 设置 → 系统 → 屏幕 → 显示卡 中将 Java 改为使用高性能显卡。&#xa;如果电脑同时有集显和独显，这能确保 MC 使用独显进行渲染，以大幅提高性能。" />
                     </StackPanel>
-                    <local:MyHint Text="你还可以在版本独立设置中找到更多高级启动选项。" Margin="0,5,0,10" Theme="Blue" Grid.Row="7" Grid.ColumnSpan="2"
+                    <local:MyHint Text="版本独立设置中还有更多高级选项可供调整。" Margin="0,5,0,10" Theme="Blue" Grid.Row="7" Grid.ColumnSpan="2"
                                   CanClose="True" RelativeSetup="HintMoreAdvancedSetup" />
                 </Grid>
             </local:MyCard>

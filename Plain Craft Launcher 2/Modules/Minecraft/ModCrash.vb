@@ -485,7 +485,7 @@ Done:
         '崩溃报告分析，高优先级
         If LogCrash IsNot Nothing Then
             If LogCrash.Contains("Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass") Then AppendReason(CrashReason.Java版本过高)
-            If LogCrash.Contains("Failed loading config file ") Then AppendReason(CrashReason.Mod配置文件导致游戏崩溃, {TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=Failed loading config file .+ for modid )[^\n]+"), "").TrimEnd(vbCrLf)).First, If(RegexSeek(LogCrash, "(?<=Failed loading config file ).+(?= of type)"), "").TrimEnd(vbCrLf)})
+            If LogCrash.Contains("Failed loading config file ") Then AppendReason(CrashReason.Mod配置文件导致游戏崩溃, {TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=Failed loading config file .+ for modid )[^\n]+"), "").TrimEnd(vbCrLf)).First, If(RegexSeek(LogCrash, "(?<=Failed loading config file ).+(?= of type)"), "").TrimEnd(vbCrLf)}) '#7071
         End If
 
         '游戏日志分析
@@ -542,8 +542,8 @@ Done:
             If LogMc.Contains("Found a duplicate mod") Then AppendReason(CrashReason.Mod重复安装, RegexSearch(If(RegexSeek(LogMc, "Found a duplicate mod[^\n]+"), ""), "[^\\/]+.jar", RegularExpressions.RegexOptions.IgnoreCase))
             If LogMc.Contains("Found duplicate mods") Then AppendReason(CrashReason.Mod重复安装, RegexSearch(LogMc, "(?<=Mod ID: ')\w+?(?=' from mod files:)").Distinct.ToList)
             If LogMc.Contains("ModResolutionException: Duplicate") Then AppendReason(CrashReason.Mod重复安装, RegexSearch(If(RegexSeek(LogMc, "ModResolutionException: Duplicate[^\n]+"), ""), "[^\\/]+.jar", RegularExpressions.RegexOptions.IgnoreCase))
-            If LogMc.Contains("Incompatible mods found!") Then '#5006
-                AppendReason(CrashReason.Mod互不兼容, If(RegexSeek(LogMc, "(?<=Incompatible mods found![\s\S]+: )[\s\S]+?(?=\tat )"), ""))
+            If LogMc.Contains("Incompatible mods found!") Then '#5006, #5115
+                AppendReason(CrashReason.Mod互不兼容, If(RegexSeek(LogMc, "(?<=Incompatible mods found![\s\S]+: )[\s\S]+?(?=\tat )"), "").BeforeFirst("更多信息：").Replace("Some of your mods are incompatible with the game or each other!", "").Trim((vbCrLf & " ").ToCharArray))
             End If
             If LogMc.Contains("Missing or unsupported mandatory dependencies:") Then
                 AppendReason(CrashReason.Mod缺少前置或MC版本错误,
@@ -581,6 +581,7 @@ Done:
             End If
             If LogCrash.Contains("Multiple entries with same key: ") Then AppendReason(CrashReason.确定Mod导致游戏崩溃, TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=Multiple entries with same key: )[^=]+"), "").TrimEnd((vbCrLf & " ").ToCharArray)))
             If LogCrash.Contains("LoaderExceptionModCrash: Caught exception from ") Then AppendReason(CrashReason.确定Mod导致游戏崩溃, TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=LoaderExceptionModCrash: Caught exception from )[^\n]+"), "").TrimEnd((vbCrLf & " ").ToCharArray)))
+            If LogCrash.Contains("Failed loading config file ") Then AppendReason(CrashReason.Mod配置文件导致游戏崩溃, {TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=Failed loading config file .+ for modid )[^\n]+"), "").TrimEnd(vbCrLf)).First, If(RegexSeek(LogCrash, "(?<=Failed loading config file ).+(?= of type)"), "").TrimEnd(vbCrLf)})
         End If
 
     End Sub
@@ -658,7 +659,7 @@ Done:
             End If
             'Mod 解析错误（常见于 Fabric 前置校验失败）
             If LogMc.Contains("Mod resolution failed") Then AppendReason(CrashReason.Mod加载器报错)
-            'Mixin 失败可以导致大量 Mod 实例创建失败
+            'Mixin 失败可以导致大量 Mod 实例创建失败，因此需要放到低优先级中
             If LogMc.Contains("Failed to create mod instance.") Then AppendReason(CrashReason.Mod初始化失败, TryAnalyzeModName(If(RegexSeek(LogMc, "(?<=Failed to create mod instance. ModID: )[^,]+"), If(RegexSeek(LogMc, "(?<=Failed to create mod instance. ModId )[^\n]+(?= for )"), "")).TrimEnd(vbCrLf)))
             '注意：Fabric 的 Warnings were found! 不一定是崩溃原因，它可能是单纯的警报
         End If
@@ -717,7 +718,7 @@ NextStack:
                     "preinit", "preload", "machine", "reflect", "channel", "general", "handler", "content", "systems", "modules", "service",
                     "fastutil", "optifine", "internal", "platform", "override", "fabricmc", "neoforge",
                     "injection", "listeners", "scheduler", "minecraft", "universal", "multipart", "neoforged", "microsoft",
-                    "transformer", "transformers", "minecraftforge", "blockentity", "spongepowered", "electronwill"
+                    "transformer", "transformers", "minecraftforge", "blockentity", "spongepowered", "electronwill", "concurrent"
                    }.Contains(Word.ToLower) Then Continue For
                 PossibleWords.Add(Word.Trim)
             Next
@@ -949,7 +950,7 @@ NextStack:
             Dim Additional As List(Of String) = Reason.Value
             Select Case Reason.Key
                 Case CrashReason.Java虚拟机参数有误
-                    Results.Add("由于 Java 虚拟机参数有误，导致游戏无法继续运行。\n请检查高级启动选项中设置的 Java 虚拟机参数是否有误。")
+                    Results.Add("由于 Java 参数有误，导致游戏无法继续运行。\n请检查高级选项中的 Java 虚拟机参数和游戏参数设置是否有误。")
                 Case CrashReason.Mod文件被解压
                     Results.Add("由于 Mod 文件被解压了，导致游戏无法继续运行。\n直接把整个 Mod 文件放进 Mod 文件夹中即可，若解压就会导致游戏出错。\n\n请删除 Mod 文件夹中已被解压的 Mod，然后再启动游戏。")
                 Case CrashReason.内存不足
@@ -1030,14 +1031,17 @@ NextStack:
                     End If
                 Case CrashReason.特定实体导致崩溃
                     If Additional.Count = 1 Then
-                        Dim entityInfo As String = Additional.First
-                        If entityInfo.StartsWith("minecraft:player") Then
-                            Results.Add("游戏似乎因为玩家实体 " & entityInfo & " 出现了问题。\n\n这通常是因为玩家数据损坏或世界存档问题导致的。\n请尝试以下解决方案：\n - 创建一个新世界，观察游戏是否正常运行\n - 如果新世界正常，可能需要删除或修复当前世界的玩家数据文件\n - 也可能是某个 Mod 与玩家实体处理存在冲突，尝试逐个禁用近期安装的 Mod\n - 如果问题持续存在，建议备份重要数据后重新创建世界\h")
+                        If Additional.First.Contains("minecraft:player") Then
+                            If Additional.First.Contains(" ") Then
+                                Results.Add($"游戏因为位于 {Additional.First.AfterFirst(" ")} 的玩家实体导致了崩溃。\h")
+                            Else
+                                Results.Add($"游戏因为玩家实体导致了崩溃。\h")
+                            End If
                         Else
-                            Results.Add("游戏似乎因为实体 " & entityInfo & " 出现了问题。\n\n请尝试以下解决方案：\n - 创建一个新世界，并尝试生成该类型的实体，观察游戏运行情况\n - 如果新世界中该实体正常，问题可能在于当前世界的数据损坏\n - 如果新世界中仍然崩溃，可能是某个 Mod 导致了实体处理异常\n - 尝试逐个禁用可能影响实体的 Mod（如生物类、AI 类 Mod）\n - 也可以尝试使用指令删除该坐标附近的实体\h")
+                            Results.Add($"游戏因为实体 {Additional.First} 导致了崩溃。\h")
                         End If
                     Else
-                        Results.Add("游戏似乎因为世界中的某些实体出现了问题。\n\n请尝试以下解决方案：\n - 创建一个新世界，观察游戏的运行情况\n - 如果新世界正常运行，则是当前世界的实体数据导致出错\n - 可以尝试使用指令清理异常实体\n - 如果问题持续存在，可能是某个处理实体的 Mod 存在问题\n - 建议逐个禁用近期安装的 Mod，特别是涉及生物、AI 或实体处理的 Mod\h")
+                        Results.Add($"游戏因为下列实体导致了崩溃：{Additional.Join("、")}\h")
                     End If
                 Case CrashReason.OptiFine与Forge不兼容
                     Results.Add("由于 OptiFine 与当前版本的 Forge 不兼容，导致了游戏崩溃。\n\n请前往 OptiFine 官网（https://optifine.net/downloads）查看 OptiFine 所兼容的 Forge 版本，并严格按照对应版本重新安装游戏。")

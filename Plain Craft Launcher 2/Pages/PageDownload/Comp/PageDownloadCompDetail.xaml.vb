@@ -290,7 +290,7 @@
             Sub(MyLoader)
                 Select Case MyLoader.State
                     Case LoadState.Failed
-                        Hint(MyLoader.Name & "失败：" & GetExceptionSummary(MyLoader.Error), HintType.Critical)
+                        Hint(MyLoader.Name & "失败：" & MyLoader.Error.GetBrief(), HintType.Critical)
                     Case LoadState.Aborted
                         Hint(MyLoader.Name & "已取消！", HintType.Info)
                     Case LoadState.Loading

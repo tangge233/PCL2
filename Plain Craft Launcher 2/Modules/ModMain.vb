@@ -397,12 +397,6 @@ EndHint:
     '下载页面声明
     Public FrmDownloadLeft As PageDownloadLeft
     Public FrmDownloadInstall As PageDownloadInstall
-    Public FrmDownloadClient As PageDownloadClient
-    Public FrmDownloadOptiFine As PageDownloadOptiFine
-    Public FrmDownloadLiteLoader As PageDownloadLiteLoader
-    Public FrmDownloadForge As PageDownloadForge
-    Public FrmDownloadNeoForge As PageDownloadNeoForge
-    Public FrmDownloadFabric As PageDownloadFabric
     Public FrmDownloadMod As PageDownloadMod
     Public FrmDownloadPack As PageDownloadPack
     Public FrmDownloadDataPack As PageDownloadDataPack

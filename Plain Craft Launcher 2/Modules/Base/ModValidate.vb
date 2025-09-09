@@ -191,11 +191,16 @@ Public Class ValidateExceptSame
         Me.ErrorMessage = ErrorMessage
         Me.IgnoreCase = IgnoreCase
     End Sub
-    Public Sub New(Excepts As IEnumerable, Optional ErrorMessage As String = "输入内容不能为 %", Optional IgnoreCase As Boolean = False)
+    Public Sub New(Excepts As IEnumerable(Of String), Optional ErrorMessage As String = "输入内容不能为 %", Optional IgnoreCase As Boolean = False)
         Me.Excepts = New ObjectModel.Collection(Of String)
         For Each Data As String In Excepts
             Me.Excepts.Add(Data)
         Next
+        Me.ErrorMessage = ErrorMessage
+        Me.IgnoreCase = IgnoreCase
+    End Sub
+    Public Sub New(Except As String, Optional ErrorMessage As String = "输入内容不能为 %", Optional IgnoreCase As Boolean = False)
+        Me.Excepts = New ObjectModel.Collection(Of String) From {Except}
         Me.ErrorMessage = ErrorMessage
         Me.IgnoreCase = IgnoreCase
     End Sub

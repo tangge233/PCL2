@@ -517,4 +517,12 @@ PreFin:
         FrmMain.PageChange(FormMain.PageType.Setup, FormMain.PageSubType.SetupLaunch)
     End Sub
 
+    '去除参数中的回车
+    Private Sub ReplaceEnter(sender As MyTextBox, e As TextChangedEventArgs) Handles TextAdvanceJvm.TextChanged, TextAdvanceGame.TextChanged
+        Dim NewText = sender.Text.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Replace(vbCr, " ")
+        If NewText = sender.Text Then Return
+        Dim CaretIndex = sender.CaretIndex
+        sender.Text = NewText
+        sender.CaretIndex = Math.Max(0, CaretIndex - 1)
+    End Sub
 End Class

@@ -67,9 +67,9 @@ Public Class Application
                 If Not CheckPermission(PathTemp) Then Throw New Exception("PCL 没有对 " & PathTemp & " 的访问权限")
             Catch ex As Exception
                 If PathTemp = IO.Path.GetTempPath() & "PCL\" Then
-                    MyMsgBox("PCL 无法访问缓存文件夹，可能导致程序出错或无法正常使用！" & vbCrLf & "错误原因：" & GetExceptionDetail(ex), "缓存文件夹不可用")
+                    MyMsgBox("PCL 无法访问缓存文件夹，可能导致程序出错或无法正常使用！" & vbCrLf & vbCrLf & "错误原因：" & ex.GetDetail(), "缓存文件夹不可用")
                 Else
-                    MyMsgBox("手动设置的缓存文件夹不可用，PCL 将使用默认缓存文件夹。" & vbCrLf & "错误原因：" & GetExceptionDetail(ex), "缓存文件夹不可用")
+                    MyMsgBox("手动设置的缓存文件夹不可用，PCL 将使用默认缓存文件夹。" & vbCrLf & vbCrLf & "错误原因：" & ex.GetDetail(), "缓存文件夹不可用")
                     Setup.Set("SystemSystemCache", "")
                     PathTemp = IO.Path.GetTempPath() & "PCL\"
                 End If
@@ -104,6 +104,13 @@ WaitRetry:
             ToolTipService.PlacementProperty.OverrideMetadata(GetType(DependencyObject), New FrameworkPropertyMetadata(Primitives.PlacementMode.Bottom))
             ToolTipService.HorizontalOffsetProperty.OverrideMetadata(GetType(DependencyObject), New FrameworkPropertyMetadata(8.0))
             ToolTipService.VerticalOffsetProperty.OverrideMetadata(GetType(DependencyObject), New FrameworkPropertyMetadata(4.0))
+            '设置网络配置默认值
+            ServicePointManager.Expect100Continue = False
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 Or SecurityProtocolType.Tls Or SecurityProtocolType.Tls11 Or SecurityProtocolType.Tls12
+            ServicePointManager.DefaultConnectionLimit = 10000
+            ServicePointManager.UseNagleAlgorithm = False
+            ServicePointManager.EnableDnsRoundRobin = True
+            ServicePointManager.ReusePort = True
             '设置初始窗口
             If Setup.Get("UiLauncherLogo") Then
                 FrmStart = New SplashScreen("Images\icon.ico")
@@ -136,11 +143,6 @@ WaitRetry:
             Setup.Load("ToolDownloadThread")
             Setup.Load("ToolDownloadCert")
             Setup.Load("ToolDownloadSpeed")
-            '网络配置初始化
-            ServicePointManager.Expect100Continue = True
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 Or SecurityProtocolType.Tls Or SecurityProtocolType.Tls11 Or SecurityProtocolType.Tls12
-            ServicePointManager.DefaultConnectionLimit = 1024
-            ServicePointManager.UseNagleAlgorithm = False
             '计时
             Log("[Start] 第一阶段加载用时：" & GetTimeTick() - ApplicationStartTick & " ms")
             ApplicationStartTick = GetTimeTick()
@@ -155,7 +157,7 @@ WaitRetry:
                 FilePath = PathWithName
             Catch
             End Try
-            MsgBox(GetExceptionDetail(ex, True) & vbCrLf & "PCL 所在路径：" & If(String.IsNullOrEmpty(FilePath), "获取失败", FilePath), MsgBoxStyle.Critical, "PCL 初始化错误")
+            MsgBox(ex.GetDetail(True) & vbCrLf & "PCL 所在路径：" & If(String.IsNullOrEmpty(FilePath), "获取失败", FilePath), MsgBoxStyle.Critical, "PCL 初始化错误")
             FormMain.EndProgramForce(ProcessReturnValues.Exception)
         End Try
     End Sub
@@ -168,10 +170,20 @@ WaitRetry:
     '异常
     Private Sub Application_DispatcherUnhandledException(sender As Object, e As DispatcherUnhandledExceptionEventArgs) Handles Me.DispatcherUnhandledException
         On Error Resume Next
+        '触发页面的 Dispatcher
+        If FrmMain?.PageLeft IsNot Nothing AndAlso TypeOf FrmMain.PageLeft Is IDispatcherUnhandledException Then
+            CType(FrmMain.PageLeft, IDispatcherUnhandledException).DispatcherUnhandledException(sender, e)
+            If e.Handled Then Return
+        End If
+        If FrmMain?.PageRight IsNot Nothing AndAlso TypeOf FrmMain.PageRight Is IDispatcherUnhandledException Then
+            CType(FrmMain.PageRight, IDispatcherUnhandledException).DispatcherUnhandledException(sender, e)
+            If e.Handled Then Return
+        End If
+        '正常处理
         e.Handled = True
         If IsProgramEnded Then Return
         FeedbackInfo()
-        Dim Detail As String = GetExceptionDetail(e.Exception, True)
+        Dim Detail As String = e.Exception.GetDetail(True)
         If Detail.Contains("System.Windows.Threading.Dispatcher.Invoke") OrElse Detail.Contains("MS.Internal.AppModel.ITaskbarList.HrInit") OrElse Detail.Contains("未能加载文件或程序集") OrElse
            Detail.Contains(".NET Framework") Then ' “自动错误判断” 的结果分析
             OpenWebsite("https://dotnet.microsoft.com/zh-cn/download/dotnet-framework/thank-you/net462-offline-installer")

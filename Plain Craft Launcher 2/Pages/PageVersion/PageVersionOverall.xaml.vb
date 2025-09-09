@@ -109,25 +109,23 @@
             Dim OldName As String = PageVersionLeft.Version.Name
             Dim OldPath As String = PageVersionLeft.Version.Path
             '修改此部分的同时修改快速安装的版本名检测*
-            Dim NewName As String = MyMsgBoxInput("重命名版本", "", OldName, New ObjectModel.Collection(Of Validate) From {New ValidateFolderName(PathMcFolder & "versions", IgnoreCase:=False)})
+            Dim NewName As String = MyMsgBoxInput("重命名版本", "", OldName, New ObjectModel.Collection(Of Validate) From {
+                New ValidateFolderName(PathMcFolder & "versions", IgnoreCase:=False), New ValidateExceptSame(OldName & "_temp", "不能使用该名称！")})
             If String.IsNullOrWhiteSpace(NewName) Then Return
             Dim NewPath As String = PathMcFolder & "versions\" & NewName & "\"
             '获取临时中间名，以防止仅修改大小写的重命名失败
             Dim TempName As String = NewName & "_temp"
             Dim TempPath As String = PathMcFolder & "versions\" & TempName & "\"
-            Dim IsCaseChangedOnly As Boolean = NewName.ToLower = OldName.ToLower
-            
-            '读取版本 JSON 信息
+            Dim OnlyChangedCase As Boolean = NewName.ToLower = OldName.ToLower
+            '重新读取版本 JSON 信息，避免 JsonObject 中已被合并的项被重新存储
             Dim JsonObject As JObject
-            Dim OldJsonPath As String = ""
+            Dim OldJsonPath As String = PageVersionLeft.Version.GetJsonPath()
             Try
-                OldJsonPath = PageVersionLeft.Version.GetJsonPath()
                 JsonObject = GetJson(ReadFile(OldJsonPath))
             Catch ex As Exception
                 Log(ex, "在重命名读取 json 时失败")
                 JsonObject = PageVersionLeft.Version.JsonObject
             End Try
-            
             '重命名主文件夹
             My.Computer.FileSystem.RenameDirectory(OldPath, TempName)
             My.Computer.FileSystem.RenameDirectory(TempPath, NewName)
@@ -137,7 +135,7 @@
             '重命名 jar 文件与 natives 文件夹
             '不能进行遍历重命名，否则在版本名很短的时候容易误伤其他文件（#6443）
             If Directory.Exists($"{NewPath}{OldName}-natives") Then
-                If IsCaseChangedOnly Then
+                If OnlyChangedCase Then
                     My.Computer.FileSystem.RenameDirectory($"{NewPath}{OldName}-natives", $"{OldName}natives_temp")
                     My.Computer.FileSystem.RenameDirectory($"{NewPath}{OldName}-natives_temp", $"{NewName}-natives")
                 Else
@@ -146,7 +144,7 @@
                 End If
             End If
             If File.Exists($"{NewPath}{OldName}.jar") Then
-                If IsCaseChangedOnly Then
+                If OnlyChangedCase Then
                     My.Computer.FileSystem.RenameFile($"{NewPath}{OldName}.jar", $"{OldName}_temp.jar")
                     My.Computer.FileSystem.RenameFile($"{NewPath}{OldName}_temp.jar", $"{NewName}.jar")
                 Else
@@ -162,48 +160,14 @@
             If ReadIni(PathMcFolder & "PCL.ini", "Version") = OldName Then
                 WriteIni(PathMcFolder & "PCL.ini", "Version", NewName)
             End If
-            
-            '处理JSON文件：先写入新文件，再删除旧文件
+            '更新版本 Json
             Try
-                '更新JSON内容中的id
                 JsonObject("id") = NewName
-                '写入新的JSON文件
                 WriteFile(NewPath & NewName & ".json", JsonObject.ToString)
-                
-                '删除旧的JSON文件（现在在新路径下）
-                Dim OldJsonInNewPath As String = NewPath & OldName & ".json"
-                If File.Exists(OldJsonInNewPath) Then
-                    File.Delete(OldJsonInNewPath)
-                End If
+                File.Delete(NewPath & GetFileNameFromPath(OldJsonPath))
             Catch ex As Exception
                 Log(ex, "重命名版本 json 失败")
-                '如果JSON处理失败，尝试回滚整个操作
-                If Directory.Exists(NewPath) AndAlso Not Directory.Exists(OldPath) Then
-                    Try
-                        '还原jar文件名
-                        If File.Exists($"{NewPath}{NewName}.jar") Then
-                            My.Computer.FileSystem.RenameFile($"{NewPath}{NewName}.jar", $"{OldName}.jar")
-                        End If
-                        '还原natives文件夹名
-                        If Directory.Exists($"{NewPath}{NewName}-natives") Then
-                            My.Computer.FileSystem.RenameDirectory($"{NewPath}{NewName}-natives", $"{OldName}-natives")
-                        End If
-                    Catch
-                        ' 忽略 jar 文件, natives 文件夹还原失败
-                    End Try
-                End If
-                Try
-                    '还原文件夹名
-                    My.Computer.FileSystem.RenameDirectory(NewPath, OldName)
-                    Hint("重命名失败：无法处理版本配置文件，已回滚更改", HintType.Critical)
-                    Return
-                Catch rollbackEx As Exception
-                    Log(rollbackEx, "重命名失败后尝试回滚也失败")
-                    Hint("重命名失败：版本文件可能已损坏，请检查版本文件夹", HintType.Critical)
-                    Return
-                End Try
             End Try
-            
             '刷新与提示
             Hint("重命名成功！", HintType.Finish)
             PageVersionLeft.Version = New McVersion(NewName).Load()
@@ -337,7 +301,7 @@
                     Case LoadState.Finished
                         Hint(Loader.Name & "成功！", HintType.Finish)
                     Case LoadState.Failed
-                        Hint(Loader.Name & "失败：" & GetExceptionSummary(Loader.Error), HintType.Critical)
+                        Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Critical)
                     Case LoadState.Aborted
                         Hint(Loader.Name & "已取消！", HintType.Info)
                 End Select

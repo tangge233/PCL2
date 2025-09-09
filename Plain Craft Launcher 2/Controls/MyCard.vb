@@ -123,14 +123,6 @@
         End Select
         '控件转换
         Select Case Type
-            Case 5
-                Dim LoadingPickaxe As New MyLoading With {.Text = "正在获取版本列表", .Margin = New Thickness(5)}
-                Dim Loader = New LoaderTask(Of String, List(Of DlForgeVersionEntry))("DlForgeVersion Main", AddressOf DlForgeVersionMain)
-                LoadingPickaxe.State = Loader
-                Loader.Start(Stack.Tag)
-                AddHandler LoadingPickaxe.StateChanged, AddressOf FrmDownloadForge.Forge_StateChanged
-                AddHandler LoadingPickaxe.Click, AddressOf FrmDownloadForge.Forge_Click
-                Stack.Children.Add(LoadingPickaxe)
             Case 6
                 ForgeDownloadListItemPreload(Stack, Stack.Tag, AddressOf ForgeSave_Click, True)
             Case 8
@@ -145,9 +137,6 @@
                     Stack.Children.Add(McDownloadListItem(Data, AddressOf McDownloadMenuSave, True))
                 Case 3
                     Stack.Children.Add(OptiFineDownloadListItem(Data, AddressOf OptiFineSave_Click, True))
-                Case 4
-                    Stack.Children.Add(LiteLoaderDownloadListItem(Data, AddressOf FrmDownloadLiteLoader.DownloadStart, False))
-                Case 5
                 Case 6
                     Stack.Children.Add(ForgeDownloadListItem(Data, AddressOf ForgeSave_Click, True))
                 Case 7
@@ -332,13 +321,8 @@
             SetValue(IsSwapedProperty, value)
         End Set
     End Property
-    Public Shared ReadOnly IsSwapedProperty As DependencyProperty = DependencyProperty.Register("IsSwaped", GetType(Boolean), GetType(MyCard), New PropertyMetadata(False, AddressOf OnIsSwapedPropertyChanged))
-    Private Shared Sub OnIsSwapedPropertyChanged(d As DependencyObject, e As DependencyPropertyChangedEventArgs)
-        Dim self = TryCast(d, MyCard)
-        If self IsNot Nothing Then
-            self.IsSwapped = CType(e.NewValue, Boolean)
-        End If
-    End Sub
+    Public Shared ReadOnly IsSwapedProperty As DependencyProperty = DependencyProperty.Register("IsSwaped", GetType(Boolean), GetType(MyCard), New PropertyMetadata(False,
+    Sub(sender, e) If sender IsNot Nothing AndAlso TypeOf sender Is MyCard Then CType(sender, MyCard).IsSwapped = CType(e.NewValue, Boolean)))
 
     Public Property SwapLogoRight As Boolean = False
     Private IsMouseDown As Boolean = False

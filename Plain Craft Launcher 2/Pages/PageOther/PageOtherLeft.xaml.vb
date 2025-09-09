@@ -132,7 +132,7 @@
     End Sub
     Public Shared Sub TryFeedback()
         If Not CanFeedback(True) Then Return
-        Select Case MyMsgBox("在提交新反馈前，建议先搜索反馈列表，以避免重复提交。" & vbCrLf & "如果无法打开该网页，请使用 VPN 以改善网络环境。",
+        Select Case MyMsgBox("在提交新反馈前，建议先搜索反馈列表，以避免重复提交。" & vbCrLf & "如果无法打开该网页，请使用 VPN 改善网络环境。",
                     "反馈", "提交新反馈", "查看反馈列表", "取消")
             Case 1
                 Feedback(True, False)
@@ -146,7 +146,7 @@
         e.Handled = True
     End Sub
     Public Shared Sub TryVote()
-        If MyMsgBox("是否要打开新功能投票网页？" & vbCrLf & "如果无法打开该网页，请使用 VPN 以改善网络环境。",
+        If MyMsgBox("是否要打开新功能投票网页？" & vbCrLf & "如果无法打开该网页，请使用 VPN 改善网络环境。",
                     "新功能投票", "打开", "取消") = 2 Then Return
         OpenWebsite("https://github.com/Meloong-Git/PCL/discussions/categories/%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8?discussions_q=category%3A%E5%8A%9F%E8%83%BD%E6%8A%95%E7%A5%A8+sort%3Adate_created")
     End Sub

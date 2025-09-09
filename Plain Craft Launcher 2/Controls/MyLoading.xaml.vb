@@ -79,11 +79,7 @@ Public Class MyLoading
                         Do While Ex.InnerException IsNot Nothing
                             Ex = Ex.InnerException
                         Loop
-                        LabText.Text = StrTrim(Ex.Message)
-                        If {"远程主机强迫关闭了", "远程方已关闭传输流", "未能解析此远程名称", "由于目标计算机积极拒绝",
-                            "操作已超时", "操作超时", "服务器超时", "连接超时"}.Any(Function(s) LabText.Text.Contains(s)) Then
-                            LabText.Text = "网络环境不佳，请稍后重试，或使用 VPN 以改善网络环境"
-                        End If
+                        LabText.Text = If(Ex.IsNetworkRelated(), "网络环境不佳，请稍后再试，或使用 VPN 改善网络环境", StrTrim(Ex.Message))
                     End If
                 Else
                     LabText.Text = TextError

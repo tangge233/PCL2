@@ -418,7 +418,7 @@ Public Class PageVersionExport
                 Log($"[Export] 使用配置文件中指定的导出路径：{ConfigPackPath}")
             Catch ex As Exception
                 Log(ex, $"无法使用配置文件中指定的导出路径（{ConfigPackPath}）", LogLevel.Debug)
-                If MyMsgBox($"指定的路径：{ConfigPackPath}{vbCrLf}{vbCrLf}{GetExceptionDetail(ex)}", "无法使用配置文件中指定的导出路径", "确定", "取消") = 2 Then Return
+                If MyMsgBox($"指定的路径：{ConfigPackPath}{vbCrLf}{vbCrLf}{ex.GetDetail}", "无法使用配置文件中指定的导出路径", "确定", "取消") = 2 Then Return
             End Try
         End If
         If PackPath Is Nothing Then
@@ -530,6 +530,7 @@ Public Class PageVersionExport
             Loader.Progress = 0.97
             '复制 PCL 版本设置
             CopyDirectory(McVersion.Path & "PCL\", OverridesFolder & "PCL\")
+            WriteIni(OverridesFolder & "PCL\Setup.ini", "IsStar", False)
 #If BETA Then
             '复制 PCL 本体
             If IncludePCL Then CopyFile(PathWithName, CacheFolder & "Plain Craft Launcher.exe")
