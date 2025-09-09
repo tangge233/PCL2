@@ -158,6 +158,7 @@ Retry:
         If File.Exists(OverridesIni) Then
             WriteIni(OverridesIni, "VersionArgumentIndie", 1) '开启版本隔离
             WriteIni(OverridesIni, "VersionArgumentIndieV2", True)
+            WriteIni(OverridesIni, "IsStar", False)
             CopyFile(OverridesIni, VersionIni) '覆写已有的 ini
         Else
             WriteIni(VersionIni, "VersionArgumentIndie", 1) '开启版本隔离
@@ -244,7 +245,7 @@ Retry:
             '获取 Mod 下载信息
             ModDownloadLoaders.Add(New LoaderTask(Of Integer, JArray)("获取 Mod 下载信息",
             Sub(Task As LoaderTask(Of Integer, JArray))
-                Task.Output = GetJson(DlModRequest("https://api.curseforge.com/v1/mods/files", "POST", "{""fileIds"": [" & Join(ModList, ",") & "]}", "application/json"))("data")
+                Task.Output = DlModRequest("https://api.curseforge.com/v1/mods/files", HttpMethod.Post, "{""fileIds"": [" & Join(ModList, ",") & "]}", "application/json")("data")
                 '如果文件已被删除，则 API 会跳过那一项
                 If ModList.Count > Task.Output.Count Then Throw New Exception("整合包中的部分 Mod 版本已被 Mod 作者删除，所以没法继续安装了，请向整合包作者反馈该问题")
             End Sub) With {.ProgressWeight = ModList.Count / 10}) '每 10 Mod 需要 1s

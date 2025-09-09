@@ -2,7 +2,9 @@
 
     '构造函数
     Private TempFolder As String
-    Public Sub New(UUID As Integer)
+    Private TargetVersion As McVersion
+    Public Sub New(Optional TargetVersion As McVersion = Nothing)
+        Me.TargetVersion = TargetVersion
         '构建文件结构
         TempFolder = RequestTaskTempFolder()
         Directory.CreateDirectory(TempFolder & "Temp\")
@@ -339,6 +341,7 @@ Extracted:
     ''' 导致崩溃的原因枚举。
     ''' </summary>
     Private Enum CrashReason
+        Java虚拟机参数有误
         Mod文件被解压
         MixinBootstrap缺失
         内存不足
@@ -482,10 +485,12 @@ Done:
         '崩溃报告分析，高优先级
         If LogCrash IsNot Nothing Then
             If LogCrash.Contains("Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass") Then AppendReason(CrashReason.Java版本过高)
+            If LogCrash.Contains("Failed loading config file ") Then AppendReason(CrashReason.Mod配置文件导致游戏崩溃, {TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=Failed loading config file .+ for modid )[^\n]+"), "").TrimEnd(vbCrLf)).First, If(RegexSeek(LogCrash, "(?<=Failed loading config file ).+(?= of type)"), "").TrimEnd(vbCrLf)})
         End If
 
         '游戏日志分析
         If LogMc IsNot Nothing Then
+            If LogMc.Contains("Unrecognized option:") Then AppendReason(CrashReason.Java虚拟机参数有误)
             If LogMc.Contains("Found multiple arguments for option fml.forgeVersion, but you asked for only one") Then AppendReason(CrashReason.版本Json中存在多个Forge)
             If LogMc.Contains("The driver does not appear to support OpenGL") Then AppendReason(CrashReason.显卡不支持OpenGL)
             If LogMc.Contains("java.lang.ClassCastException: java.base/jdk") Then AppendReason(CrashReason.使用JDK)
@@ -508,13 +513,13 @@ Done:
             If LogMc.Contains("Couldn't set pixel format") Then AppendReason(CrashReason.显卡驱动不支持导致无法设置像素格式)
             If LogMc.Contains("java.lang.OutOfMemoryError") OrElse LogMc.Contains("an out of memory error") Then AppendReason(CrashReason.内存不足)
             If LogMc.Contains("java.lang.RuntimeException: Shaders Mod detected. Please remove it, OptiFine has built-in support for shaders.") Then AppendReason(CrashReason.ShadersMod与OptiFine同时安装)
-            If LogMc.Contains("java.lang.NoSuchMethodError: sun.security.util.ManifestEntryVerifier") Then AppendReason(CrashReason.低版本Forge与高版本Java不兼容)
+            If LogMc.Contains("java.lang.NoSuchMethodError: sun.security.util.ManifestEntryVerifier") OrElse LogMc.Contains("java.lang.NoSuchMethodError: 'void sun.security.util.ManifestEntryVerifier") Then AppendReason(CrashReason.低版本Forge与高版本Java不兼容)
             If LogMc.Contains("1282: Invalid operation") Then AppendReason(CrashReason.光影或资源包导致OpenGL1282错误)
             If LogMc.Contains("signer information does not match signer information of other classes in the same package") Then AppendReason(CrashReason.文件或内容校验失败, If(RegexSeek(LogMc, "(?<=class "")[^']+(?=""'s signer information)"), "").TrimEnd(vbCrLf))
             If LogMc.Contains("Maybe try a lower resolution resourcepack?") Then AppendReason(CrashReason.材质过大或显卡配置不足)
             If LogMc.Contains("java.lang.NoSuchMethodError: net.minecraft.world.server.ChunkManager$ProxyTicketManager.shouldForceTicks(J)Z") AndAlso LogMc.Contains("OptiFine") Then AppendReason(CrashReason.OptiFine导致无法加载世界)
             If LogMc.Contains("Unsupported class file major version") Then AppendReason(CrashReason.Java版本不兼容)
-            If LogMc.Contains("com.electronwill.nightconfig.core.io.ParsingException: Not enough data available") Then AppendReason(CrashReason.NightConfig的Bug)
+            If LogMc.Contains("com.electronwill.nightconfig.core.io.ParsingException: Not enough data available") AndAlso Not CrashReasons.ContainsKey(CrashReason.Mod配置文件导致游戏崩溃) Then AppendReason(CrashReason.NightConfig的Bug)
             If LogMc.Contains("Cannot find launch target fmlclient, unable to launch") Then AppendReason(CrashReason.Forge安装不完整)
             If LogMc.Contains("Invalid paths argument, contained no existing paths") AndAlso LogMc.Contains("libraries\net\minecraftforge\fmlcore") Then AppendReason(CrashReason.Forge安装不完整)
             If LogMc.Contains("Invalid module name: '' is not a Java identifier") Then AppendReason(CrashReason.Mod名称包含特殊字符)
@@ -576,7 +581,6 @@ Done:
             End If
             If LogCrash.Contains("Multiple entries with same key: ") Then AppendReason(CrashReason.确定Mod导致游戏崩溃, TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=Multiple entries with same key: )[^=]+"), "").TrimEnd((vbCrLf & " ").ToCharArray)))
             If LogCrash.Contains("LoaderExceptionModCrash: Caught exception from ") Then AppendReason(CrashReason.确定Mod导致游戏崩溃, TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=LoaderExceptionModCrash: Caught exception from )[^\n]+"), "").TrimEnd((vbCrLf & " ").ToCharArray)))
-            If LogCrash.Contains("Failed loading config file ") Then AppendReason(CrashReason.Mod配置文件导致游戏崩溃, {TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=Failed loading config file .+ for modid )[^\n]+"), "").TrimEnd(vbCrLf)).First, If(RegexSeek(LogCrash, "(?<=Failed loading config file ).+(?= of type)"), "").TrimEnd(vbCrLf)})
         End If
 
     End Sub
@@ -856,12 +860,13 @@ NextStack:
     ''' <summary>
     ''' 弹出崩溃弹窗，并指导导出崩溃报告。
     ''' </summary>
-    Public Sub Output(IsHandAnalyze As Boolean, Optional ExtraFiles As List(Of String) = Nothing)
+    Public Sub Output(IsManualAnalyze As Boolean, Optional ExtraFiles As List(Of String) = Nothing)
         '弹窗提示
         FrmMain.ShowWindowToTop()
-        Select Case MyMsgBox(GetAnalyzeResult(IsHandAnalyze), If(IsHandAnalyze, "错误报告分析结果", "Minecraft 出现错误"),
-            "确定", If(IsHandAnalyze OrElse DirectFile Is Nothing, "", "查看日志"), If(IsHandAnalyze, "", "导出错误报告"),
-            Button2Action:=If(IsHandAnalyze OrElse DirectFile Is Nothing, Nothing,
+        Dim Detail As String = GetAnalyzeResult(IsManualAnalyze)
+        Select Case MyMsgBox(Detail, If(IsManualAnalyze, "错误报告分析结果", "Minecraft 出现错误"),
+            "确定", If(IsManualAnalyze OrElse DirectFile Is Nothing, "", "查看日志"), If(IsManualAnalyze, "", "导出错误报告"),
+            Button2Action:=If(IsManualAnalyze OrElse DirectFile Is Nothing, Nothing,
             Sub()
                 '弹窗选择：查看日志
                 If File.Exists(DirectFile.Value.Key) Then
@@ -918,6 +923,11 @@ NextStack:
                 End Try
                 OpenExplorer(FileAddress)
         End Select
+        '上报
+        If IsManualAnalyze Then Return
+        Telemetry("Minecraft 崩溃",
+                  "Version", If(TargetVersion Is Nothing, "null", TargetVersion.Version.ToString),
+                  "Detail", FilterUserName(Detail, "*"))
     End Sub
     ''' <summary>
     ''' 获取崩溃分析的结果描述。
@@ -938,6 +948,8 @@ NextStack:
         For Each Reason In CrashReasons
             Dim Additional As List(Of String) = Reason.Value
             Select Case Reason.Key
+                Case CrashReason.Java虚拟机参数有误
+                    Results.Add("由于 Java 虚拟机参数有误，导致游戏无法继续运行。\n请检查高级启动选项中设置的 Java 虚拟机参数是否有误。")
                 Case CrashReason.Mod文件被解压
                     Results.Add("由于 Mod 文件被解压了，导致游戏无法继续运行。\n直接把整个 Mod 文件放进 Mod 文件夹中即可，若解压就会导致游戏出错。\n\n请删除 Mod 文件夹中已被解压的 Mod，然后再启动游戏。")
                 Case CrashReason.内存不足
@@ -1018,9 +1030,14 @@ NextStack:
                     End If
                 Case CrashReason.特定实体导致崩溃
                     If Additional.Count = 1 Then
-                        Results.Add("游戏似乎因为实体 " & Additional.First & " 出现了问题。\n\n你可以创建一个新世界，并生成一个该实体，然后观察游戏的运行情况：\n - 若正常运行，则是该实体导致出错，你或许需要使用一些方式删除此实体。\n - 若仍然出错，问题就可能来自其他原因……\h")
+                        Dim entityInfo As String = Additional.First
+                        If entityInfo.StartsWith("minecraft:player") Then
+                            Results.Add("游戏似乎因为玩家实体 " & entityInfo & " 出现了问题。\n\n这通常是因为玩家数据损坏或世界存档问题导致的。\n请尝试以下解决方案：\n - 创建一个新世界，观察游戏是否正常运行\n - 如果新世界正常，可能需要删除或修复当前世界的玩家数据文件\n - 也可能是某个 Mod 与玩家实体处理存在冲突，尝试逐个禁用近期安装的 Mod\n - 如果问题持续存在，建议备份重要数据后重新创建世界\h")
+                        Else
+                            Results.Add("游戏似乎因为实体 " & entityInfo & " 出现了问题。\n\n请尝试以下解决方案：\n - 创建一个新世界，并尝试生成该类型的实体，观察游戏运行情况\n - 如果新世界中该实体正常，问题可能在于当前世界的数据损坏\n - 如果新世界中仍然崩溃，可能是某个 Mod 导致了实体处理异常\n - 尝试逐个禁用可能影响实体的 Mod（如生物类、AI 类 Mod）\n - 也可以尝试使用指令删除该坐标附近的实体\h")
+                        End If
                     Else
-                        Results.Add("游戏似乎因为世界中的某些实体出现了问题。\n\n你可以创建一个新世界，并生成各种实体，观察游戏的运行情况：\n - 若正常运行，则是某些实体导致出错，你或许需要删除该世界。\n - 若仍然出错，问题就可能来自其他原因……\h")
+                        Results.Add("游戏似乎因为世界中的某些实体出现了问题。\n\n请尝试以下解决方案：\n - 创建一个新世界，观察游戏的运行情况\n - 如果新世界正常运行，则是当前世界的实体数据导致出错\n - 可以尝试使用指令清理异常实体\n - 如果问题持续存在，可能是某个处理实体的 Mod 存在问题\n - 建议逐个禁用近期安装的 Mod，特别是涉及生物、AI 或实体处理的 Mod\h")
                     End If
                 Case CrashReason.OptiFine与Forge不兼容
                     Results.Add("由于 OptiFine 与当前版本的 Forge 不兼容，导致了游戏崩溃。\n\n请前往 OptiFine 官网（https://optifine.net/downloads）查看 OptiFine 所兼容的 Forge 版本，并严格按照对应版本重新安装游戏。")
@@ -1102,7 +1119,7 @@ NextStack:
                 If(Not Results.Any(Function(r) r.EndsWithF("\h")) OrElse IsHandAnalyze, "",
                     vbCrLf & "如果要寻求帮助，请把错误报告文件发给对方，而不是发送这个窗口的照片或者截图。" &
                     If(If(PageSetupSystem.IsLauncherNewest(), True), "",
-                    vbCrLf & vbCrLf & "此外，你正在使用老版本 PCL，更新 PCL 或许也能解决这个问题。" & vbCrLf & "你可以点击 设置 → 启动器 → 检查更新 来更新 PCL。"))
+                    vbCrLf & vbCrLf & "此外，你正在使用老版本 PCL，更新 PCL 或许也能解决这个问题。" & vbCrLf & "你可以点击 [设置 → 其他 → 启动器 → 检查更新] 更新 PCL。"))
     End Function
 
 End Class
