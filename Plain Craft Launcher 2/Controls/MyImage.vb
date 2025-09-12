@@ -121,7 +121,6 @@
         RunInNewThread(
         Sub()
             Try
-RetryStart:
                 '下载
                 ActualSource = LoadingSource '显示加载中的占位图片
                 NetDownloadByLoader(

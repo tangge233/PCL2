@@ -424,7 +424,7 @@
                             If(File.FileName.EndsWith(".mrpack"), "*.mrpack", "*.zip")), DefaultFolder)
                     If Not Target.Contains("\") Then Return
                     '构造步骤加载器
-                    Dim LoaderName As String = Desc & "下载：" & GetFileNameWithoutExtentionFromPath(Target) & " "
+                    Dim LoaderName As String = Desc & "下载：" & IO.Path.GetFileNameWithoutExtension(Target) & " "
                     If Target <> DefaultFolder Then CachedFolder(Project.Type) = GetPathFromFullPath(Target)
                     Dim Loaders As New List(Of LoaderBase)
                     Loaders.Add(New LoaderDownload("下载文件", New List(Of NetFile) From {File.ToNetFile(Target)}) With {.ProgressWeight = 6, .Block = True})

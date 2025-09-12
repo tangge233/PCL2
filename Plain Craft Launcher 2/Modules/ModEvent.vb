@@ -45,9 +45,9 @@
                                 Dim Info As New ProcessStartInfo With {
                                     .Arguments = If(Data.Length >= 2, Data(1), ""),
                                     .FileName = Location,
-                                    .WorkingDirectory = ShortenPath(WorkingDir)
+                                    .WorkingDirectory = WorkingDir
                                 }
-                                Process.Start(Info)
+                                StartProcess(Info)
                             End If
                         Catch ex As Exception
                             Log(ex, "执行打开类自定义事件失败", LogLevel.Msgbox)

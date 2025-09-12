@@ -19,6 +19,9 @@ Public Class Application
     '开始
     Private Sub Application_Startup(sender As Object, e As StartupEventArgs) Handles Me.Startup
         Try
+            '动态 DLL 调用（必须尽量在前面，否则模块加载 CacheCow 等 DLL 就可能导致崩溃）
+            AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf AssemblyResolve
+            '开始
             SecretOnApplicationStart()
             '检查参数调用
             If e.Args.Length > 0 Then
@@ -116,8 +119,6 @@ WaitRetry:
                 FrmStart = New SplashScreen("Images\icon.ico")
                 FrmStart.Show(False, True)
             End If
-            '动态 DLL 调用
-            AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf AssemblyResolve
             '日志初始化
             LogStart()
             '添加日志

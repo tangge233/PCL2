@@ -98,7 +98,7 @@
                 If File.Exists(PathFolder & "pdf-bookmark") Then Throw New Exception("不兼容 PDF Bookmark 的 Java") '#5326
                 IsJre = Not File.Exists(PathFolder & "javac.exe")
                 '运行 -version
-                Output = ShellAndGetOutput(PathJava, "-version", 15000).ToLower
+                Output = StartProcessAndGetOutput(PathJava, "-version", 15000).ToLower
                 If Output = "" Then Throw New ApplicationException("尝试运行该 Java 失败")
                 If ModeDebug Then Log("[Java] Java 检查输出：" & PathJava & vbCrLf & Output)
                 If Output.Contains("/lib/ext exists") Then Throw New ApplicationException("无法运行该 Java，请在删除 Java 文件夹中的 /lib/ext 文件夹后再试")
@@ -445,8 +445,8 @@ NoUserJava:
     ''' 将 Java 按照适用性排序。
     ''' </summary>
     Public Function JavaSorter(Left As JavaEntry, Right As JavaEntry) As Boolean
-        Dim PathInfo As New DirectoryInfo(ShortenPath(Path))
-        Dim PathMcInfo As New DirectoryInfo(ShortenPath(PathMcFolder))
+        Dim PathInfo As New DirectoryInfo(Path)
+        Dim PathMcInfo As New DirectoryInfo(PathMcFolder)
         '1. 尽量在当前文件夹或当前 Minecraft 文件夹
         Dim ProgramPathParent As String, MinecraftPathParent As String = ""
         ProgramPathParent = If(PathInfo.Parent, PathInfo).FullName
@@ -646,7 +646,7 @@ Wait:
     Private Sub JavaSearchFolder(OriginalPath As String, ByRef Results As Dictionary(Of String, Boolean), Source As Boolean, Optional IsFullSearch As Boolean = False)
         Try
             Log("[Java] 开始" & If(IsFullSearch, "完全", "部分") & "遍历查找：" & OriginalPath)
-            JavaSearchFolder(New DirectoryInfo(ShortenPath(OriginalPath)), Results, Source, IsFullSearch)
+            JavaSearchFolder(New DirectoryInfo(OriginalPath), Results, Source, IsFullSearch)
         Catch ex As UnauthorizedAccessException
             Log("[Java] 遍历查找 Java 时遭遇无权限的文件夹：" & OriginalPath)
         Catch ex As Exception

@@ -73,7 +73,7 @@ Public Module ModMod
             Get
                 If _Name Is Nothing Then Load()
                 If _Name Is Nothing Then _Name = _ModId
-                If _Name Is Nothing Then _Name = GetFileNameWithoutExtentionFromPath(Path)
+                If _Name Is Nothing Then _Name = IO.Path.GetFileNameWithoutExtension(Path)
                 Return _Name
             End Get
             Set(value As String)

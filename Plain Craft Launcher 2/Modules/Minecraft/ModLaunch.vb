@@ -695,7 +695,7 @@ LoginFinish:
         '发送登录请求
         Dim RequestData As New JObject(
             New JProperty("accessToken", AccessToken), New JProperty("clientToken", ClientToken), New JProperty("requestUser", True))
-        NetRequestByClient(
+        NetRequestByClientRetry(
             Data.Input.BaseUrl & "/validate", HttpMethod.Post,
             Content:=RequestData.ToString(Newtonsoft.Json.Formatting.None),
             Headers:={{"Accept-Language", "zh-CN"}},
@@ -1827,9 +1827,9 @@ NextVersion:
     ''' </summary>
     Private Function GetNativesFolder() As String
         Dim Result As String = McVersionCurrent.Path & McVersionCurrent.Name & "-natives"
-        If IsGBKEncoding OrElse Result.IsASCII() Then Return Result
+        If IsGBKEncoding OrElse Result.IsASCII() Then Return ShortenPath(Result)
         Result = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\.minecraft\bin\natives"
-        If Result.IsASCII() Then Return Result
+        If Result.IsASCII() Then Return ShortenPath(Result)
         Return OsDrive & "ProgramData\PCL\natives"
     End Function
 
@@ -2159,14 +2159,15 @@ IgnoreCustomSkin:
         '执行自定义命令
         If CustomCommandGlobal <> "" Then
             McLaunchLog("正在执行全局自定义命令：" & CustomCommandGlobal)
-            Dim CustomProcess As New Process
+            Dim CustomProcess As Process = Nothing
             Try
-                CustomProcess.StartInfo.FileName = "cmd.exe"
-                CustomProcess.StartInfo.Arguments = "/c """ & CustomCommandGlobal & """"
-                CustomProcess.StartInfo.WorkingDirectory = ShortenPath(PathMcFolder)
-                CustomProcess.StartInfo.UseShellExecute = False
-                CustomProcess.StartInfo.CreateNoWindow = True
-                CustomProcess.Start()
+                CustomProcess = StartProcess(New ProcessStartInfo With {
+                    .FileName = "cmd.exe",
+                    .Arguments = $"/c ""{CustomCommandGlobal}""",
+                    .WorkingDirectory = PathMcFolder,
+                    .UseShellExecute = False,
+                    .CreateNoWindow = True
+                })
                 If Setup.Get("LaunchAdvanceRunWait") Then
                     Do Until CustomProcess.HasExited OrElse Loader.IsAborted
                         Thread.Sleep(10)
@@ -2175,7 +2176,7 @@ IgnoreCustomSkin:
             Catch ex As Exception
                 Log(ex, "执行全局自定义命令失败", LogLevel.Hint)
             Finally
-                If Not CustomProcess.HasExited AndAlso Loader.IsAborted Then
+                If CustomProcess IsNot Nothing AndAlso Not CustomProcess.HasExited AndAlso Loader.IsAborted Then
                     McLaunchLog("由于取消启动，已强制结束自定义命令 CMD 进程") '#1183
                     CustomProcess.Kill()
                 End If
@@ -2183,14 +2184,15 @@ IgnoreCustomSkin:
         End If
         If CustomCommandVersion <> "" Then
             McLaunchLog("正在执行版本自定义命令：" & CustomCommandVersion)
-            Dim CustomProcess As New Process
+            Dim CustomProcess As Process = Nothing
             Try
-                CustomProcess.StartInfo.FileName = "cmd.exe"
-                CustomProcess.StartInfo.Arguments = "/c """ & CustomCommandVersion & """"
-                CustomProcess.StartInfo.WorkingDirectory = ShortenPath(PathMcFolder)
-                CustomProcess.StartInfo.UseShellExecute = False
-                CustomProcess.StartInfo.CreateNoWindow = True
-                CustomProcess.Start()
+                CustomProcess = StartProcess(New ProcessStartInfo With {
+                    .FileName = "cmd.exe",
+                    .Arguments = $"/c ""{CustomCommandVersion}""",
+                    .WorkingDirectory = PathMcFolder,
+                    .UseShellExecute = False,
+                    .CreateNoWindow = True
+                })
                 If Setup.Get("VersionAdvanceRunWait", Version:=McVersionCurrent) Then
                     Do Until CustomProcess.HasExited OrElse Loader.IsAborted
                         Thread.Sleep(10)
@@ -2199,7 +2201,7 @@ IgnoreCustomSkin:
             Catch ex As Exception
                 Log(ex, "执行版本自定义命令失败", LogLevel.Hint)
             Finally
-                If Not CustomProcess.HasExited AndAlso Loader.IsAborted Then
+                If CustomProcess IsNot Nothing AndAlso Not CustomProcess.HasExited AndAlso Loader.IsAborted Then
                     McLaunchLog("由于取消启动，已强制结束自定义命令 CMD 进程") '#1183
                     CustomProcess.Kill()
                 End If
@@ -2210,7 +2212,6 @@ IgnoreCustomSkin:
     Private Sub McLaunchRun(Loader As LoaderTask(Of Integer, Process))
 
         '启动信息
-        Dim GameProcess = New Process()
         Dim StartInfo As New ProcessStartInfo(McLaunchJavaSelected.PathJava) '使用 javaw.exe 会导致 #6263
 
         '设置环境变量
@@ -2220,16 +2221,15 @@ IgnoreCustomSkin:
         StartInfo.EnvironmentVariables("appdata") = ShortenPath(PathMcFolder)
 
         '设置其他参数
-        StartInfo.WorkingDirectory = ShortenPath(McVersionCurrent.PathIndie)
+        StartInfo.WorkingDirectory = McVersionCurrent.PathIndie
         StartInfo.UseShellExecute = False
         StartInfo.RedirectStandardOutput = True
         StartInfo.RedirectStandardError = True
         StartInfo.CreateNoWindow = True
         StartInfo.Arguments = McLaunchArgument
-        GameProcess.StartInfo = StartInfo
 
         '开始进程
-        GameProcess.Start()
+        Dim GameProcess = StartProcess(StartInfo)
         McLaunchLog("已启动游戏进程：" & McLaunchJavaSelected.PathJava)
         If Loader.IsAborted Then
             McLaunchLog("由于取消启动，已强制结束游戏进程") '#1631

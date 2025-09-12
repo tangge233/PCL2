@@ -871,11 +871,11 @@ NextStack:
             Sub()
                 '弹窗选择：查看日志
                 If File.Exists(DirectFile.Value.Key) Then
-                    ShellOnly(DirectFile.Value.Key)
+                    StartProcess(DirectFile.Value.Key)
                 Else
                     Dim FilePath As String = PathTemp & "Crash.txt"
                     WriteFile(FilePath, Join(DirectFile.Value.Value, vbCrLf))
-                    ShellOnly(FilePath)
+                    StartProcess(FilePath)
                 End If
             End Sub))
             Case 3

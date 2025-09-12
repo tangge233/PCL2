@@ -81,13 +81,14 @@ Friend Module ModSecret
     ''' 设置 Headers 的 UA、Referer。
     ''' </summary>
     Friend Sub SecretHeadersSign(Url As String, ByRef Req As HttpRequestMessage, Optional SimulateBrowserHeaders As Boolean = False)
-        If Req.Headers.UserAgent.Any Then Return
-        If Url.Contains("baidupcs.com") OrElse Url.Contains("baidu.com") Then
-            Req.Headers.Add("User-Agent", "LogStatistic")  '#4951
-        ElseIf SimulateBrowserHeaders Then
-            Req.Headers.Add("User-Agent", $"PCL2/{VersionStandardCode} Mozilla/5.0 AppleWebKit/537.36 Chrome/63.0.3239.132 Safari/537.36")
-        Else
-            Req.Headers.Add("User-Agent", $"PCL2/{VersionStandardCode}")
+        If Not Req.Headers.UserAgent.Any Then
+            If Url.Contains("baidupcs.com") OrElse Url.Contains("baidu.com") Then
+                Req.Headers.Add("User-Agent", "LogStatistic")  '#4951
+            ElseIf SimulateBrowserHeaders Then
+                Req.Headers.Add("User-Agent", $"PCL2/{VersionStandardCode} Mozilla/5.0 AppleWebKit/537.36 Chrome/63.0.3239.132 Safari/537.36")
+            Else
+                Req.Headers.Add("User-Agent", $"PCL2/{VersionStandardCode}")
+            End If
         End If
         If Not SimulateBrowserHeaders Then Req.Headers.Add("Referer", $"http://{VersionCode}.open.pcl2.server/")
         If Url.Contains("api.curseforge.com") Then Req.Headers.Add("x-api-key", CurseForgeAPIKey)

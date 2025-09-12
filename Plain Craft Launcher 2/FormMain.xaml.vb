@@ -11,6 +11,14 @@ Public Class FormMain
         Dim FeatureList As New List(Of KeyValuePair(Of Integer, String))
         '统计更新日志条目
 #If BETA Then
+        If LastVersion < 369 Then 'Release 2.10.8
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "新增：允许在版本设置中设置禁止更新 Mod，以防整合包玩家误操作"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：若整合包需要 PCL 不兼容的加载器，允许选择跳过它的安装"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "删除：由于已不再需要，删除手动安装包下载功能"))
+            FeatureCount += 21
+            BugCount += 32
+        End If
         If LastVersion < 367 Then 'Release 2.10.6
             FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：启用 MCIM 社区资源镜像源，以缓解社区资源难以下载的问题"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：正版登录出错时无法给出正确的错误信息"))
@@ -96,6 +104,11 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 370 Then 'Snapshot 2.10.8
+            If LastVersion >= 368 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
+            FeatureCount += 3
+            BugCount += 4
+        End If
         If LastVersion < 368 Then 'Snapshot 2.10.7
             FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "新增：允许在版本设置中设置禁止更新 Mod，以防整合包玩家误操作"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
@@ -590,7 +603,7 @@ Public Class FormMain
                 FeedbackInfo()
                 Log("请在 https://github.com/Meloong-Git/PCL/issues 提交错误报告，以便于作者解决此问题！")
                 IsLogShown = True
-                ShellOnly(Path & "PCL\Log1.txt")
+                StartProcess(Path & "PCL\Log1.txt")
             End If
             Thread.Sleep(500) '防止 PCL 在记事本打开前就被掐掉
         End If

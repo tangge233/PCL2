@@ -13,13 +13,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.10.7" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.10.7." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.10.8" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.10.8." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
     Public Const VersionCode As Integer = 367 'Release
 #Else
-    Public Const VersionCode As Integer = 368 'Snapshot
+    Public Const VersionCode As Integer = 370 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -765,17 +765,6 @@ Public Module ModBase
         Return FilePath
     End Function
     ''' <summary>
-    ''' 从文件路径或者 Url 获取不包含路径与扩展名的文件名。不包含文件名将会抛出异常。
-    ''' </summary>
-    Public Function GetFileNameWithoutExtentionFromPath(FilePath As String) As String
-        Dim Name As String = GetFileNameFromPath(FilePath)
-        If Name.Contains(".") Then
-            Return Name.Substring(0, Name.LastIndexOfF("."))
-        Else
-            Return Name
-        End If
-    End Function
-    ''' <summary>
     ''' 从文件夹路径获取文件夹名。
     ''' </summary>
     Public Function GetFolderNameFromPath(FolderPath As String) As String
@@ -791,8 +780,8 @@ Public Module ModBase
     Public Sub CopyFile(FromPath As String, ToPath As String)
         Try
             '还原文件路径
-            FromPath = ShortenPath(If(FromPath.Contains(":\"), FromPath, Path & FromPath))
-            ToPath = ShortenPath(If(ToPath.Contains(":\"), ToPath, Path & ToPath))
+            FromPath = If(FromPath.Contains(":\"), FromPath, Path & FromPath)
+            ToPath = If(ToPath.Contains(":\"), ToPath, Path & ToPath)
             '如果复制同一个文件则跳过
             If FromPath = ToPath Then Return
             '确保目录存在
@@ -861,7 +850,7 @@ Public Module ModBase
     ''' <param name="Append">是否将文件内容追加到当前文件，而不是覆盖它。</param>
     Public Sub WriteFile(FilePath As String, Text As String, Optional Append As Boolean = False, Optional Encoding As Encoding = Nothing)
         '处理相对路径
-        FilePath = ShortenPath(If(FilePath.Contains(":\"), FilePath, Path & FilePath))
+        FilePath = If(FilePath.Contains(":\"), FilePath, Path & FilePath)
         '确保目录存在
         Directory.CreateDirectory(GetPathFromFullPath(FilePath))
         '写入文件
@@ -886,7 +875,7 @@ Public Module ModBase
     ''' <param name="Append">是否将文件内容追加到当前文件，而不是覆盖它。</param>
     Public Sub WriteFile(FilePath As String, Content As Byte(), Optional Append As Boolean = False)
         '处理相对路径
-        FilePath = ShortenPath(If(FilePath.Contains(":\"), FilePath, Path & FilePath))
+        FilePath = If(FilePath.Contains(":\"), FilePath, Path & FilePath)
         '确保目录存在
         Directory.CreateDirectory(GetPathFromFullPath(FilePath))
         '写入文件
@@ -1294,11 +1283,11 @@ Re:
     ''' </summary>
     Public Sub ExtractFile(CompressFilePath As String, DestDirectory As String, Optional Encode As Encoding = Nothing,
                            Optional ProgressIncrementHandler As Action(Of Double) = Nothing)
-        Directory.CreateDirectory(ShortenPath(DestDirectory))
+        Directory.CreateDirectory(DestDirectory)
         If CompressFilePath.EndsWithF(".gz", True) Then
             '以 gz 方式解压
             Dim stream As New GZipStream(New FileStream(CompressFilePath, FileMode.Open, FileAccess.ReadWrite), CompressionMode.Decompress)
-            Dim decompressedFile As New FileStream(ShortenPath(DestDirectory & GetFileNameFromPath(CompressFilePath).ToLower.Replace(".tar", "").Replace(".gz", "")), FileMode.OpenOrCreate, FileAccess.Write)
+            Dim decompressedFile As New FileStream(DestDirectory & GetFileNameFromPath(CompressFilePath).ToLower.Replace(".tar", "").Replace(".gz", ""), FileMode.OpenOrCreate, FileAccess.Write)
             Dim data As Integer = stream.ReadByte()
             While data <> -1
                 decompressedFile.WriteByte(data)
@@ -1312,13 +1301,10 @@ Re:
                 Dim TotalCount As Long = Archive.Entries.Count
                 For Each Entry As ZipArchiveEntry In Archive.Entries
                     If ProgressIncrementHandler IsNot Nothing AndAlso TotalCount > 0 Then ProgressIncrementHandler(1 / TotalCount)
-                    Dim DestinationPath As String = ShortenPath(IO.Path.Combine(DestDirectory, Entry.FullName))
-                    If DestinationPath.EndsWithF("\") OrElse DestinationPath.EndsWithF("/") Then
-                        Continue For '不创建空文件夹
-                    Else
-                        Directory.CreateDirectory(GetPathFromFullPath(DestinationPath))
-                        Entry.ExtractToFile(DestinationPath, True)
-                    End If
+                    Dim DestinationPath As String = IO.Path.Combine(DestDirectory, Entry.FullName)
+                    If DestinationPath.EndsWithF("\") OrElse DestinationPath.EndsWithF("/") Then Continue For '不创建空文件夹
+                    Directory.CreateDirectory(GetPathFromFullPath(DestinationPath))
+                    Entry.ExtractToFile(DestinationPath, True)
                 Next
             End Using
         End If
@@ -1342,6 +1328,7 @@ Re:
         Try
             Files = Directory.GetFiles(Path)
         Catch ex As DirectoryNotFoundException '#4549
+            If Not Directory.Exists(Path) Then Return 0 '可能已被其他线程删除
             Log(ex, $"疑似为孤立符号链接，尝试直接删除（{Path}）", LogLevel.Developer)
             Directory.Delete(Path)
             Return 0
@@ -1406,7 +1393,7 @@ RetryDir:
     ''' 遍历文件夹中的所有文件。
     ''' </summary>
     Public Function EnumerateFiles(Directory As String) As IEnumerable(Of FileInfo)
-        Dim Info As New DirectoryInfo(ShortenPath(Directory))
+        Dim Info As New DirectoryInfo(Directory)
         If Not Info.Exists Then Return New List(Of FileInfo)
         Return Info.EnumerateFiles("*", SearchOption.AllDirectories)
     End Function
@@ -1414,13 +1401,15 @@ RetryDir:
     ''' <summary>
     ''' 若路径长度大于指定值，则将长路径转换为短路径。
     ''' </summary>
-    Public Function ShortenPath(LongPath As String, Optional ShortenThreshold As Integer = 247) As String
-        If LongPath.Length <= ShortenThreshold Then Return LongPath
+    Public Function ShortenPath(LongPath As String) As String
+        If LongPath.Length <= 200 OrElse LongPath.StartsWithF("http", True) Then Return LongPath
+        If Not Directory.Exists(LongPath) AndAlso Not File.Exists(LongPath) Then Return LongPath
         Dim ShortPath As New StringBuilder(260)
         GetShortPathName(LongPath, ShortPath, 260)
-        Return ShortPath.ToString
+        ShortenPath = ShortPath.ToString
+        If String.IsNullOrEmpty(ShortenPath) Then Return LongPath
     End Function
-    Private Declare Function GetShortPathName Lib "kernel32" Alias "GetShortPathNameA" (ByVal lpszLongPath As String, ByVal lpszShortPath As StringBuilder, ByVal cchBuffer As Integer) As Integer
+    Private Declare Function GetShortPathName Lib "kernel32" Alias "GetShortPathNameA" (lpszLongPath As String, lpszShortPath As StringBuilder, cchBuffer As Integer) As Integer
 
 #End Region
 
@@ -1500,7 +1489,7 @@ RetryDir:
         If TypeOf InnerEx Is TypeLoadException OrElse TypeOf InnerEx Is BadImageFormatException OrElse TypeOf InnerEx Is MissingMethodException OrElse TypeOf InnerEx Is NotImplementedException OrElse TypeOf InnerEx Is TypeInitializationException Then
             Return "PCL 的运行环境存在问题。请尝试重新安装 .NET Framework 4.6.2 然后再试。若无法安装，请先卸载较新版本的 .NET Framework，然后再尝试安装。"
         ElseIf TypeOf InnerEx Is UnauthorizedAccessException Then
-            Return "PCL 的权限不足。请尝试右键 PCL 选择以管理员身份运行，或将目标从 C 盘或桌面挪到其他硬盘。"
+            Return "PCL 的权限不足。请尝试右键 PCL 选择以管理员身份运行。"
         ElseIf TypeOf InnerEx Is OutOfMemoryException Then
             Return "你的电脑运行内存不足，导致 PCL 无法继续运行。请在关闭一部分不需要的程序后再试。"
         ElseIf TypeOf InnerEx Is Runtime.InteropServices.COMException Then
@@ -2027,8 +2016,8 @@ RetryDir:
         '构造函数
         Public Sub New()
         End Sub
-        Public Sub New(data As IEnumerable(Of KeyValuePair(Of TKey, TValue)))
-            For Each DataItem In data
+        Public Sub New(Data As IEnumerable(Of KeyValuePair(Of TKey, TValue)))
+            For Each DataItem In Data
                 _Dictionary.Add(DataItem.Key, DataItem.Value)
             Next
         End Sub
@@ -2184,7 +2173,7 @@ RetryDir:
     ''' 返回程序的返回代码，如果运行失败将抛出异常。
     ''' </summary>
     Public Function RunAsAdmin(Argument As String) As Integer
-        Dim NewProcess = Process.Start(New ProcessStartInfo(PathWithName) With {.Verb = "runas", .Arguments = Argument})
+        Dim NewProcess = StartProcess(New ProcessStartInfo(PathWithName) With {.Verb = "runas", .Arguments = Argument})
         NewProcess.WaitForExit()
         Return NewProcess.ExitCode
     End Function
@@ -2343,46 +2332,21 @@ NextElement:
     End Class
 
     ''' <summary>
-    ''' 前台运行文件。
+    ''' 启动进程并返回进程实例，若失败则抛出异常。
+    ''' 会自动进行长路径处理。
     ''' </summary>
-    ''' <param name="FileName">文件名。可以为“notepad”等缩写。</param>
-    ''' <param name="Arguments">运行参数。</param>
-    Public Sub ShellOnly(FileName As String, Optional Arguments As String = "")
-        Try
-            FileName = ShortenPath(FileName)
-            Using Program As New Process
-                Program.StartInfo.Arguments = Arguments
-                Program.StartInfo.FileName = FileName
-                Log("[System] 执行外部命令：" & FileName & " " & Arguments)
-                Program.Start()
-            End Using
-        Catch ex As Exception
-            Log(ex, "打开文件或程序失败：" & FileName, LogLevel.Msgbox)
-        End Try
-    End Sub
+    Public Function StartProcess(FileName As String, Optional Arguments As String = "") As Process
+        Return StartProcess(New ProcessStartInfo With {.FileName = FileName, .Arguments = Arguments})
+    End Function
     ''' <summary>
-    ''' 前台运行文件并返回返回值。
+    ''' 启动进程并返回进程实例，若失败则抛出异常。
+    ''' 会自动进行长路径处理。
     ''' </summary>
-    ''' <param name="FileName">文件名。可以为“notepad”等缩写。</param>
-    ''' <param name="Arguments">运行参数。</param>
-    ''' <param name="Timeout">等待该程序结束的最长时间（毫秒）。超时会返回 Result.Timeout。</param>
-    Public Function ShellAndGetExitCode(FileName As String, Optional Arguments As String = "", Optional Timeout As Integer = 1000000) As ProcessReturnValues
-        Try
-            Using Program As New Process
-                Program.StartInfo.Arguments = Arguments
-                Program.StartInfo.FileName = FileName
-                Log("[System] 执行外部命令并等待返回码：" & FileName & " " & Arguments)
-                Program.Start()
-                If Program.WaitForExit(Timeout) Then
-                    Return Program.ExitCode
-                Else
-                    Return ProcessReturnValues.Timeout
-                End If
-            End Using
-        Catch ex As Exception
-            Log(ex, "执行命令失败：" & FileName, LogLevel.Msgbox)
-            Return ProcessReturnValues.Fail
-        End Try
+    Public Function StartProcess(StartInfo As ProcessStartInfo) As Process
+        StartInfo.FileName = ShortenPath(StartInfo.FileName)
+        If Not String.IsNullOrEmpty(StartInfo.WorkingDirectory) Then StartInfo.WorkingDirectory = ShortenPath(StartInfo.WorkingDirectory)
+        Log("[System] 启动进程：" & StartInfo.FileName & " " & StartInfo.Arguments)
+        Return Process.Start(StartInfo)
     End Function
     ''' <summary>
     ''' 静默运行文件并返回输出流字符串。执行失败会抛出异常。
@@ -2390,10 +2354,11 @@ NextElement:
     ''' <param name="FileName">文件名。可以为“notepad”等缩写。</param>
     ''' <param name="Arguments">运行参数。</param>
     ''' <param name="Timeout">等待该程序结束的最长时间（毫秒）。超时会抛出错误。</param>
-    Public Function ShellAndGetOutput(FileName As String, Optional Arguments As String = "", Optional Timeout As Integer = 1000000, Optional WorkingDirectory As String = Nothing) As String
+    Public Function StartProcessAndGetOutput(FileName As String, Optional Arguments As String = "", Optional Timeout As Integer = 1000000,
+                                      Optional WorkingDirectory As String = Nothing) As String
         Dim Info = New ProcessStartInfo With {
             .Arguments = Arguments,
-            .FileName = FileName,
+            .FileName = ShortenPath(FileName),
             .UseShellExecute = False,
             .CreateNoWindow = True,
             .RedirectStandardError = True,
@@ -2408,7 +2373,7 @@ NextElement:
             End If
         End If
         Log("[System] 执行外部命令并等待返回结果：" & FileName & " " & Arguments)
-        Using Program As New Process() With {.StartInfo = Info}
+        Using Program As New Process With {.StartInfo = Info}
             Program.Start()
             Dim Result As String = Program.StandardOutput.ReadToEnd & Program.StandardError.ReadToEnd
             Program.WaitForExit(Timeout)
@@ -2510,17 +2475,14 @@ NextElement:
     ''' <summary>
     ''' 尝试从字典中获取某项，如果该项不存在，则返回默认值。
     ''' </summary>
-    <Extension> Public Function GetOrDefault(Of TKey, TValue)(Dict As Dictionary(Of TKey, TValue), Key As TKey, Optional DefaultValue As TValue = Nothing) As TValue
-        If Dict.ContainsKey(Key) Then
-            Return Dict(Key)
-        Else
-            Return DefaultValue
-        End If
+    <Extension> Public Function GetOrDefault(Of TKey, TValue)(Dict As IDictionary(Of TKey, TValue), Key As TKey, Optional DefaultValue As TValue = Nothing) As TValue
+        Dim Result As TValue
+        Return If(Dict.TryGetValue(Key, Result), Result, DefaultValue)
     End Function
     ''' <summary>
     ''' 将某项添加到以列表作为值的字典中。
     ''' </summary>
-    <Extension> Public Sub AddToList(Of TKey, TValue)(Dict As Dictionary(Of TKey, List(Of TValue)), Key As TKey, Value As TValue)
+    <Extension> Public Sub AddToList(Of TKey, TValue)(Dict As IDictionary(Of TKey, List(Of TValue)), Key As TKey, Value As TValue)
         If Dict.ContainsKey(Key) Then
             Dict(Key).Add(Value)
         Else
@@ -2568,7 +2530,7 @@ NextElement:
                 Throw New Exception(Url & " 不是一个有效的网址，它必须以 http 开头！")
             End If
             Log("[System] 正在打开网页：" & Url)
-            Process.Start(Url)
+            StartProcess(Url)
         Catch ex As Exception
             Log(ex, "无法打开网页（" & Url & "）")
             ClipboardSet(Url, False)
@@ -2582,12 +2544,12 @@ NextElement:
     ''' </summary>
     Public Sub OpenExplorer(Location As String)
         Try
-            Location = ShortenPath(Location.Replace("/", "\").Trim(" "c, """"c))
+            Location = Location.Replace("/", "\").Trim(" "c, """"c)
             Log("[System] 正在打开资源管理器：" & Location)
             If Location.EndsWith("\") Then
-                ShellOnly(Location)
+                StartProcess(Location)
             Else
-                ShellOnly("explorer", $"/select,""{Location}""")
+                StartProcess("explorer", $"/select,""{Location}""")
             End If
         Catch ex As Exception
             Log(ex, "打开资源管理器失败，请尝试关闭安全软件（如 360 安全卫士）", LogLevel.Msgbox)

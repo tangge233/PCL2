@@ -1,9 +1,7 @@
 ﻿Imports System.Net.Http.Headers
 Imports System.Net.Sockets
 Imports System.Runtime.CompilerServices
-Imports System.Security.Policy
 Imports System.Threading.Tasks
-Imports CacheCow.Client
 
 Public Module ModNet
 
@@ -75,6 +73,11 @@ Retry:
         Catch ex As ThreadInterruptedException
             Throw
         Catch ex As Exception
+            If TypeOf ex Is ResponsedWebException Then
+                If CType(ex, ResponsedWebException).StatusCode = HttpStatusCode.Forbidden Then Throw
+                If CType(ex, ResponsedWebException).StatusCode = 429 Then Thread.Sleep(10000) 'Too Many Requests
+            End If
+            '重试
             Select Case RetryCount
                 Case 0
                     RetryException = ex
@@ -245,8 +248,20 @@ RequestFinished:
             SecretHeadersSign(Url, Request, SimulateBrowserHeaders)
             'DNS 解析
             CancelToken = New CancellationTokenSource(Timeout)
-            HostIp = DnsLookup(Request, CancelToken)
+            HostIp = DNSLookup(Request, CancelToken)
+            If HostIp IsNot Nothing AndAlso Not IPReliability.ContainsKey(HostIp) Then
+                IPReliability(HostIp) = -0.01 '预先降低一点，这样快速的重复请求会使用不同的 IP 以提高成功率
+            End If
             '发送请求
+            SyncLock RequestClientLock
+                '延迟初始化，以避免在程序启动前加载 CacheCow 导致 DLL 加载失败
+                If RequestClient Is Nothing Then
+                    RequestClient = CacheCow.Client.ClientExtensions.CreateClient(New CacheCow.Client.FileCacheStore.FileStore(PathTemp & "Cache/Http/"), New HttpClientHandler With {
+                        .AutomaticDecompression = DecompressionMethods.Deflate Or DecompressionMethods.GZip Or DecompressionMethods.None,
+                        .UseCookies = False '不设为 False 就不能从 Header 手动传入 Cookies
+                    })
+                End If
+            End SyncLock
             Response = RequestClient.SendAsync(Request, HttpCompletionOption.ResponseHeadersRead, CancelToken.Token).GetAwaiter().GetResult()
             Dim ResponseStream = Response.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
             Dim ResponseBytes As Byte()
@@ -263,18 +278,18 @@ RequestFinished:
                 Dim ResponseMessage = If(Encoding, Encoding.UTF8).GetString(ResponseBytes)
                 Throw New ResponsedWebException(
                     $"错误码 {Response.StatusCode} ({CInt(Response.StatusCode)})，{Method}，{Url}，{HostIp}" &
-                    If(String.IsNullOrEmpty(ResponseMessage), "", vbCrLf & ResponseMessage), ResponseMessage)
+                    If(String.IsNullOrEmpty(ResponseMessage), "", vbCrLf & ResponseMessage), Response.StatusCode, ResponseMessage)
             End If
         Catch ex As ThreadInterruptedException
             Throw
         Catch ex As ResponsedWebException
             Throw
-        Catch ex As DnsLookupException
-            Throw
         Catch ex As Exception
             RecordIPReliability(HostIp, -1)
             If TypeOf ex Is OperationCanceledException Then 'CancellationToken 超时
-                Throw New WebException($"连接服务器超时，请稍后再试，或使用 VPN 改善网络环境（{Method}, {Url}，{HostIp}）", WebExceptionStatus.Timeout)
+                Throw New WebException($"连接服务器超时，请稍后再试，或使用 VPN 改善网络环境（{Method}, {Url}，IP：{HostIp}）", WebExceptionStatus.Timeout)
+            ElseIf ex.IsNetworkRelated Then
+                Throw New WebException($"网络请求失败，请稍后再试，或使用 VPN 改善网络环境（{Method}, {Url}，IP：{HostIp}）", WebExceptionStatus.Timeout)
             Else
                 Throw New Exception($"网络请求出现意外异常（{Method}, {Url}，{HostIp}）", ex)
             End If
@@ -284,17 +299,15 @@ RequestFinished:
             Response?.Dispose()
         End Try
     End Function
-    Private RequestClient As HttpClient = ClientExtensions.CreateClient(New FileCacheStore.FileStore(PathTemp & "Cache/Http/"), New HttpClientHandler With {
-        .AutomaticDecompression = DecompressionMethods.Deflate Or DecompressionMethods.GZip Or DecompressionMethods.None,
-        .UseCookies = False '不设为 False 就不能从 Header 手动传入 Cookies
-    })
+    Private RequestClient As HttpClient = Nothing
+    Private RequestClientLock As New Object
 
     ''' <summary>
     ''' 进行 DNS 解析。它仅在选择的 IP 与系统默认的不一致时才对 URL 中的 Host 进行替换。
     ''' 返回请求时应使用的 IP；若为 IPv6，则加上了方括号。
+    ''' 若解析失败，则返回 Nothing。
     ''' </summary>
-    ''' <exception cref="DnsLookupException"></exception>
-    Private Function DnsLookup(Request As HttpRequestMessage, CancelToken As CancellationTokenSource) As String
+    Private Function DNSLookup(Request As HttpRequestMessage, CancelToken As CancellationTokenSource) As String
         Dim GetIPReliability = Function(Key) IPReliability.GetOrDefault(Key.ToString, 0)
         '初步 DNS 解析
         Dim Host = Request.RequestUri.Host
@@ -303,10 +316,14 @@ RequestFinished:
             DnsTask = Dns.GetHostAddressesAsync(Host)
             DnsTask.Wait(CancelToken.Token)
         Catch ex As Exception
-            Throw New DnsLookupException($"DNS 解析失败，请检查你的网络连接（{Host}）", ex)
+            Log(ex, $"DNS 解析失败（{Host}）")
+            Return Nothing
         End Try
         Dim Candidates As IPAddress() = DnsTask.Result.ToArray
-        If Not Candidates.Any Then Throw New DnsLookupException($"DNS 解析无结果，请检查你的网络连接（{Host}）")
+        If Not Candidates.Any Then
+            Log($"[Net] DNS 解析无结果（{Host}）")
+            Return Nothing
+        End If
         '若同时存在 IPv4 和 IPv6 地址，仅选择其中一类（因为 GFW 可能只屏蔽了 IPv4 或 IPv6）
         Dim IPv4Targets = Candidates.Where(Function(i) i.AddressFamily = AddressFamily.InterNetwork).ToArray
         Dim IPv6Targets = Candidates.Where(Function(i) i.AddressFamily = AddressFamily.InterNetworkV6).ToArray
@@ -322,20 +339,19 @@ RequestFinished:
         Dim TargetIp As String = If(Target.AddressFamily = AddressFamily.InterNetworkV6, $"[{Target}]", Target.ToString)
         If Target IsNot Candidates.First Then
             '优选结果与系统默认 IP 不一致，替换域名并设置 Host 头
-            If ModeDebug Then Log($"[Net] DNS 结果：{Host} → {Target}，所有可能的 IP 与可靠度：{DnsTask.Result.Select(Function(i) $"{i} → {GetIPReliability(i):0.000}").Join("；")}")
+            If ModeDebug Then Log($"[Net] DNS 解析结果：{Host} → {Target}，所有可能的 IP 与可靠度：{DnsTask.Result.Select(Function(i) $"{i} → {GetIPReliability(i):0.000}").Join("；")}")
             Request.Headers.Host = Host
             Dim Builder As New UriBuilder(Request.RequestUri)
             Builder.Host = TargetIp
             Request.RequestUri = Builder.Uri
         End If
-        If Not IPReliability.ContainsKey(TargetIp) Then IPReliability(TargetIp) = -0.01 '预先降低一点，这样快速的重复请求会使用不同的 IP 以提高成功率
         Return TargetIp
     End Function
     ''' <summary>
     ''' 记录每个 IP 地址的请求可靠度。
     ''' 通常取值 -1 ~ +0.5，越高越好。未尝试过的 IP 应视为 0。
     ''' </summary>
-    Private IPReliability As New Dictionary(Of String, Double)
+    Private IPReliability As New SafeDictionary(Of String, Double)
     ''' <summary>
     ''' 根据请求结果，记录 IP 地址的可靠度。
     ''' </summary>
@@ -346,29 +362,22 @@ RequestFinished:
     End Sub
 
     ''' <summary>
-    ''' DNS 解析失败引发的异常。
-    ''' </summary>
-    Private Class DnsLookupException
-        Inherits Exception
-        Public Sub New(Message As String, Optional InnerException As Exception = Nothing)
-            MyBase.New(Message, InnerException)
-        End Sub
-        Public Sub New(Message As String)
-            MyBase.New(Message)
-        End Sub
-    End Class
-    ''' <summary>
-    ''' 当网络请求失败时引发的异常。
-    ''' 附带 Response 属性，可用于获取远程服务器给予的回复。
+    ''' 当 HTTP 状态码不指示成功时引发的异常。
+    ''' 附带额外属性，可用于获取远程服务器给予的回复以及 HTTP 状态码。
     ''' </summary>
     Public Class ResponsedWebException
         Inherits WebException
         ''' <summary>
+        ''' HTTP 状态码。
+        ''' </summary>
+        Public StatusCode As HttpStatusCode
+        ''' <summary>
         ''' 远程服务器给予的回复。
         ''' </summary>
         Public Overloads Property Response As String
-        Public Sub New(Message As String, Response As String)
+        Public Sub New(Message As String, StatusCode As HttpStatusCode, Response As String)
             MyBase.New(Message)
+            Me.StatusCode = StatusCode
             Me.Response = Response
         End Sub
     End Class
@@ -750,7 +759,7 @@ RequestFinished:
         ''' </summary>
         Public Check As FileChecker
         ''' <summary>
-        ''' 下载时是否添加浏览器 UA。
+        ''' 是否模拟浏览器的 UserAgent 和 Referer。
         ''' </summary>
         Public SimulateBrowserHeaders As Boolean
 
@@ -969,7 +978,7 @@ StartThread:
             If ModeDebug OrElse Th.DownloadStart = 0 Then Log($"[Download] {LocalName}：开始，起始点 {Th.DownloadStart}，{Th.Source.Url}")
             Dim ResultStream As Stream = Nothing, HttpRequest As HttpRequestMessage = Nothing,
                 Response As HttpResponseMessage = Nothing, ResponseStream As Stream = Nothing,
-                CancelToken As CancellationTokenSource = Nothing, HostIp As String = ""
+                CancelToken As CancellationTokenSource = Nothing, HostIp As String = Nothing
             '部分下载源真的特别慢，并且只需要一个请求，例如 Ping 为 20s，如果增长太慢，就会造成类似 2.5s 5s 7.5s 10s 12.5s... 的极大延迟
             '延迟过长会导致某些特别慢的链接迟迟不被掐死
             Dim Timeout As Integer = Math.Min(Math.Max(ConnectAverage, 6000) * (1 + Th.Source.FailCount), 30000)
@@ -980,7 +989,7 @@ StartThread:
                 HttpRequest = New HttpRequestMessage(HttpMethod.Get, Th.Source.Url)
                 SecretHeadersSign(Th.Source.Url, HttpRequest, SimulateBrowserHeaders)
                 CancelToken = New CancellationTokenSource(Timeout)
-                HostIp = DnsLookup(HttpRequest, CancelToken) 'DNS 预解析
+                HostIp = DNSLookup(HttpRequest, CancelToken) 'DNS 预解析
                 If Not Th.IsFirstThread Then HttpRequest.Headers.Range = New RangeHeaderValue(Th.DownloadStart, Nothing)
                 Dim ContentLength As Long = 0
                 Response = ThreadClient.SendAsync(HttpRequest, HttpCompletionOption.ResponseHeadersRead, CancelToken.Token).GetAwaiter().GetResult()
@@ -1126,7 +1135,7 @@ SourceBreak:
                     RecordIPReliability(HostIp, 0.5)
                 End If
             Catch ex As Exception
-                Log($"[Download] {LocalName}：出错，{If(TypeOf ex Is OperationCanceledException, $"已超时（{Timeout}ms）", ex.GetDetail())}，{HostIp}")
+                Log($"[Download] {LocalName}：出错，{If(TypeOf ex Is OperationCanceledException, $"已超时（{Timeout}ms）", ex.GetDetail())}，IP：{HostIp}")
                 RecordIPReliability(HostIp, -0.7)
                 SourceFail(Th, ex, False)
             Finally
@@ -1864,7 +1873,7 @@ Retry:
         End Sub
         Private IsManagerStarted As Boolean = False
 
-        'Public FileRemainList As New List(Of String)
+        Private DownloadCacheLock As New Object
         Private IsDownloadCacheCleared As Boolean = False
         ''' <summary>
         ''' 开始一个下载任务。
@@ -1872,15 +1881,19 @@ Retry:
         Public Sub Start(Task As LoaderDownload)
             StartManager()
             '清理缓存
-            If Not IsDownloadCacheCleared Then
-                Try
-                    DeleteDirectory(PathTemp & "Download")
-                Catch ex As Exception
-                    Log(ex, "清理下载缓存失败")
-                End Try
+            SyncLock DownloadCacheLock '防止同时开启多个下载任务时重复清理
+                If Not IsDownloadCacheCleared Then
+                    Try
+                        Log("[Net] 开始清理下载缓存")
+                        DeleteDirectory(PathTemp & "Download")
+                        Log("[Net] 下载缓存已清理")
+                    Catch ex As Exception
+                        Log(ex, "清理下载缓存失败")
+                    End Try
+                    Directory.CreateDirectory(PathTemp & "Download")
+                End If
                 IsDownloadCacheCleared = True
-            End If
-            Directory.CreateDirectory(PathTemp & "Download")
+            End SyncLock
             '文件处理
             SyncLock LockFiles
                 '添加每个文件
@@ -1959,11 +1972,12 @@ Retry:
     ''' 判断某个 Exception 是否为网络问题所导致。
     ''' </summary>
     <Extension> Public Function IsNetworkRelated(Ex As Exception) As Boolean
-        If TypeOf Ex Is DnsLookupException Then Return True
         Dim Detail = Ex.GetDetail()
         If Detail.Contains("(403)") Then Return False
-        Return {"(408)", "超时", "timeout", "网络请求失败", "连接尝试失败", "远程主机强迫关闭了", "远程方已关闭传输流", "未能解析此远程名称", "由于目标计算机积极拒绝"}.
-            Any(Function(k) Detail.ContainsF(k, True))
+        Return {
+            "(408)", "超时", "timeout", "网络请求失败", "连接尝试失败", "远程主机强迫关闭了", "远程方已关闭传输流", "未能解析此远程名称",
+            "由于目标计算机积极拒绝", "基础连接已经关闭"
+        }.Any(Function(k) Detail.ContainsF(k, True))
     End Function
 
 End Module
