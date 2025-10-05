@@ -14,7 +14,7 @@
         AniControlEnabled -= 1
 
         '非重复加载部分
-        If IsLoaded Then Exit Sub
+        If IsLoaded Then Return
         IsLoaded = True
 
         '内存自动刷新
@@ -61,6 +61,7 @@
             CheckAdvanceAssetsV2.Checked = Setup.Get("VersionAdvanceAssetsV2", Version:=PageVersionLeft.Version)
             CheckAdvanceJava.Checked = Setup.Get("VersionAdvanceJava", Version:=PageVersionLeft.Version)
             CheckAdvanceDisableJLW.Checked = Setup.Get("VersionAdvanceDisableJLW", Version:=PageVersionLeft.Version)
+            CheckAdvanceDisableModUpdate.Checked = Setup.Get("VersionAdvanceDisableModUpdate", Version:=PageVersionLeft.Version)
 
         Catch ex As Exception
             Log(ex, "重载版本独立设置时出错", LogLevel.Feedback)
@@ -91,6 +92,7 @@
             Setup.Reset("VersionAdvanceRun", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionAdvanceRunWait", Version:=PageVersionLeft.Version)
             Setup.Reset("VersionAdvanceDisableJLW", Version:=PageVersionLeft.Version)
+            Setup.Reset("VersionAdvanceDisableModUpdate", Version:=PageVersionLeft.Version)
 
             Setup.Reset("VersionArgumentJavaSelect", Version:=PageVersionLeft.Version)
             JavaSearchLoader.Start(IsForceRestart:=True)
@@ -125,14 +127,14 @@
     Private Shared Sub CheckBoxLikeComboChange(sender As MyComboBox, e As Object) Handles ComboArgumentIndieV2.SelectionChanged
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.SelectedIndex = 0, Version:=PageVersionLeft.Version)
     End Sub
-    Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckAdvanceRunWait.Change, CheckAdvanceAssetsV2.Change, CheckAdvanceJava.Change, CheckAdvanceDisableJLW.Change
+    Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckAdvanceRunWait.Change, CheckAdvanceAssetsV2.Change, CheckAdvanceJava.Change, CheckAdvanceDisableJLW.Change, CheckAdvanceDisableModUpdate.Change
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Checked, Version:=PageVersionLeft.Version)
     End Sub
 
 #Region "游戏内存"
 
     Public Sub RamType(Type As Integer)
-        If SliderRamCustom Is Nothing Then Exit Sub
+        If SliderRamCustom Is Nothing Then Return
         SliderRamCustom.IsEnabled = (Type = 1)
     End Sub
 
@@ -140,7 +142,7 @@
     ''' 刷新 UI 上的 RAM 显示。
     ''' </summary>
     Public Sub RefreshRam(ShowAnim As Boolean)
-        If LabRamGame Is Nothing OrElse LabRamUsed Is Nothing OrElse FrmMain.PageCurrent <> FormMain.PageType.VersionSetup OrElse FrmVersionLeft.PageID <> FormMain.PageSubType.VersionSetup Then Exit Sub
+        If LabRamGame Is Nothing OrElse LabRamUsed Is Nothing OrElse FrmMain.PageCurrent <> FormMain.PageType.VersionSetup OrElse FrmVersionLeft.PageID <> FormMain.PageSubType.VersionSetup Then Return
         '获取内存情况
         Dim RamGame As Double = Math.Round(GetRam(PageVersionLeft.Version), 5)
         Dim RamTotal As Double = Math.Round(My.Computer.Info.TotalPhysicalMemory / 1024 / 1024 / 1024, 1)
@@ -355,22 +357,31 @@ PreFin:
 
 #Region "服务器"
 
+    '自动替换标点
+    Private Sub TextServerEnter_Change() Handles TextServerEnter.TextChanged
+        Dim NewText = TextServerEnter.Text.Replace("：", ":").Replace("。", ".")
+        If NewText = TextServerEnter.Text Then Return
+        Dim CurrentPosition = TextServerEnter.SelectionStart '重设焦点
+        TextServerEnter.Text = NewText
+        TextServerEnter.SelectionStart = CurrentPosition
+    End Sub
+
     '全局
     Private ComboServerLoginLast As Integer
     Private Sub ComboServerLogin_Changed() Handles ComboServerLogin.SelectionChanged, TextServerNide.ValidatedTextChanged, TextServerAuthServer.ValidatedTextChanged, TextServerAuthRegister.ValidatedTextChanged
-        If AniControlEnabled <> 0 Then Exit Sub
+        If AniControlEnabled <> 0 Then Return
         ServerLogin(ComboServerLogin.SelectedIndex)
         '检查是否输入正确，正确才触发设置改变
-        If ComboServerLogin.SelectedIndex = 3 AndAlso Not TextServerNide.IsValidated Then Exit Sub
-        If ComboServerLogin.SelectedIndex = 4 AndAlso Not TextServerAuthServer.IsValidated Then Exit Sub
+        If ComboServerLogin.SelectedIndex = 3 AndAlso Not TextServerNide.IsValidated Then Return
+        If ComboServerLogin.SelectedIndex = 4 AndAlso Not TextServerAuthServer.IsValidated Then Return
         '检查结果是否发生改变，未改变则不触发设置改变
-        If ComboServerLoginLast = ComboServerLogin.SelectedIndex Then Exit Sub
+        If ComboServerLoginLast = ComboServerLogin.SelectedIndex Then Return
         '触发
         ComboServerLoginLast = ComboServerLogin.SelectedIndex
         ComboChange(ComboServerLogin, Nothing)
     End Sub
     Public Sub ServerLogin(Type As Integer)
-        If LabServerNide Is Nothing Then Exit Sub
+        If LabServerNide Is Nothing Then Return
         LabServerNide.Visibility = If(Type = 3, Visibility.Visible, Visibility.Collapsed)
         TextServerNide.Visibility = If(Type = 3, Visibility.Visible, Visibility.Collapsed)
         PanServerNide.Visibility = If(Type = 3, Visibility.Visible, Visibility.Collapsed)
@@ -393,7 +404,7 @@ PreFin:
     Private Sub BtnServerAuthLittle_Click(sender As Object, e As EventArgs) Handles BtnServerAuthLittle.Click
         If TextServerAuthServer.Text <> "" AndAlso TextServerAuthServer.Text <> "https://littleskin.cn/api/yggdrasil" AndAlso
             MyMsgBox("即将把第三方登录设置覆盖为 LittleSkin 登录。" & vbCrLf & "除非你是服主，或者服主要求你这样做，否则请不要继续。" & vbCrLf & vbCrLf & "是否确实需要覆盖当前设置？",
-                     "设置覆盖确认", "继续", "取消") = 2 Then Exit Sub
+                     "设置覆盖确认", "继续", "取消") = 2 Then Return
         TextServerAuthServer.Text = "https://littleskin.cn/api/yggdrasil"
         TextServerAuthRegister.Text = "https://littleskin.cn/auth/register"
         TextServerAuthName.Text = "LittleSkin 登录"
@@ -405,7 +416,7 @@ PreFin:
 
     '刷新 Java 下拉框显示
     Public Sub RefreshJavaComboBox()
-        If ComboArgumentJava Is Nothing Then Exit Sub
+        If ComboArgumentJava Is Nothing Then Return
         '初始化列表
         ComboArgumentJava.Items.Clear()
         ComboArgumentJava.Items.Add(New MyComboBoxItem With {.Content = "跟随全局设置", .Tag = "使用全局设置"})
@@ -451,9 +462,9 @@ PreFin:
 
     '下拉框选择更改
     Private Sub JavaSelectionUpdate() Handles ComboArgumentJava.SelectionChanged
-        If AniControlEnabled <> 0 Then Exit Sub
+        If AniControlEnabled <> 0 Then Return
         'Java 不可用时也不清空，会导致刷新时找不到对象
-        If ComboArgumentJava.SelectedItem Is Nothing OrElse ComboArgumentJava.SelectedItem.Tag Is Nothing Then Exit Sub
+        If ComboArgumentJava.SelectedItem Is Nothing OrElse ComboArgumentJava.SelectedItem.Tag Is Nothing Then Return
         '设置新的 Java
         Dim SelectedJava = ComboArgumentJava.SelectedItem.Tag
         If "使用全局设置".Equals(SelectedJava) Then
@@ -479,8 +490,8 @@ PreFin:
     '版本隔离警告
     Private IsReverting As Boolean = False
     Private Sub ComboArgumentIndieV2_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ComboArgumentIndieV2.SelectionChanged
-        If AniControlEnabled <> 0 Then Exit Sub
-        If IsReverting Then Exit Sub
+        If AniControlEnabled <> 0 Then Return
+        If IsReverting Then Return
         If MyMsgBox("调整版本隔离后，你可能得把游戏存档、Mod 等文件手动迁移到新的游戏文件夹中。" & vbCrLf &
                     "如果修改后发现存档消失，把这项设置改回来就能恢复。" & vbCrLf &
                     "如果你不会迁移存档，不建议修改这项设置！",
@@ -506,4 +517,12 @@ PreFin:
         FrmMain.PageChange(FormMain.PageType.Setup, FormMain.PageSubType.SetupLaunch)
     End Sub
 
+    '去除参数中的回车
+    Private Sub ReplaceEnter(sender As MyTextBox, e As TextChangedEventArgs) Handles TextAdvanceJvm.TextChanged, TextAdvanceGame.TextChanged
+        Dim NewText = sender.Text.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr).Replace(vbCr, " ")
+        If NewText = sender.Text Then Return
+        Dim CaretIndex = sender.CaretIndex
+        sender.Text = NewText
+        sender.CaretIndex = Math.Max(0, CaretIndex - 1)
+    End Sub
 End Class

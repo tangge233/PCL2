@@ -79,7 +79,7 @@
                     If MusicState = MusicStates.Pause Then
                         FrmMain.BtnExtraMusic.Logo = Logo.IconPlay
                         FrmMain.BtnExtraMusic.LogoScale = 0.8
-                        ToolTipText = "已暂停：" & GetFileNameWithoutExtentionFromPath(MusicCurrent)
+                        ToolTipText = "已暂停：" & IO.Path.GetFileNameWithoutExtension(MusicCurrent)
                         If MusicAllList.Count > 1 Then
                             ToolTipText += vbCrLf & "左键恢复播放，右键播放下一曲。"
                         Else
@@ -88,7 +88,7 @@
                     Else
                         FrmMain.BtnExtraMusic.Logo = Logo.IconMusic
                         FrmMain.BtnExtraMusic.LogoScale = 1
-                        ToolTipText = "正在播放：" & GetFileNameWithoutExtentionFromPath(MusicCurrent)
+                        ToolTipText = "正在播放：" & IO.Path.GetFileNameWithoutExtension(MusicCurrent)
                         If MusicAllList.Count > 1 Then
                             ToolTipText += vbCrLf & "左键暂停，右键播放下一曲。"
                         Else
@@ -247,7 +247,7 @@
                 Log("[Music] 已恢复播放")
                 Try
                     MusicNAudio?.Play()
-                Catch 'https://github.com/Hex-Dragon/PCL2/pull/5415#issuecomment-2751135223
+                Catch 'https://github.com/Meloong-Git/PCL/pull/5415#issuecomment-2751135223
                     MusicNAudio?.Stop()
                     MusicNAudio?.Play()
                 End Try

@@ -10,7 +10,7 @@
 
         '路径
         ''' <summary>
-        ''' Java.exe 文件的完整路径。
+        ''' java.exe 文件的完整路径。
         ''' </summary>
         Public ReadOnly Property PathJava As String
             Get
@@ -18,15 +18,7 @@
             End Get
         End Property
         ''' <summary>
-        ''' Javaw.exe 文件的完整路径。
-        ''' </summary>
-        Public ReadOnly Property PathJavaw As String
-            Get
-                Return PathFolder & "javaw.exe"
-            End Get
-        End Property
-        ''' <summary>
-        ''' Javaw.exe 文件所在文件夹的路径，以 \ 结尾。
+        ''' java.exe 文件所在文件夹的路径，以 \ 结尾。
         ''' </summary>
         Public PathFolder As String
         ''' <summary>
@@ -98,22 +90,19 @@
         ''' 检查并获取 Java 详细信息。在 Java 存在异常时抛出错误。
         ''' </summary>
         Public Sub Check()
-            If IsChecked Then Exit Sub
+            If IsChecked Then Return
             Dim Output As String = Nothing
             Try
                 '确定文件存在
-                If Not File.Exists(PathJavaw) Then
-                    Throw New FileNotFoundException("未找到 javaw.exe 文件", PathJavaw)
-                End If
-                If Not File.Exists(PathFolder & "java.exe") Then
-                    Throw New FileNotFoundException("未找到 java.exe 文件", PathFolder & "java.exe")
-                End If
+                If Not File.Exists(PathJava) Then Throw New FileNotFoundException("未找到 java.exe 文件", PathJava)
+                If File.Exists(PathFolder & "pdf-bookmark") Then Throw New Exception("不兼容 PDF Bookmark 的 Java") '#5326
                 IsJre = Not File.Exists(PathFolder & "javac.exe")
                 '运行 -version
-                Output = ShellAndGetOutput(PathFolder & "java.exe", "-version", 15000).ToLower
+                Output = StartProcessAndGetOutput(PathJava, "-version", 15000).ToLower
                 If Output = "" Then Throw New ApplicationException("尝试运行该 Java 失败")
-                If ModeDebug Then Log("[Java] Java 检查输出：" & PathFolder & "java.exe" & vbCrLf & Output)
+                If ModeDebug Then Log("[Java] Java 检查输出：" & PathJava & vbCrLf & Output)
                 If Output.Contains("/lib/ext exists") Then Throw New ApplicationException("无法运行该 Java，请在删除 Java 文件夹中的 /lib/ext 文件夹后再试")
+                If Output.Contains("a fatal error") Then Throw New ApplicationException("无法运行该 Java，该 Java 或系统存在问题")
                 '获取详细信息
                 Dim VersionString = If(RegexSeek(Output, "(?<=version "")[^""]+"), If(RegexSeek(Output, "(?<=openjdk )[0-9]+"), "")).Replace("_", ".").Split("-").First
                 If VersionString.Split(".").Count > 4 Then VersionString = VersionString.Replace(".0.", ".") '#3493，VersionString = "21.0.2.0.2"
@@ -132,17 +121,17 @@
                 End If
                 Is64Bit = Output.Contains("64-bit")
                 If Version.Minor <= 4 OrElse Version.Minor >= 100 Then Throw New ApplicationException("分析详细信息失败，获取的版本为 " & Version.ToString)
-                '基于 #3649，在 64 位系统上禁用 32 位 Java
+                '#3649：在 64 位系统上禁用 32 位 Java
                 If Not Is64Bit AndAlso Not Is32BitSystem Then Throw New Exception("该 Java 为 32 位版本，请安装 64 位的 Java")
-                '基于 #2249 发现 JRE 17 似乎也导致了 Forge 安装失败，干脆禁用更多版本的 JRE
+                '#2249：JRE 17 似乎会导致 Forge 安装失败，干脆禁用更多版本的 JRE
                 If IsJre AndAlso VersionCode >= 16 Then Throw New Exception("由于高版本 JRE 对游戏的兼容性很差，因此不再允许使用。你可以使用对应版本的 JDK，而非 JRE！")
             Catch ex As ApplicationException
                 Throw ex
             Catch ex As ThreadInterruptedException
                 Throw ex
             Catch ex As Exception
-                Log("[Java] 检查失败的 Java 输出：" & PathFolder & "java.exe" & vbCrLf & If(Output, "无程序输出"))
-                Throw New Exception("检查 Java 失败（" & If(PathJavaw, "Nothing") & "）", ex)
+                Log("[Java] 检查失败的 Java 输出：" & If(PathJava, "Nothing") & vbCrLf & If(Output, "无程序输出"))
+                Throw New Exception("检查 Java 失败（" & If(PathJava, "Nothing") & "）", ex)
             End Try
             IsChecked = True
         End Sub
@@ -372,6 +361,7 @@ ExitUserJavaCheck:
             For Each Java In AllowedJavaList
                 '如果在官启文件夹启动，会将官启自带 Java 错误视作 MC 文件夹指定 Java，导致了 #2054 的第二例
                 If Java.PathFolder.Contains(".minecraft\cache\java") Then Continue For
+                If Java.PathFolder.Contains("PCL\MyDownload\") Then Continue For '#5780
                 If TargetJavaList.Contains(Java) Then
                     '直接使用指定的 Java
                     AllowedJavaList = New List(Of JavaEntry) From {Java}
@@ -455,10 +445,12 @@ NoUserJava:
     ''' 将 Java 按照适用性排序。
     ''' </summary>
     Public Function JavaSorter(Left As JavaEntry, Right As JavaEntry) As Boolean
+        Dim PathInfo As New DirectoryInfo(Path)
+        Dim PathMcInfo As New DirectoryInfo(PathMcFolder)
         '1. 尽量在当前文件夹或当前 Minecraft 文件夹
         Dim ProgramPathParent As String, MinecraftPathParent As String = ""
-        ProgramPathParent = If(New DirectoryInfo(Path).Parent, New DirectoryInfo(Path)).FullName
-        If PathMcFolder <> "" Then MinecraftPathParent = If(New DirectoryInfo(PathMcFolder).Parent, New DirectoryInfo(PathMcFolder)).FullName
+        ProgramPathParent = If(PathInfo.Parent, PathInfo).FullName
+        If PathMcFolder <> "" Then MinecraftPathParent = If(PathMcInfo.Parent, PathMcInfo).FullName
         If Left.PathFolder.StartsWithF(ProgramPathParent) AndAlso Not Right.PathFolder.StartsWithF(ProgramPathParent) Then Return True
         If Not Left.PathFolder.StartsWithF(ProgramPathParent) AndAlso Right.PathFolder.StartsWithF(ProgramPathParent) Then Return False
         If PathMcFolder <> "" Then
@@ -525,6 +517,8 @@ NoUserJava:
                 If Disk.DriveType = DriveType.Network Then Continue For '跳过网络驱动器（#3705）
                 JavaSearchFolder(Disk.Name, JavaPreList, False)
             Next
+            '查找 .jdks 文件夹中的 Java
+            JavaSearchFolder(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) & "\.jdks\", JavaPreList, False, True)
             '查找 APPDATA 文件夹中的 Java
             JavaSearchFolder(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\", JavaPreList, False)
             JavaSearchFolder(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) & "\", JavaPreList, False)
@@ -555,10 +549,9 @@ NoUserJava:
             '若不全为特殊引用，则清除特殊引用的地址
             Dim JavaWithoutInherit As New Dictionary(Of String, Boolean)
             For Each Pair In JavaPreList
-                If Pair.Key.Contains("java8path_target_") OrElse Pair.Key.Contains("javapath_target_") OrElse Pair.Key.Contains("javatmp") Then
-                    Log("[Java] 位于 " & Pair.Key & " 的 Java 包含特殊引用")
+                If Pair.Key.Contains("java8path_target_") OrElse Pair.Key.Contains("javapath_target_") OrElse Pair.Key.Contains("javatmp") OrElse Pair.Key.ContainsF("system32") Then
+                    Log("[Java] 位于 " & Pair.Key & " 的 Java 位于特殊路径，不应优先使用")
                 Else
-                    Log("[Java] 位于 " & Pair.Key & " 的 Java 不含特殊引用")
                     JavaWithoutInherit.Add(Pair.Key, Pair.Value)
                 End If
             Next
@@ -653,7 +646,7 @@ Wait:
     Private Sub JavaSearchFolder(OriginalPath As String, ByRef Results As Dictionary(Of String, Boolean), Source As Boolean, Optional IsFullSearch As Boolean = False)
         Try
             Log("[Java] 开始" & If(IsFullSearch, "完全", "部分") & "遍历查找：" & OriginalPath)
-            JavaSearchFolder(New DirectoryInfo(ShortenPath(OriginalPath)), Results, Source, IsFullSearch)
+            JavaSearchFolder(New DirectoryInfo(OriginalPath), Results, Source, IsFullSearch)
         Catch ex As UnauthorizedAccessException
             Log("[Java] 遍历查找 Java 时遭遇无权限的文件夹：" & OriginalPath)
         Catch ex As Exception
@@ -668,20 +661,20 @@ Wait:
     Private Sub JavaSearchFolder(OriginalPath As DirectoryInfo, ByRef Results As Dictionary(Of String, Boolean), Source As Boolean, Optional IsFullSearch As Boolean = False)
         Try
             '确认目录存在
-            If Not OriginalPath.Exists Then Exit Sub
+            If Not OriginalPath.Exists Then Return
             Dim Path As String = OriginalPath.FullName.Replace("\\", "\")
             If Not Path.EndsWithF("\") Then Path += "\"
             '若该目录有 Java，则加入结果
             If File.Exists(Path & "javaw.exe") Then Results(Path) = Source
             '查找其下的所有文件夹
-            '不应使用网易的 Java：https://github.com/Hex-Dragon/PCL2/issues/1279#issuecomment-2761489121
-            Dim Keywords = {"java", "jdk", "env", "环境", "run", "软件", "jre", "mc", "dragon",
+            '不应使用网易的 Java：https://github.com/Meloong-Git/PCL/issues/1279#issuecomment-2761489121
+            Dim Keywords = {"java", "jdk", "env", "环境", "run", "软件", "jre", "mc", "dragon", "bin",
                             "soft", "cache", "temp", "corretto", "roaming", "users", "craft", "program", "世界", "net",
                             "游戏", "oracle", "game", "file", "data", "jvm", "服务", "server", "客户", "client", "整合",
                             "应用", "运行", "前置", "mojang", "官启", "新建文件夹", "eclipse", "microsoft", "hotspot",
                             "runtime", "x86", "x64", "forge", "原版", "optifine", "官方", "启动", "hmcl", "mod", "高清",
                             "download", "launch", "程序", "path", "version", "baka", "pcl", "zulu", "local", "packages",
-                            "4297127d64ec6", "1.", "启动"}
+                            "4297127d64ec6", "1.", "启动", "jbr"}
             For Each FolderInfo As DirectoryInfo In OriginalPath.EnumerateDirectories
                 If FolderInfo.Attributes.HasFlag(FileAttributes.ReparsePoint) Then Continue For '跳过符号链接
                 Dim SearchEntry = GetFolderNameFromPath(FolderInfo.Name).ToLower '用于搜索的字符串
@@ -712,8 +705,8 @@ Wait:
             Return False
         Else
             Return MyMsgBox($"PCL 未找到 {VersionDescription}，是否需要 PCL 自动下载？" & vbCrLf &
-                            $"如果你已经安装了 {VersionDescription}，请在 设置 → 启动选项 → 游戏 Java 中手动导入。",
-                            "未找到 Java", "自动下载", "取消") = 1
+                            $"如果你已经安装了 {VersionDescription}，可以在 设置 → 启动选项 → 游戏 Java 中手动导入。",
+                            "自动下载 Java？", "自动下载", "取消") = 1
         End If
     End Function
 
@@ -742,10 +735,10 @@ Wait:
     Private LastJavaBaseDir As String = Nothing '用于在下载中断或失败时删除未完成下载的 Java 文件夹，防止残留只下了一半但 -version 能跑的 Java
     Private Sub JavaFileList(Loader As LoaderTask(Of Integer, List(Of NetFile)))
         Log("[Java] 开始获取 Java 下载信息")
-        Dim IndexFileStr As String = NetGetCodeByLoader(
-            {"https://bmclapi2.bangbang93.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json",
-             "https://piston-meta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json"},
-        IsJson:=True)
+        Dim IndexFileStr As String = NetRequestByLoader(DlVersionListOrder(
+            {"https://piston-meta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json"},
+            {"https://bmclapi2.bangbang93.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json"}
+        ), IsJson:=True)
         '获取下载地址
         Dim MainEntry As JObject = CType(GetJson(IndexFileStr), JObject)($"windows-x{If(Is32BitSystem, "86", "64")}")
         Dim Entries = MainEntry.Children.Reverse. '选择最靠后的一项（最新）
@@ -754,7 +747,7 @@ Wait:
         Dim Address As String = TargetEntry.Value("manifest")("url")
         Log($"[Java] 准备下载 Java {TargetEntry.Value("version")("name")}（{TargetEntry.Key}）：{Address}")
         '获取文件列表
-        Dim ListFileStr As String = NetGetCodeByLoader({Address.Replace("piston-meta.mojang.com", "bmclapi2.bangbang93.com"), Address}, IsJson:=True)
+        Dim ListFileStr As String = NetRequestByLoader(DlSourceOrder({Address}, {Address.Replace("piston-meta.mojang.com", "bmclapi2.bangbang93.com")}), IsJson:=True)
         LastJavaBaseDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\.minecraft\runtime\" & TargetEntry.Key & "\"
         Dim Results As New List(Of NetFile)
         For Each File As JProperty In CType(GetJson(ListFileStr), JObject)("files")
@@ -767,7 +760,7 @@ Wait:
             End If
             If Checker.Check(LastJavaBaseDir & File.Name) Is Nothing Then Continue For '跳过已存在的文件
             Dim Url As String = Info("url")
-            Results.Add(New NetFile({Url.Replace("piston-data.mojang.com", "bmclapi2.bangbang93.com"), Url}, LastJavaBaseDir & File.Name, Checker))
+            Results.Add(New NetFile(DlSourceOrder({Url}, {Url.Replace("piston-data.mojang.com", "bmclapi2.bangbang93.com")}), LastJavaBaseDir & File.Name, Checker))
         Next
         Loader.Output = Results
         Log($"[Java] 需要下载 {Results.Count} 个文件，目标文件夹：{LastJavaBaseDir}")

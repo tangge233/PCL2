@@ -1,4 +1,4 @@
-﻿Imports System.Collections.ObjectModel
+Imports System.Collections.ObjectModel
 
 Public Module ModEvent
 #Region "事件执行方法"
