@@ -111,7 +111,7 @@
     ''' </summary>
     Public Sub MusicControlPause()
         If MusicNAudio Is Nothing Then
-            Hint("音乐播放尚未开始！", HintType.Critical)
+            Hint("音乐播放尚未开始！", HintType.Red)
         Else
             Select Case MusicState
                 Case MusicStates.Pause
@@ -131,14 +131,14 @@
     Public Sub MusicControlNext()
         If MusicAllList.Count = 1 Then
             MusicStartPlay(MusicCurrent)
-            Hint("重新播放：" & GetFileNameFromPath(MusicCurrent), HintType.Finish)
+            Hint("重新播放：" & GetFileNameFromPath(MusicCurrent), HintType.Green)
         Else
             Dim Address As String = DequeueNextMusicAddress()
             If Address Is Nothing Then
-                Hint("没有可以播放的音乐！", HintType.Critical)
+                Hint("没有可以播放的音乐！", HintType.Red)
             Else
                 MusicStartPlay(Address)
-                Hint("正在播放：" & GetFileNameFromPath(Address), HintType.Finish)
+                Hint("正在播放：" & GetFileNameFromPath(Address), HintType.Green)
             End If
         End If
         MusicRefreshUI()
@@ -182,19 +182,19 @@
             MusicListInit(True)
             If Not MusicAllList.Any() Then
                 If MusicNAudio Is Nothing Then
-                    If ShowHint Then Hint("未检测到可用的背景音乐！", HintType.Critical)
+                    If ShowHint Then Hint("未检测到可用的背景音乐！", HintType.Red)
                 Else
                     MusicNAudio = Nothing
-                    If ShowHint Then Hint("背景音乐已清除！", HintType.Finish)
+                    If ShowHint Then Hint("背景音乐已清除！", HintType.Green)
                 End If
             Else
                 Dim Address As String = DequeueNextMusicAddress()
                 If Address Is Nothing Then
-                    If ShowHint Then Hint("没有可以播放的音乐！", HintType.Critical)
+                    If ShowHint Then Hint("没有可以播放的音乐！", HintType.Red)
                 Else
                     Try
                         MusicStartPlay(Address, IsFirstLoad)
-                        If ShowHint Then Hint("背景音乐已刷新：" & GetFileNameFromPath(Address), HintType.Finish, False)
+                        If ShowHint Then Hint("背景音乐已刷新：" & GetFileNameFromPath(Address), HintType.Green, False)
                     Catch
                     End Try
                 End If
@@ -303,18 +303,18 @@
         Catch ex As Exception
             Log(ex, "播放音乐出现内部错误（" & MusicCurrent & "）", LogLevel.Developer)
             If TypeOf ex Is NAudio.MmException AndAlso ex.Message.Contains("AlreadyAllocated") Then
-                Hint("你的音频设备正被其他程序占用。请在关闭占用的程序后重启 PCL，才能恢复音乐播放功能！", HintType.Critical)
+                Hint("你的音频设备正被其他程序占用。请在关闭占用的程序后重启 PCL，才能恢复音乐播放功能！", HintType.Red)
                 Thread.Sleep(1000000000)
             End If
             If TypeOf ex Is NAudio.MmException AndAlso (ex.Message.Contains("NoDriver") OrElse ex.Message.Contains("BadDeviceId")) Then
-                Hint("由于音频设备变更，音乐播放功能在重启 PCL 后才能恢复！", HintType.Critical)
+                Hint("由于音频设备变更，音乐播放功能在重启 PCL 后才能恢复！", HintType.Red)
                 Thread.Sleep(1000000000)
             End If
             If ex.Message.Contains("Got a frame at sample rate") OrElse ex.Message.Contains("does not support changes to") Then
-                Hint("播放音乐失败（" & GetFileNameFromPath(MusicCurrent) & "）：PCL 不支持播放音频属性在中途发生变化的音乐", HintType.Critical)
+                Hint("播放音乐失败（" & GetFileNameFromPath(MusicCurrent) & "）：PCL 不支持播放音频属性在中途发生变化的音乐", HintType.Red)
             ElseIf Not (MusicCurrent.EndsWithF(".wav", True) OrElse MusicCurrent.EndsWithF(".mp3", True) OrElse MusicCurrent.EndsWithF(".flac", True)) OrElse
                 ex.Message.Contains("0xC00D36C4") Then '#5096：不支持给定的 URL 的字节流类型。 (异常来自 HRESULT:0xC00D36C4)
-                Hint("播放音乐失败（" & GetFileNameFromPath(MusicCurrent) & "）：PCL 可能不支持此音乐格式，请将格式转换为 .wav、.mp3 或 .flac 后再试", HintType.Critical)
+                Hint("播放音乐失败（" & GetFileNameFromPath(MusicCurrent) & "）：PCL 可能不支持此音乐格式，请将格式转换为 .wav、.mp3 或 .flac 后再试", HintType.Red)
             Else
                 Log(ex, "播放音乐失败（" & GetFileNameFromPath(MusicCurrent) & "）", LogLevel.Hint)
             End If

@@ -48,48 +48,16 @@
         End Set
     End Property
 
-    '触发点击事件
+    '鼠标点击判定（务必放在点击事件之后，以使得 Button_MouseUp 先于 Button_MouseLeave 执行）
+    Private IsMouseDown As Boolean = False
     Private Sub Button_MouseUp(sender As Object, e As MouseButtonEventArgs) Handles Me.MouseLeftButtonUp
         If Not IsMouseDown Then Return
         Log("[Control] 按下图标按钮" & If(String.IsNullOrEmpty(Name), "", "：" & Name))
         RaiseEvent Click(sender, e)
         e.Handled = True
         Button_MouseUp()
-        ModEvent.ProcessCustomEvents(EventType, EventData, _CustomEvents)
+        RaiseCustomEvent() '自定义事件
     End Sub
-    Public Property EventType As String
-        Get
-            Return GetValue(EventTypeProperty)
-        End Get
-        Set(value As String)
-            SetValue(EventTypeProperty, value)
-        End Set
-    End Property
-    Public Shared ReadOnly EventTypeProperty As DependencyProperty = DependencyProperty.Register("EventType", GetType(String), GetType(MyIconButton), New PropertyMetadata(Nothing))
-    Public Property EventData As String
-        Get
-            Return GetValue(EventDataProperty)
-        End Get
-        Set(value As String)
-            SetValue(EventDataProperty, value)
-        End Set
-    End Property
-    Public Shared ReadOnly EventDataProperty As DependencyProperty = DependencyProperty.Register("EventData", GetType(String), GetType(MyIconButton), New PropertyMetadata(Nothing))
-    Public Property CustomEvents As CustomEventCollection
-        Get
-            If _CustomEvents Is Nothing Then
-                _CustomEvents = New CustomEventCollection
-            End If
-            Return _CustomEvents
-        End Get
-        Set(value As CustomEventCollection)
-            _CustomEvents = value
-        End Set
-    End Property
-    Private _CustomEvents As CustomEventCollection = Nothing
-
-    '鼠标点击判定（务必放在点击事件之后，以使得 Button_MouseUp 先于 Button_MouseLeave 执行）
-    Private IsMouseDown As Boolean = False
     Private Sub Button_MouseDown(sender As Object, e As MouseButtonEventArgs) Handles Me.MouseLeftButtonDown
         IsMouseDown = True
         Focus()
@@ -114,7 +82,6 @@
         RefreshAnim() '直接刷新颜色以判断是否已触发 MouseLeave
     End Sub
 
-    '自定义事件
     '务必放在 IsMouseDown 更新之后
     Private Const AnimationColorIn As Integer = 120
     Private Const AnimationColorOut As Integer = 150

@@ -7,23 +7,12 @@ Public Module ModMain
 
     ''' <summary>
     ''' 提示信息的种类。
+    ''' 该枚举在自定义事件中使用，是公开 API 的一部分。
     ''' </summary>
     Public Enum HintType
-        ''' <summary>
-        ''' 信息，通常是蓝色的“i”。
-        ''' </summary>
-        ''' <remarks></remarks>
-        Info
-        ''' <summary>
-        ''' 已完成，通常是绿色的“√”。
-        ''' </summary>
-        ''' <remarks></remarks>
-        Finish
-        ''' <summary>
-        ''' 错误，通常是红色的“×”。
-        ''' </summary>
-        ''' <remarks></remarks>
-        Critical
+        Blue
+        Green
+        Red
     End Enum
     Private Structure HintMessage
         Public Text As String
@@ -38,7 +27,7 @@ Public Module ModMain
     ''' <summary>
     ''' 在窗口左下角弹出提示文本。
     ''' </summary>
-    Public Sub Hint(Text As String, Optional Type As HintType = HintType.Info, Optional Log As Boolean = True)
+    Public Sub Hint(Text As String, Optional Type As HintType = HintType.Blue, Optional Log As Boolean = True)
         If HintWaiting Is Nothing Then HintWaiting = New SafeList(Of HintMessage)
         HintWaiting.Add(New HintMessage With {.Text = If(Text, ""), .Type = Type, .Log = Log})
     End Sub
@@ -68,13 +57,13 @@ Public Module ModMain
                 Dim TargetColor0, TargetColor1 As MyColor
                 Dim Percent As Double = 0.3
                 Select Case CurrentHint.Type
-                    Case HintType.Info
+                    Case HintType.Blue
                         TargetColor0 = New MyColor(215, 37, 155, 252)
                         TargetColor1 = New MyColor(215, 10, 142, 252)
-                    Case HintType.Finish
+                    Case HintType.Green
                         TargetColor0 = New MyColor(215, 33, 177, 33)
                         TargetColor1 = New MyColor(215, 29, 160, 29)
-                    Case Else 'HintType.Critical
+                    Case Else 'HintType.Red
                         TargetColor0 = New MyColor(215, 255, 53, 11)
                         TargetColor1 = New MyColor(215, 255, 43, 0)
                 End Select
@@ -490,7 +479,7 @@ EndHint:
         ''' 是否为 “执行事件”。
         ''' </summary>
         Public IsEvent As Boolean
-        Public EventType As String
+        Public EventType As CustomEvent.EventType
         Public EventData As String
         ''' <summary>
         ''' 若非执行事件，其对应的 .xaml 本地文件内容。
@@ -504,7 +493,7 @@ EndHint:
         ''' </summary>
         Public Sub New(FilePath As String)
             RawPath = FilePath
-            Dim JsonData As JObject = GetJson(HelpArgumentReplace(ReadFile(FilePath)))
+            Dim JsonData As JObject = GetJson(ArgumentReplace(ReadFile(FilePath), AddressOf EscapeXML))
             If JsonData Is Nothing Then Throw New FileNotFoundException("未找到帮助文件：" & FilePath, FilePath)
             '加载常规信息
             If JsonData("Title") IsNot Nothing Then
@@ -524,8 +513,7 @@ EndHint:
             Next
             '加载事件信息
             If If(JsonData("IsEvent"), False) Then
-                EventType = JsonData("EventType")
-                If EventType Is Nothing Then Throw New ArgumentException("未找到 EventType 项")
+                EventType = [Enum].Parse(GetType(CustomEvent.EventType), JsonData("EventType").ToString)
                 EventData = If(JsonData("EventData"), "")
                 IsEvent = True
             Else
@@ -550,7 +538,7 @@ EndHint:
         Public Function SetToListItem(Item As MyListItem) As MyListItem
             Dim Logo As String
             If IsEvent Then
-                If EventType = "弹出窗口" Then
+                If EventType = CustomEvent.EventType.弹出窗口 Then
                     Logo = PathImage & "Blocks/GrassPath.png"
                 Else
                     Logo = PathImage & "Blocks/CommandBlock.png"
@@ -567,9 +555,9 @@ EndHint:
                 .Height = 42
                 .Type = MyListItem.CheckType.Clickable
                 .Tag = Me
-                .EventType = Nothing
-                .EventData = Nothing
             End With
+            CustomEventService.SetEventType(Item, CustomEvent.EventType.None) '清空自定义事件属性，它们会被下面的点击事件处理
+            CustomEventService.SetEventData(Item, Nothing)
             '项目的点击事件
             AddHandler Item.Click, Sub(sender, e) PageOtherHelp.OnItemClick(sender.Tag)
             Return Item
@@ -669,15 +657,6 @@ NextFile:
             Log("[Help] 已解压内置帮助文件，目前状态：" & File.Exists(PathTemp & "Help\启动器\备份设置.xaml"), LogLevel.Debug)
         End If
     End Sub
-    ''' <summary>
-    ''' 对帮助文件约定的替换标记进行处理，如果遇到需要转义的字符会进行转义。
-    ''' </summary>
-    Public Function HelpArgumentReplace(Xaml As String) As String
-        Dim Result = Xaml.Replace("{path}", EscapeXML(Path))
-        Result = Result.RegexReplaceEach("\{hint\}", Function() EscapeXML(PageOtherTest.GetRandomHint()))
-        Result = Result.RegexReplaceEach("\{cave\}", Function() EscapeXML(PageOtherTest.GetRandomCave()))
-        Return Result
-    End Function
 
 #End Region
 
@@ -835,6 +814,78 @@ NextFile:
             Log($"[System] 已调整显卡设置：{Executeable}")
         End Using
     End Sub
+
+    ''' <summary>
+    ''' 对替换标记进行处理。会对替换内容使用 EscapeHandler 进行转义。
+    ''' </summary>
+    Public Function ArgumentReplace(Text As String, Optional EscapeHandler As Func(Of String, String) = Nothing, Optional ReplaceTime As Boolean = True) As String
+        '预处理
+        If Text Is Nothing Then Return Nothing
+        Dim Replacer =
+        Function(s As String) As String
+            If s Is Nothing Then Return ""
+            If EscapeHandler Is Nothing Then Return s
+            If s.Contains(":\") Then s = ShortenPath(s)
+            Return EscapeHandler(s)
+        End Function
+        '基础
+        Text = Text.Replace("{pcl_version}", Replacer(VersionBaseName))
+        Text = Text.Replace("{pcl_version_code}", Replacer(VersionCode))
+        Text = Text.Replace("{pcl_version_branch}", Replacer(VersionBranchName))
+        Text = Text.Replace("{pcl_branch}", Replacer(VersionBranchMain))
+        Text = Text.Replace("{identify}", Replacer(Identify))
+        Text = Text.Replace("{path}", Replacer(Path))
+        Text = Text.Replace("{path_with_name}", Replacer(PathWithName))
+        Text = Text.Replace("{path_temp}", Replacer(PathTemp))
+        '时间
+        If ReplaceTime Then '在窗口标题中，时间会被后续动态替换，所以此时不应该替换
+            Text = Text.Replace("{date}", Replacer(Date.Now.ToString("yyyy/M/d")))
+            Text = Text.Replace("{time}", Replacer(Date.Now.ToString("HH:mm:ss")))
+        End If
+        'Minecraft
+        Text = Text.Replace("{java}", Replacer(McLaunchJavaSelected?.PathFolder))
+        Text = Text.Replace("{minecraft}", Replacer(PathMcFolder))
+        If McVersionCurrent IsNot Nothing Then
+            Text = Text.Replace("{version_path}", Replacer(McVersionCurrent.Path)) : Text = Text.Replace("{verpath}", Replacer(McVersionCurrent.Path))
+            Text = Text.Replace("{version_indie}", Replacer(McVersionCurrent.PathIndie)) : Text = Text.Replace("{verindie}", Replacer(McVersionCurrent.PathIndie))
+            Text = Text.Replace("{name}", Replacer(McVersionCurrent.Name))
+            If {"unknown", "old", "pending"}.Contains(McVersionCurrent.Version.McName.ToLower) Then
+                Text = Text.Replace("{version}", Replacer(McVersionCurrent.Name))
+            Else
+                Text = Text.Replace("{version}", Replacer(McVersionCurrent.Version.McName))
+            End If
+        Else
+            Text = Text.Replace("{version_path}", Replacer(Nothing)) : Text = Text.Replace("{verpath}", Replacer(Nothing))
+            Text = Text.Replace("{version_indie}", Replacer(Nothing)) : Text = Text.Replace("{verindie}", Replacer(Nothing))
+            Text = Text.Replace("{name}", Replacer(Nothing))
+            Text = Text.Replace("{version}", Replacer(Nothing))
+        End If
+        '登录信息
+        If McLoginLoader.State = LoadState.Finished Then
+            Text = Text.Replace("{user}", Replacer(McLoginLoader.Output.Name))
+            Text = Text.Replace("{uuid}", Replacer(McLoginLoader.Output.Uuid.ToLower))
+            Select Case McLoginLoader.Input.Type
+                Case McLoginType.Legacy
+                    Text = Text.Replace("{login}", Replacer("离线"))
+                Case McLoginType.Ms
+                    Text = Text.Replace("{login}", Replacer("正版"))
+                Case McLoginType.Nide
+                    Text = Text.Replace("{login}", Replacer("统一通行证"))
+                Case McLoginType.Auth
+                    Text = Text.Replace("{login}", Replacer("Authlib-Injector"))
+            End Select
+        Else
+            Text = Text.Replace("{user}", Replacer(Nothing))
+            Text = Text.Replace("{uuid}", Replacer(Nothing))
+            Text = Text.Replace("{login}", Replacer(Nothing))
+        End If
+        '高级
+        Text = Text.RegexReplaceEach("\{hint\}", Function() Replacer(PageOtherTest.GetRandomHint()))
+        Text = Text.RegexReplaceEach("\{cave\}", Function() Replacer(PageOtherTest.GetRandomCave()))
+        Text = Text.RegexReplaceEach("\{setup:([a-zA-Z0-9]+)\}", Function(m) Replacer(Setup.GetSafe(m.Groups(1).Value, McVersionCurrent)))
+        Text = Text.RegexReplaceEach("\{varible:([^\}]+)\}", Function(m) Replacer(ReadReg("CustomEvent" & m.Groups(1).Value, Nothing)))
+        Return Text
+    End Function
 
 #End Region
 

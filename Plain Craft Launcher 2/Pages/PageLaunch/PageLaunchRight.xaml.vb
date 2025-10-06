@@ -134,6 +134,8 @@ Public Class PageLaunchRight
     Private Sub OnlineLoaderSub(Task As LoaderTask(Of String, Integer))
         Dim Address As String = Task.Input '#3721 中连续触发两次导致内容变化
         Try
+            '替换自定义变量与设置
+            Address = ArgumentReplace(Address, AddressOf WebUtility.HtmlEncode)
             '获取版本校验地址
             Dim VersionAddress As String
             If Address.Contains(".xaml") Then
@@ -146,29 +148,27 @@ Public Class PageLaunchRight
             End If
             '校验版本
             Dim Version As String = ""
-            Dim NeedDownload As Boolean = True
             Try
                 Version = NetRequestByClientRetry(VersionAddress)
                 If Version.Length > 1000 Then Throw New Exception($"获取的主页版本过长（{Version.Length} 字符）")
                 Dim CurrentVersion As String = Setup.Get("CacheSavedPageVersion")
                 If Version <> "" AndAlso CurrentVersion <> "" AndAlso Version = CurrentVersion Then
                     Log($"[Page] 当前缓存的主页已为最新，当前版本：{Version}，检查源：{VersionAddress}")
-                    NeedDownload = False
-                Else
-                    Log($"[Page] 需要下载联网主页，当前版本：{Version}，检查源：{VersionAddress}")
+                    Return
                 End If
+                Log($"[Page] 需要下载联网主页，当前版本：{Version}，检查源：{VersionAddress}")
             Catch exx As Exception
                 Log(exx, $"联网获取主页版本失败", LogLevel.Developer)
                 Log($"[Page] 无法检查联网主页版本，将直接下载，检查源：{VersionAddress}")
             End Try
             '实际下载
-            If Not NeedDownload Then Return
             Dim FileContent As String = NetRequestByClientRetry(Address)
             Log($"[Page] 已联网下载主页，内容长度：{FileContent.Length}，来源：{Address}")
             Setup.Set("CacheSavedPageUrl", Address)
             Setup.Set("CacheSavedPageVersion", Version)
             WriteFile(PathTemp & "Cache\Custom.xaml", FileContent)
-            Refresh() '要求刷新
+            '若内容变更则要求刷新
+            If LoadedContentHash <> FileContent.GetHashCode() Then Refresh()
         Catch ex As Exception
             Log(ex, $"下载主页失败（{Address}）", If(ModeDebug, LogLevel.Msgbox, LogLevel.Hint))
         End Try
@@ -220,7 +220,7 @@ Public Class PageLaunchRight
                 End If
                 Dim LoadStartTime As Date = Date.Now
                 '修改时应同时修改 PageOtherHelpDetail.Init
-                Content = HelpArgumentReplace(Content)
+                Content = ArgumentReplace(Content, AddressOf EscapeXML)
                 Do While Content.Contains("xmlns")
                     Content = Content.RegexReplace("xmlns[^""']*(""|')[^""']*(""|')", "").Replace("xmlns", "") '禁止声明命名空间
                 Loop

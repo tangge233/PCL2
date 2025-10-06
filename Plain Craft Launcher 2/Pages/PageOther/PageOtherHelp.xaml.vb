@@ -71,7 +71,7 @@
     Public Shared Sub OnItemClick(Entry As HelpEntry)
         Try
             If Entry.IsEvent Then
-                ModEvent.ProcessCustomEvents(Entry.EventType, Entry.EventData, Nothing)
+                CustomEvent.Raise(Entry.EventType, Entry.EventData)
             Else
                 EnterHelpPage(Entry)
             End If

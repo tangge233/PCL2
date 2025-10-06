@@ -47,7 +47,7 @@
     Public Shared Sub Save(Loader As LoaderTask(Of EqualableList(Of String), String))
         Dim Address = Loader.Output
         If Not Loader.State = LoadState.Finished Then
-            Hint("皮肤正在获取中，请稍候！", HintType.Critical)
+            Hint("皮肤正在获取中，请稍候！", HintType.Red)
             If Not Loader.State = LoadState.Loading Then Loader.Start()
             Return
         End If
@@ -61,7 +61,7 @@
                 Else
                     CopyFile(Address, FileAddress)
                 End If
-                Hint("皮肤保存成功！", HintType.Finish)
+                Hint("皮肤保存成功！", HintType.Green)
             End If
         Catch ex As Exception
             Log(ex, "保存皮肤失败", LogLevel.Hint)
@@ -143,7 +143,7 @@
         Next
         If FrmLaunchLeft IsNot Nothing AndAlso HasLoaderRunning Then
             '由于 Abort 不是实时的，暂时不会释放文件，会导致删除报错，故只能取消执行
-            Hint("有正在获取中的皮肤，请稍后再试！", HintType.Info)
+            Hint("有正在获取中的皮肤，请稍后再试！", HintType.Blue)
         Else
             RunInThread(
             Sub()
@@ -161,7 +161,7 @@
                     For Each SkinLoader In If(sender IsNot Nothing, {sender}, {PageLaunchLeft.SkinLegacy, PageLaunchLeft.SkinMs})
                         SkinLoader.WaitForExit(IsForceRestart:=True)
                     Next
-                    Hint("已刷新头像！", HintType.Finish)
+                    Hint("已刷新头像！", HintType.Green)
                 Catch ex As Exception
                     Log(ex, "刷新皮肤缓存失败", LogLevel.Msgbox)
                 End Try
@@ -184,7 +184,7 @@
                     SkinLoader.WaitForExit(IsForceRestart:=True)
                 Next
                 '完成提示
-                Hint("更改皮肤成功！", HintType.Finish)
+                Hint("更改皮肤成功！", HintType.Green)
             Catch ex As Exception
                 Log(ex, "更改正版皮肤后刷新皮肤失败", LogLevel.Feedback)
             End Try
@@ -212,7 +212,7 @@
             Return
         End If
         If McLoginMsLoader.State = LoadState.Failed Then
-            Hint("登录失败，无法更改披风！", HintType.Critical)
+            Hint("登录失败，无法更改披风！", HintType.Red)
             Return
         End If
         Hint("正在获取披风列表，请稍候……")
@@ -225,7 +225,7 @@ Retry:
                 '获取登录信息
                 If McLoginMsLoader.State <> LoadState.Finished Then McLoginMsLoader.WaitForExit(PageLoginMsSkin.GetLoginData())
                 If McLoginMsLoader.State <> LoadState.Finished Then
-                    Hint("登录失败，无法更改披风！", HintType.Critical)
+                    Hint("登录失败，无法更改披风！", HintType.Red)
                     Return
                 End If
                 Dim AccessToken As String = McLoginMsLoader.Output.AccessToken
@@ -265,10 +265,10 @@ Retry:
                     ContentType:="application/json",
                     Headers:={{"Authorization", "Bearer " & AccessToken}})
                 If Result.Contains("""errorMessage""") Then
-                    Hint("更改披风失败：" & GetJson(Result)("errorMessage").ToString, HintType.Critical)
+                    Hint("更改披风失败：" & GetJson(Result)("errorMessage").ToString, HintType.Red)
                     Return
                 Else
-                    Hint("更改披风成功！", HintType.Finish)
+                    Hint("更改披风成功！", HintType.Green)
                 End If
             Catch ex As Exception
                 Log(ex, "更改披风失败", LogLevel.Hint)

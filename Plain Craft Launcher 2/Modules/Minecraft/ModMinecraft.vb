@@ -68,7 +68,7 @@ Public Module ModMinecraft
             For Each Folder As String In Setup.Get("LaunchFolders").Split("|")
                 If Folder = "" Then Continue For
                 If Not Folder.Contains(">") OrElse Not Folder.EndsWithF("\") Then
-                    Hint("无效的 Minecraft 文件夹：" & Folder, HintType.Critical)
+                    Hint("无效的 Minecraft 文件夹：" & Folder, HintType.Red)
                     Continue For
                 End If
                 Dim Name As String = Folder.Split(">")(0)
@@ -261,6 +261,12 @@ Public Module ModMinecraft
         ''' 显示的描述文本。
         ''' </summary>
         Public Info As String = "该版本未被加载，请向作者反馈此问题"
+        Public ReadOnly Property HasCustomInfo As Boolean
+            Get
+                Return ReadIni(Path & "PCL\Setup.ini", "CustomInfo") <> ""
+            End Get
+        End Property
+
         ''' <summary>
         ''' 该版本的列表检查原始结果，不受自定义影响。
         ''' </summary>
@@ -784,7 +790,17 @@ ExitDataLoad:
                 End If
                 '确定版本描述
                 Dim CustomInfo As String = ReadIni(Path & "PCL\Setup.ini", "CustomInfo")
-                Info = If(CustomInfo <> "", CustomInfo, GetDefaultDescription())
+                If CustomInfo <> "" Then
+                    Info = CustomInfo
+                Else
+                    Info = GetVersionDescription()
+                    If State = McVersionState.Fool Then
+                        Info = GetMcFoolName(Version.McName)
+                    ElseIf State <> McVersionState.Error Then
+                        If Setup.Get("VersionServerLogin", Version:=Me) = 3 Then Info += ", 统一通行证验证"
+                        If Setup.Get("VersionServerLogin", Version:=Me) = 4 Then Info += ", Authlib 验证"
+                    End If
+                End If
                 '确定版本收藏状态
                 IsStar = ReadIni(Path & "PCL\Setup.ini", "IsStar", False)
                 '确定版本显示种类
@@ -817,11 +833,13 @@ ExitDataLoad:
             End Try
             Return Me
         End Function
+        Public IsLoaded As Boolean = False
         ''' <summary>
-        ''' 获取版本的默认描述。
+        ''' 获取对该版本的简短描述。
+        ''' 例如 “快照 16w01a”、“原版 1.12.2”、“愚人节版本 2.0”。
         ''' </summary>
-        Public Function GetDefaultDescription() As String
-            Dim Info As String = ""
+        Public Function GetVersionDescription() As String
+            Dim Info As String
             Select Case State
                 Case McVersionState.Snapshot
                     If Version.McName.ContainsF("pre", True) Then
@@ -838,21 +856,38 @@ ExitDataLoad:
                 Case McVersionState.Original, McVersionState.Forge, McVersionState.NeoForge, McVersionState.Fabric, McVersionState.OptiFine, McVersionState.LiteLoader
                     Info = Version.ToString
                 Case McVersionState.Fool
-                    Info = GetMcFoolName(Version.McName)
+                    Info = "愚人节版本 " & Version.McName
                 Case McVersionState.Error
                     Return Me.Info '已有错误信息
                 Case Else
                     Info = "发生了未知错误，请向作者反馈此问题"
             End Select
-            If Not State = McVersionState.Error Then
-                If Setup.Get("VersionServerLogin", Version:=Me) = 3 Then Info += ", 统一通行证验证"
-                If Setup.Get("VersionServerLogin", Version:=Me) = 4 Then Info += ", Authlib 验证"
-            End If
             Return Info
         End Function
 
-        Public IsLoaded As Boolean = False
+        Public Function ToListItem() As MyListItem
+            Dim NewItem As New MyListItem With {.Info = Info, .Height = 42, .Tag = Me, .SnapsToDevicePixels = True, .Type = MyListItem.CheckType.Clickable}
+            '标题
+            NewItem.Inlines.Clear()
+            NewItem.Inlines.Add(New Run(Name))
+            If HasCustomInfo Then '如果版本设置了自定义描述，在标题后面以淡灰色显示其版本号
+                NewItem.Inlines.Add(New Run("  |  " & GetVersionDescription()) With {.Foreground = New MyColor(215, 215, 215), .FontSize = 12})
+            End If
+            'Logo
+            Try
+                If Logo.EndsWith("PCL\Logo.png") Then
+                    NewItem.Logo = Path & "PCL\Logo.png" '修复老版本中，存储的自定义 Logo 使用完整路径，导致移动后无法加载的 Bug
+                Else
+                    NewItem.Logo = Logo
+                End If
+            Catch ex As Exception
+                Log(ex, "加载版本图标失败", LogLevel.Hint)
+                NewItem.Logo = "pack://application:,,,/images/Blocks/RedstoneBlock.png"
+            End Try
+            Return NewItem
+        End Function
 
+        '运算符支持
         Public Overrides Function Equals(obj As Object) As Boolean
             Dim version = TryCast(obj, McVersion)
             Return version IsNot Nothing AndAlso Path = version.Path
@@ -865,7 +900,6 @@ ExitDataLoad:
         Public Shared Operator <>(a As McVersion, b As McVersion) As Boolean
             Return Not (a = b)
         End Operator
-
     End Class
     Public Enum McVersionState
         [Error]
@@ -1567,12 +1601,12 @@ OnLoaded:
         Try
             Dim Image As New MyBitmap(FileName)
             If Image.Pic.Width <> 64 OrElse Not (Image.Pic.Height = 32 OrElse Image.Pic.Height = 64) Then
-                Hint("皮肤图片大小应为 64x32 像素或 64x64 像素！", HintType.Critical)
+                Hint("皮肤图片大小应为 64x32 像素或 64x64 像素！", HintType.Red)
                 Return New McSkinInfo With {.IsVaild = False}
             End If
             Dim FileInfo As New FileInfo(FileName)
             If FileInfo.Length > 24 * 1024 Then
-                Hint("皮肤文件大小需小于 24 KB，而所选文件大小为 " & Math.Round(FileInfo.Length / 1024, 2) & " KB", HintType.Critical)
+                Hint("皮肤文件大小需小于 24 KB，而所选文件大小为 " & Math.Round(FileInfo.Length / 1024, 2) & " KB", HintType.Red)
                 Return New McSkinInfo With {.IsVaild = False}
             End If
         Catch ex As Exception

@@ -77,7 +77,7 @@
             Return
         End If
         If McLoginLoader.State = LoadState.Failed Then
-            Hint("登录失败，无法更改皮肤！", HintType.Critical)
+            Hint("登录失败，无法更改皮肤！", HintType.Red)
             Return
         End If
         Dim SkinInfo As McSkinInfo = McSkinSelect()
@@ -106,7 +106,7 @@ Retry:
                     McLoginMsLoader.Start(GetLoginData(), IsForceRestart:=True)
                     GoTo Retry
                 ElseIf Result.Contains("""error""") Then
-                    Hint("更改皮肤失败：" & GetJson(Result)("error").ToString, HintType.Critical)
+                    Hint("更改皮肤失败：" & GetJson(Result)("error").ToString, HintType.Red)
                     Return
                 End If
                 '获取新皮肤地址
@@ -122,7 +122,7 @@ Retry:
                 Throw New Exception("未知错误（" & Result & "）")
             Catch ex As Exception
                 If TypeOf ex Is OperationCanceledException Then
-                    Hint("更改皮肤失败：连接皮肤服务器超时，请稍后再试，或使用 VPN 改善网络环境", HintType.Critical)
+                    Hint("更改皮肤失败：连接皮肤服务器超时，请稍后再试，或使用 VPN 改善网络环境", HintType.Red)
                 Else
                     Log(ex, "更改皮肤失败", LogLevel.Hint)
                 End If

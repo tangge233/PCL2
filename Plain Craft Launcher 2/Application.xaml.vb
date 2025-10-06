@@ -78,7 +78,6 @@ Public Class Application
                 End If
             End Try
             Directory.CreateDirectory(PathTemp & "Cache")
-            Directory.CreateDirectory(PathTemp & "Download")
             Directory.CreateDirectory(PathAppdata)
             '检测单例
 #If Not DEBUG Then
@@ -124,9 +123,9 @@ WaitRetry:
             '添加日志
             Log($"[Start] 程序版本：{VersionDisplayName} ({VersionCode}{If(CommitHash = "", "", $"，#{CommitHash}")})")
 #If RELEASE Then
-            Log($"[Start] 识别码：{UniqueAddress}{If(ThemeCheckOne(9), "，正式版", "")}")
+            Log($"[Start] 识别码：{Identify}{If(ThemeCheckOne(9), "，正式版", "")}")
 #Else
-            Log($"[Start] 识别码：{UniqueAddress}{If(ThemeCheckOne(9), "，已解锁反馈主题", "")}")
+            Log($"[Start] 识别码：{Identify}{If(ThemeCheckOne(9), "，已解锁反馈主题", "")}")
 #End If
             Log($"[Start] 程序路径：{PathWithName}")
             Log($"[Start] 系统编码：{Encoding.Default.HeaderName} ({Encoding.Default.CodePage}, GBK={IsGBKEncoding})")

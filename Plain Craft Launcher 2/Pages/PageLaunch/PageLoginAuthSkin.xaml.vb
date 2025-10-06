@@ -50,7 +50,7 @@
             If CType(McLoginLoader.Input, McLoginServer).ForceReselectProfile Then
                 Hint("正在尝试更换，请稍候！")
             Else
-                Hint("正在登录中，请稍后再更换角色！", HintType.Critical)
+                Hint("正在登录中，请稍后再更换角色！", HintType.Red)
             End If
             Return
         End If

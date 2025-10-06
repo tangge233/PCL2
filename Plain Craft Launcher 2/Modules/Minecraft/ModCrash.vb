@@ -908,8 +908,7 @@ NextStack:
                         If File.Exists(OutputFile) Then
                             If FileEncoding Is Nothing Then FileEncoding = GetEncoding(ReadFileBytes(OutputFile))
                             Dim FileContent As String = ReadFile(OutputFile, FileEncoding)
-                            FileContent = FilterAccessToken(FileContent, If(FileName = "启动脚本.bat", "F", "*"))
-                            FileContent = FilterUserName(FileContent, "*")
+                            FileContent = FilterUserName(FilterAccessToken(FileContent, If(FileName = "启动脚本.bat", "F", "*")), "*")
                             WriteFile(TempFolder & "Report\" & FileName, FileContent, Encoding:=FileEncoding)
                             Log($"[Crash] 导出文件：{FileName}，编码：{FileEncoding.HeaderName}")
                         End If
@@ -917,7 +916,7 @@ NextStack:
                     '导出报告
                     Compression.ZipFile.CreateFromDirectory(TempFolder & "Report\", FileAddress)
                     DeleteDirectory(TempFolder & "Report\")
-                    Hint("错误报告已导出！", HintType.Finish)
+                    Hint("错误报告已导出！", HintType.Green)
                 Catch ex As Exception
                     Log(ex, "导出错误报告失败", LogLevel.Feedback)
                     Return

@@ -32,7 +32,7 @@ Public Module ModDownloadLib
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"Minecraft {Id} 下载" Then Continue For
                 If Behaviour = NetPreDownloadBehaviour.ExitWhileExistsOrDownloading Then Return OngoingLoader
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return OngoingLoader
             Next
 
@@ -223,7 +223,7 @@ Public Module ModDownloadLib
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"Minecraft {Id} 服务端下载" Then Continue For
-                Hint("该服务端正在下载中！", HintType.Critical)
+                Hint("该服务端正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -241,7 +241,7 @@ Public Module ModDownloadLib
                         File.Delete(VersionFolder & Id & ".json")
                         If Not New DirectoryInfo(VersionFolder).GetFileSystemInfos.Any() Then Directory.Delete(VersionFolder)
                         Task.Output = New List(Of NetFile)
-                        Hint($"Mojang 没有给 Minecraft {Id} 提供官方服务端下载，没法下，撤退！", HintType.Critical)
+                        Hint($"Mojang 没有给 Minecraft {Id} 提供官方服务端下载，没法下，撤退！", HintType.Red)
                         Thread.Sleep(2000) '等玩家把上一个提示看完
                         Task.Abort()
                         Return
@@ -300,7 +300,7 @@ pause"
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"Minecraft {Id} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -401,7 +401,7 @@ pause"
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"OptiFine {DownloadInfo.NameDisplay} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -832,7 +832,7 @@ Retry:
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"LiteLoader {Id} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -866,7 +866,7 @@ Retry:
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"LiteLoader {Id} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -1048,7 +1048,7 @@ Retry:
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"{DisplayName} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -1803,7 +1803,7 @@ Retry:
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"Fabric {Version} 安装器下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -1986,28 +1986,28 @@ Retry:
     ''' 在加载器状态改变后显示一条提示。
     ''' 不会进行任何其他操作。
     ''' </summary>
-    Public Sub LoaderStateChangedHintOnly(Loader)
+    Public Sub LoaderStateChangedHintOnly(Loader As LoaderBase)
         Select Case Loader.State
             Case LoadState.Finished
-                Hint(Loader.Name & "成功！", HintType.Finish)
+                Hint(Loader.Name & "成功！", HintType.Green)
             Case LoadState.Failed
-                Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Critical)
+                Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Red)
             Case LoadState.Aborted
-                Hint(Loader.Name & "已取消！", HintType.Info)
+                Hint(Loader.Name & "已取消！", HintType.Blue)
         End Select
     End Sub
     ''' <summary>
     ''' 安装加载器状态改变后进行提示和重载文件夹列表的方法。
     ''' </summary>
-    Public Sub McInstallState(Loader)
+    Public Sub McInstallState(Loader As LoaderBase)
         Select Case Loader.State
             Case LoadState.Finished
                 WriteIni(PathMcFolder & "PCL.ini", "VersionCache", "") '清空缓存（合并安装会先生成文件夹，这会在刷新时误判为可以使用缓存）
-                Hint(Loader.Name & "成功！", HintType.Finish)
+                Hint(Loader.Name & "成功！", HintType.Green)
             Case LoadState.Failed
-                Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Critical)
+                Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Red)
             Case LoadState.Aborted
-                Hint(Loader.Name & "已取消！", HintType.Info)
+                Hint(Loader.Name & "已取消！", HintType.Blue)
             Case LoadState.Loading
                 Return '不重新加载版本列表
         End Select
@@ -2108,7 +2108,7 @@ Retry:
 
         '重复版本检查
         If File.Exists($"{VersionFolder}{Request.TargetVersionName}.json") Then
-            Hint("版本 " & Request.TargetVersionName & " 已经存在！", HintType.Critical)
+            Hint("版本 " & Request.TargetVersionName & " 已经存在！", HintType.Red)
             Throw New CancelledException
         End If
 

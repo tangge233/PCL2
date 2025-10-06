@@ -93,7 +93,7 @@
             JavaSearchLoader.Start(IsForceRestart:=True)
 
             Log("[Setup] 已初始化启动设置")
-            Hint("已初始化启动设置！", HintType.Finish, False)
+            Hint("已初始化启动设置！", HintType.Green, False)
         Catch ex As Exception
             Log(ex, "初始化启动设置失败", LogLevel.Msgbox)
         End Try
@@ -170,7 +170,7 @@
         Try
             File.Delete(PathAppdata & "CustomSkin.png")
             RadioSkinType0.SetChecked(True, True)
-            Hint("离线皮肤已清空！", HintType.Finish)
+            Hint("离线皮肤已清空！", HintType.Green)
         Catch ex As Exception
             Log(ex, "清空离线皮肤失败", LogLevel.Msgbox)
         End Try
@@ -468,7 +468,7 @@ PreFin:
     '手动选择
     Private Sub BtnArgumentJavaSelect_Click(sender As Object, e As EventArgs) Handles BtnArgumentJavaSelect.Click
         If JavaSearchLoader.State = LoadState.Loading Then
-            Hint("正在搜索 Java，请稍候！", HintType.Critical)
+            Hint("正在搜索 Java，请稍候！", HintType.Red)
             Return
         End If
         '选择 Java
@@ -489,7 +489,7 @@ PreFin:
             Setup.Set("LaunchArgumentJavaAll", JavaNewList.ToString(Newtonsoft.Json.Formatting.None))
             '重新加载列表
             JavaSearchLoader.Start(IsForceRestart:=True)
-            Hint("已将该 Java 加入 Java 列表！", HintType.Finish)
+            Hint("已将该 Java 加入 Java 列表！", HintType.Green)
         Catch ex As Exception
             Log(ex, "该 Java 存在异常，无法使用", LogLevel.Msgbox, "异常的 Java")
             Return
@@ -498,7 +498,7 @@ PreFin:
     '自动查找
     Private Sub BtnArgumentJavaSearch_Click(sender As Object, e As EventArgs) Handles BtnArgumentJavaSearch.Click
         If JavaSearchLoader.State = LoadState.Loading Then
-            Hint("正在搜索 Java，请稍候！", HintType.Critical)
+            Hint("正在搜索 Java，请稍候！", HintType.Red)
             Return
         End If
         RunInThread(
@@ -506,9 +506,9 @@ PreFin:
             Hint("正在搜索 Java！")
             JavaSearchLoader.WaitForExit(IsForceRestart:=True)
             If Not JavaList.Any() Then
-                Hint("未找到可用的 Java！", HintType.Critical)
+                Hint("未找到可用的 Java！", HintType.Red)
             Else
-                Hint("已找到 " & JavaList.Count & " 个 Java，请检查下拉框查看列表！", HintType.Finish)
+                Hint("已找到 " & JavaList.Count & " 个 Java，请检查下拉框查看列表！", HintType.Green)
             End If
         End Sub)
     End Sub

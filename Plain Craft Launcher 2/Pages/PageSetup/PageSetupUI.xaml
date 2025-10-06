@@ -225,7 +225,8 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="下载地址" Margin="0,0,25,0" />
-                        <local:MyTextBox x:Name="TextCustomNet" Tag="UiCustomNet" Grid.Column="1" MaxHeight="28">
+                        <local:MyTextBox x:Name="TextCustomNet" Tag="UiCustomNet" Grid.Column="1" MaxHeight="28"
+                                         ToolTip="你可以用替换标记动态改变网址，以传入参数或变量。&#xa;在 更多 → 帮助 中搜索 “替换标记” 以了解用法。">
                             <local:MyTextBox.ValidateRules>
                                 <local:ValidateNullable />
                                 <local:ValidateHttp />

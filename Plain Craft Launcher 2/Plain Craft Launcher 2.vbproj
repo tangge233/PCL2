@@ -206,8 +206,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\Behaviors\ClipboardInterceptor.vb" />
-    <Compile Include="Controls\IMyRadio.vb" />
-    <Compile Include="Controls\Interfaces.vb" />
+    <Compile Include="Controls\Behaviors\IMyRadio.vb" />
+    <Compile Include="Controls\Behaviors\Interfaces.vb" />
     <Compile Include="Controls\MyComboBox.vb" />
     <Compile Include="Controls\MyComboBoxItem.vb" />
     <Compile Include="Controls\MyCard.vb" />

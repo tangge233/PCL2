@@ -30,7 +30,7 @@
         BtnFolderMods.Visibility = If(PageVersionLeft.Version.Modable, Visibility.Visible, Visibility.Collapsed)
         '刷新版本显示
         PanDisplayItem.Children.Clear()
-        ItemVersion = PageSelectRight.McVersionListItem(PageVersionLeft.Version)
+        ItemVersion = PageVersionLeft.Version.ToListItem
         ItemVersion.IsHitTestVisible = False
         PanDisplayItem.Children.Add(ItemVersion)
         FrmMain.PageNameRefresh()
@@ -169,7 +169,7 @@
                 Log(ex, "重命名版本 json 失败")
             End Try
             '刷新与提示
-            Hint("重命名成功！", HintType.Finish)
+            Hint("重命名成功！", HintType.Green)
             PageVersionLeft.Version = New McVersion(NewName).Load()
             If Not IsNothing(McVersionCurrent) AndAlso McVersionCurrent.Equals(PageVersionLeft.Version) Then WriteIni(PathMcFolder & "PCL.ini", "Version", NewName)
             Reload()
@@ -263,7 +263,7 @@
             If SavePath = "" Then Return
             '检查中断（等玩家选完弹窗指不定任务就结束了呢……）
             If McLaunchLoader.State = LoadState.Loading Then
-                Hint("请在当前启动任务结束后再试！", HintType.Critical)
+                Hint("请在当前启动任务结束后再试！", HintType.Red)
                 Return
             End If
             '生成脚本
@@ -284,13 +284,13 @@
         Try
             '忽略文件检查提示
             If ShouldIgnoreFileCheck(PageVersionLeft.Version) Then
-                Hint("请先关闭 [版本设置 → 设置 → 高级启动选项 → 关闭文件校验]，然后再尝试补全文件！", HintType.Info)
+                Hint("请先关闭 [版本设置 → 设置 → 高级启动选项 → 关闭文件校验]，然后再尝试补全文件！", HintType.Blue)
                 Return
             End If
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar
                 If OngoingLoader.Name <> PageVersionLeft.Version.Name & " 文件补全" Then Continue For
-                Hint("正在处理中，请稍候！", HintType.Critical)
+                Hint("正在处理中，请稍候！", HintType.Red)
                 Return
             Next
             '启动
@@ -299,11 +299,11 @@
             Sub()
                 Select Case Loader.State
                     Case LoadState.Finished
-                        Hint(Loader.Name & "成功！", HintType.Finish)
+                        Hint(Loader.Name & "成功！", HintType.Green)
                     Case LoadState.Failed
-                        Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Critical)
+                        Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Red)
                     Case LoadState.Aborted
-                        Hint(Loader.Name & "已取消！", HintType.Info)
+                        Hint(Loader.Name & "已取消！", HintType.Blue)
                 End Select
             End Sub
             Loader.Start(PageVersionLeft.Version.Name)
@@ -329,10 +329,10 @@
                     IniClearCache(PageVersionLeft.Version.Path & "PCL\Setup.ini")
                     If IsShiftPressed Then
                         DeleteDirectory(PageVersionLeft.Version.Path)
-                        Hint("版本 " & PageVersionLeft.Version.Name & " 已永久删除！", HintType.Finish)
+                        Hint("版本 " & PageVersionLeft.Version.Name & " 已永久删除！", HintType.Green)
                     Else
-                        FileIO.FileSystem.DeleteDirectory(PageVersionLeft.Version.Path, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                        Hint("版本 " & PageVersionLeft.Version.Name & " 已删除到回收站！", HintType.Finish)
+                        FileIO.FileSystem.DeleteDirectory(PageVersionLeft.Version.Path, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
+                        Hint("版本 " & PageVersionLeft.Version.Name & " 已删除到回收站！", HintType.Green)
                     End If
                 Case 2
                     Return

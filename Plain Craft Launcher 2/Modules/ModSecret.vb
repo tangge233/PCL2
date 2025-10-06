@@ -6,6 +6,8 @@ Friend Module ModSecret
 
 #Region "杂项"
 
+    '标注 PCL 的不同分支，仅用于替换标记
+    Public Const VersionBranchMain As String = "OpenSource"
     '在开源版的注册表与常规版的注册表隔离，以防数据冲突
     Public Const RegFolder As String = "PCLDebug"
     '用于微软登录的 ClientId
@@ -56,13 +58,13 @@ Friend Module ModSecret
     ''' <summary>
     ''' 获取设备标识码。
     ''' </summary>
-    Friend Function SecretGetUniqueAddress() As String
+    Friend Function SecretGetIdentify() As String
         Return "0000-0000-0000-0000"
     End Function
 
     Friend Sub SecretLaunchJvmArgs(ByRef DataList As List(Of String))
         Dim DataJvmCustom As String = Setup.Get("VersionAdvanceJvm", Version:=McVersionCurrent)
-        DataList.Insert(0, If(DataJvmCustom = "", Setup.Get("LaunchAdvanceJvm"), DataJvmCustom)) '可变 JVM 参数
+        DataList.Insert(0, ArgumentReplace(If(DataJvmCustom = "", Setup.Get("LaunchAdvanceJvm"), DataJvmCustom))) '可变 JVM 参数
         McLaunchLog("当前剩余内存：" & Math.Round(My.Computer.Info.AvailablePhysicalMemory / 1024 / 1024 / 1024 * 10) / 10 & "G")
         DataList.Add("-Xmn" & Math.Floor(PageVersionSetup.GetRam(McVersionCurrent) * 1024 * 0.15) & "m")
         DataList.Add("-Xmx" & Math.Floor(PageVersionSetup.GetRam(McVersionCurrent) * 1024) & "m")

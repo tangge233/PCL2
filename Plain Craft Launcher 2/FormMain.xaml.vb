@@ -104,6 +104,15 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 371 Then 'Snapshot 2.10.9
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：如果版本设置了自定义描述，会在标题后面以淡灰色显示其版本号"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：支持为一个控件设置多个自定义事件"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：修改变量、弹出提示自定义事件"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：添加大量替换标记，允许在更多设置和 XAML 中使用更多替换标记"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法安装 MMC 整合包"))
+            FeatureCount += 33
+            BugCount += 11
+        End If
         If LastVersion < 370 Then 'Snapshot 2.10.8
             If LastVersion >= 368 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
             FeatureCount += 3
@@ -318,7 +327,7 @@ Public Class FormMain
         FrmLaunchRight.PageState = MyPageRight.PageStates.ContentStay
         '模式提醒
 #If DEBUG Then
-        Hint("[开发者模式] PCL 正以开发者模式运行，这可能会造成严重的性能下降，请务必立即向开发者反馈此问题！", HintType.Critical)
+        Hint("[开发者模式] PCL 正以开发者模式运行，这可能会造成严重的性能下降，请务必立即向开发者反馈此问题！", HintType.Red)
 #End If
         If ModeDebug Then Hint("[调试模式] PCL 正以调试模式运行，这可能会导致性能下降，若无必要请不要开启！")
         '尽早执行的加载池
@@ -687,9 +696,9 @@ Public Class FormMain
         If e.Key = Key.F12 Then
             PageSetupUI.HiddenForceShow = Not PageSetupUI.HiddenForceShow
             If PageSetupUI.HiddenForceShow Then
-                Hint("功能隐藏设置已暂时关闭！", HintType.Finish)
+                Hint("功能隐藏设置已暂时关闭！", HintType.Green)
             Else
-                Hint("功能隐藏设置已重新开启！", HintType.Finish)
+                Hint("功能隐藏设置已重新开启！", HintType.Green)
             End If
             PageSetupUI.HiddenRefresh()
             Return
@@ -785,12 +794,12 @@ Public Class FormMain
                         Dim AuthlibServer As String = Net.WebUtility.UrlDecode(Str.Substring("authlib-injector:yggdrasil-server:".Length))
                         Log("[System] Authlib 拖拽：" & AuthlibServer)
                         If Not String.IsNullOrEmpty(New ValidateHttp().Validate(AuthlibServer)) Then
-                            Hint($"输入的 Authlib 验证服务器不符合网址格式（{AuthlibServer}）！", HintType.Critical)
+                            Hint($"输入的 Authlib 验证服务器不符合网址格式（{AuthlibServer}）！", HintType.Red)
                             Return
                         End If
                         Dim TargetVersion = If(PageCurrent = PageType.VersionSetup, PageVersionLeft.Version, McVersionCurrent)
                         If TargetVersion Is Nothing Then
-                            Hint("请先下载游戏，再设置第三方登录！", HintType.Critical)
+                            Hint("请先下载游戏，再设置第三方登录！", HintType.Red)
                             Return
                         End If
                         If AuthlibServer = "https://littleskin.cn/api/yggdrasil" Then
@@ -837,7 +846,7 @@ Public Class FormMain
                 '获取文件并检查
                 Dim FilePathRaw = e.Data.GetData(DataFormats.FileDrop)
                 If FilePathRaw Is Nothing Then '#2690
-                    Hint("请将文件解压后再拖入！", HintType.Critical)
+                    Hint("请将文件解压后再拖入！", HintType.Red)
                     Return
                 End If
                 e.Handled = True
@@ -855,10 +864,10 @@ Public Class FormMain
             Log("[System] 接受文件拖拽：" & FilePath & If(FilePathList.Any, $" 等 {FilePathList.Count} 个文件", ""), LogLevel.Developer)
             '基础检查
             If Directory.Exists(FilePathList.First) AndAlso Not File.Exists(FilePathList.First) Then
-                Hint("请拖入一个文件，而非文件夹！", HintType.Critical)
+                Hint("请拖入一个文件，而非文件夹！", HintType.Red)
                 Return
             ElseIf Not File.Exists(FilePathList.First) Then
-                Hint("拖入的文件不存在：" & FilePathList.First, HintType.Critical)
+                Hint("拖入的文件不存在：" & FilePathList.First, HintType.Red)
                 Return
             End If
             '多文件拖拽
@@ -866,7 +875,7 @@ Public Class FormMain
                 '必须要求全部为 jar 文件
                 For Each File In FilePathList
                     If Not {"jar", "litemod", "disabled", "old"}.Contains(File.AfterLast(".").ToLower) Then
-                        Hint("一次请只拖入一个文件！", HintType.Critical)
+                        Hint("一次请只拖入一个文件！", HintType.Red)
                         Return
                     End If
                 Next
@@ -885,7 +894,7 @@ Public Class FormMain
                 Sub()
                     Setup.Set("UiCustomType", 1)
                     FrmLaunchRight.ForceRefresh()
-                    Hint("已加载主页自定义文件！", HintType.Finish)
+                    Hint("已加载主页自定义文件！", HintType.Green)
                 End Sub)
                 Return
             End If
@@ -995,9 +1004,9 @@ Public Class FormMain
 #Region "切换页面"
 
     '页面种类与属性
-    '注意，这一枚举在 “切换页面” EventType 中调用，应视作公开 API 的一部分
     ''' <summary>
     ''' 页面种类。
+    ''' 该枚举在自定义事件中使用，是公开 API 的一部分。
     ''' </summary>
     Public Enum PageType
         ''' <summary>
@@ -1043,6 +1052,7 @@ Public Class FormMain
     End Enum
     ''' <summary>
     ''' 次要页面种类。其数值必须与 StackPanel 中的下标一致。
+    ''' 该枚举在自定义事件中使用，是公开 API 的一部分。
     ''' </summary>
     Public Enum PageSubType
         [Default] = 0
@@ -1485,7 +1495,7 @@ Public Class FormMain
     '投降
     Public Sub AprilGiveup() Handles BtnExtraApril.Click
         If IsAprilEnabled AndAlso Not IsAprilGiveup Then
-            Hint("=D", HintType.Finish)
+            Hint("=D", HintType.Green)
             IsAprilGiveup = True
             FrmLaunchLeft.AprilScaleTrans.ScaleX = 1
             FrmLaunchLeft.AprilScaleTrans.ScaleY = 1
@@ -1503,7 +1513,7 @@ Public Class FormMain
             For Each Watcher In McWatcherList
                 Watcher.Kill()
             Next
-            Hint("已关闭运行中的 Minecraft！", HintType.Finish)
+            Hint("已关闭运行中的 Minecraft！", HintType.Green)
         Catch ex As Exception
             Log(ex, "强制关闭所有 Minecraft 失败", LogLevel.Feedback)
         End Try

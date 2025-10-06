@@ -35,7 +35,7 @@ Public Module ModLaunch
         '预检查
         If Not RunInUi() Then Throw New Exception("McLaunchStart 必须在 UI 线程调用！")
         If McLaunchLoader.State = LoadState.Loading Then
-            Hint("已有游戏正在启动中！", HintType.Critical)
+            Hint("已有游戏正在启动中！", HintType.Red)
             Return False
         End If
         '强制切换需要启动的版本
@@ -44,7 +44,7 @@ Public Module ModLaunch
             '检查版本
             CurrentLaunchOptions.Version.Load()
             If CurrentLaunchOptions.Version.State = McVersionState.Error Then
-                Hint("无法启动 Minecraft：" & CurrentLaunchOptions.Version.Info, HintType.Critical)
+                Hint("无法启动 Minecraft：" & CurrentLaunchOptions.Version.Info, HintType.Red)
                 Return False
             End If
             '切换版本
@@ -98,7 +98,7 @@ Public Module ModLaunch
             McLaunchPrecheck()
             McLaunchLog("预检测已通过")
         Catch ex As Exception
-            If Not ex.Message.StartsWithF("$$") Then Hint(ex.Message, HintType.Critical)
+            If Not ex.Message.StartsWithF("$$") Then Hint(ex.Message, HintType.Red)
             Throw
         End Try
         Dim IsSavingBatch As Boolean = CurrentLaunchOptions?.SaveBatch IsNot Nothing
@@ -146,7 +146,7 @@ Public Module ModLaunch
             '成功与失败处理
             Select Case LaunchLoader.State
                 Case LoadState.Finished
-                    Hint(McVersionCurrent.Name & " 启动成功！", HintType.Finish)
+                    Hint(McVersionCurrent.Name & " 启动成功！", HintType.Green)
                     '上报
                     If Not IsSavingBatch Then
                         Telemetry("Minecraft 启动成功",
@@ -155,9 +155,9 @@ Public Module ModLaunch
                     End If
                 Case LoadState.Aborted
                     If AbortHint Is Nothing Then
-                        Hint(If(IsSavingBatch, "已取消导出启动脚本！", "已取消启动！"), HintType.Info)
+                        Hint(If(IsSavingBatch, "已取消导出启动脚本！", "已取消启动！"), HintType.Blue)
                     Else
-                        Hint(AbortHint, HintType.Finish)
+                        Hint(AbortHint, HintType.Green)
                     End If
                 Case LoadState.Failed
                     Throw LaunchLoader.Error
@@ -270,7 +270,7 @@ NextInner:
                 Select Case MyMsgBox("你必须先登录正版账号，才能进行离线登录！", "正版验证", "购买正版", "试玩", "返回",
                     Button1Action:=Sub() OpenWebsite("https://www.xbox.com/zh-cn/games/store/minecraft-java-bedrock-edition-for-pc/9nxp44l49shj"))
                     Case 2
-                        Hint("游戏将以试玩模式启动！", HintType.Critical)
+                        Hint("游戏将以试玩模式启动！", HintType.Red)
                         CurrentLaunchOptions.ExtraArgs.Add("--demo")
                     Case 3
                         Throw New Exception("$$")
@@ -755,10 +755,10 @@ LoginFinish:
                 ContentType:="application/json; charset=utf-8", RequireJson:=True))
             '检查登录结果
             If LoginJson("availableProfiles").Count = 0 Then
-                If Data.Input.ForceReselectProfile Then Hint("你还没有创建角色，无法更换！", HintType.Critical)
+                If Data.Input.ForceReselectProfile Then Hint("你还没有创建角色，无法更换！", HintType.Red)
                 Throw New Exception("$你还没有创建角色，请在创建角色后再试！")
             ElseIf Data.Input.ForceReselectProfile AndAlso LoginJson("availableProfiles").Count = 1 Then
-                Hint("你的账户中只有一个角色，无法更换！", HintType.Critical)
+                Hint("你的账户中只有一个角色，无法更换！", HintType.Red)
             End If
             Dim SelectedName As String = Nothing
             Dim SelectedId As String = Nothing
@@ -1304,7 +1304,7 @@ Retry:
             If McLaunchJavaSelected IsNot Nothing Then
                 McLaunchLog("选择的 Java：" & McLaunchJavaSelected.ToString)
             Else
-                Hint("没有可用的 Java，已取消启动！", HintType.Critical)
+                Hint("没有可用的 Java，已取消启动！", HintType.Red)
                 Throw New Exception("$$")
             End If
 
@@ -1395,7 +1395,7 @@ Retry:
         Next
         '自定义
         Dim ArgumentGame As String = Setup.Get("VersionAdvanceGame", Version:=McVersionCurrent)
-        Arguments += " " & If(ArgumentGame = "", Setup.Get("LaunchAdvanceGame"), ArgumentGame)
+        Arguments += " " & ArgumentReplace(If(ArgumentGame = "", Setup.Get("LaunchAdvanceGame"), ArgumentGame))
         '进行参数替换
         Dim ReplaceArguments = McLaunchArgumentsReplace(McVersionCurrent, Loader)
         If String.IsNullOrWhiteSpace(ReplaceArguments("${version_type}")) Then
@@ -1412,6 +1412,9 @@ Retry:
             FinalArguments += Argument & " "
         Next
         FinalArguments = FinalArguments.TrimEnd
+        '替换 Module Path 为短路径（Forge 会在版本 JSON 硬编码这些路径）
+        FinalArguments = FinalArguments.RegexReplaceEach("(?<= (-p|--module-path) "")[^""]+(?="" )",
+            Function(ModulePath) ModulePath.Value.RegexReplaceEach("[A-Z]{1}:\\[^;]+", Function(m) ShortenPath(m.Value)))
         '进服
         Dim Server As String = If(String.IsNullOrEmpty(CurrentLaunchOptions.ServerIp), Setup.Get("VersionServerEnter", McVersionCurrent), CurrentLaunchOptions.ServerIp)
         If Server.Length > 0 Then
@@ -1427,7 +1430,7 @@ Retry:
                     '不包含端口号
                     FinalArguments += $" --server {Server} --port 25565"
                 End If
-                If McVersionCurrent.Version.HasOptiFine Then Hint("OptiFine 与自动进入服务器可能不兼容，有概率导致材质丢失甚至游戏崩溃！", HintType.Critical)
+                If McVersionCurrent.Version.HasOptiFine Then Hint("OptiFine 与自动进入服务器可能不兼容，有概率导致材质丢失甚至游戏崩溃！", HintType.Red)
             End If
         End If
         '输出
@@ -1447,7 +1450,7 @@ Retry:
         If ArgumentJvm = "" Then ArgumentJvm = Setup.Get("LaunchAdvanceJvm")
         If Not ArgumentJvm.Contains("-Dlog4j2.formatMsgNoLookups=true") Then ArgumentJvm += " -Dlog4j2.formatMsgNoLookups=true"
         ArgumentJvm = ArgumentJvm.Replace(" -XX:MaxDirectMemorySize=256M", "") '#3511 的清理
-        DataList.Insert(0, ArgumentJvm) '可变 JVM 参数
+        DataList.Insert(0, ArgumentReplace(ArgumentJvm)) '可变 JVM 参数
         DataList.Add("-Xmn" & Math.Floor(PageVersionSetup.GetRam(McVersionCurrent, Not McLaunchJavaSelected.Is64Bit) * 1024 * 0.15) & "m")
         DataList.Add("-Xmx" & Math.Floor(PageVersionSetup.GetRam(McVersionCurrent, Not McLaunchJavaSelected.Is64Bit) * 1024) & "m")
         DataList.Add("""-Djava.library.path=" & GetNativesFolder() & """")
@@ -1571,7 +1574,7 @@ NextVersion:
 
         '去重
         DeDuplicateDataList.Remove("-XX:MaxDirectMemorySize=256M") '#3511 的清理
-        Dim Result As String = Join(DeDuplicateDataList.Distinct.ToList, " ")
+        Dim Result As String = DeDuplicateDataList.Distinct.Join(" ")
 
         '添加 MainClass
         If Version.JsonObject("mainClass") Is Nothing Then
@@ -1592,7 +1595,7 @@ NextVersion:
         If Not BasicString.Contains("--height") Then BasicString += " --height ${resolution_height} --width ${resolution_width}"
         DataList.Add(BasicString)
 
-        Dim Result As String = Join(DataList, " ")
+        Dim Result As String = DataList.Join(" ")
 
         '特别改变 OptiFineTweaker
         If (Version.Version.HasForge OrElse Version.Version.HasLiteLoader) AndAlso Version.Version.HasOptiFine Then
@@ -1697,7 +1700,7 @@ NextVersion:
         GameArguments.Add("${launcher_version}", VersionCode)
         GameArguments.Add("${version_name}", Version.Name)
         Dim ArgumentInfo As String = Setup.Get("VersionArgumentInfo", Version:=McVersionCurrent)
-        GameArguments.Add("${version_type}", If(ArgumentInfo = "", Setup.Get("LaunchArgumentInfo"), ArgumentInfo))
+        GameArguments.Add("${version_type}", ArgumentReplace(If(ArgumentInfo = "", Setup.Get("LaunchArgumentInfo"), ArgumentInfo)))
         GameArguments.Add("${game_directory}", ShortenPath(Left(McVersionCurrent.PathIndie, McVersionCurrent.PathIndie.Count - 1)))
         GameArguments.Add("${assets_root}", ShortenPath(PathMcFolder & "assets"))
         GameArguments.Add("${user_properties}", "{}")
@@ -1707,7 +1710,7 @@ NextVersion:
         GameArguments.Add("${access_token}", McLoginLoader.Output.AccessToken)
         GameArguments.Add("${auth_session}", McLoginLoader.Output.AccessToken)
         GameArguments.Add("${user_type}", "msa") '#1221
-        GameArguments.Add("${primary_jar}", Version.Path & Version.Name & ".jar") '#6942
+        GameArguments.Add("${primary_jar}", ShortenPath(Version.Path & Version.Name & ".jar")) '#6942
 
         '窗口尺寸参数
         Dim GameSize As Size
@@ -1827,10 +1830,14 @@ NextVersion:
     ''' </summary>
     Private Function GetNativesFolder() As String
         Dim Result As String = McVersionCurrent.Path & McVersionCurrent.Name & "-natives"
-        If IsGBKEncoding OrElse Result.IsASCII() Then Return ShortenPath(Result)
-        Result = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\.minecraft\bin\natives"
-        If Result.IsASCII() Then Return ShortenPath(Result)
-        Return OsDrive & "ProgramData\PCL\natives"
+        If Not (IsGBKEncoding OrElse Result.IsASCII()) Then
+            Result = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) & "\.minecraft\bin\natives"
+            If Not Result.IsASCII() Then
+                Result = OsDrive & "ProgramData\PCL\natives"
+            End If
+        End If
+        Directory.CreateDirectory(Result) '提前创建，这样 ShortenPath 才有结果（否则在长路径下首次启动 Forge 会崩溃）
+        Return ShortenPath(Result)
     End Function
 
 #End Region
@@ -1981,7 +1988,7 @@ NextVersion:
                McLoginLoader.Input.Type = McLoginType.Legacy AndAlso '离线登录
                (Setup.Get("LaunchSkinType") = 2 OrElse '强制 Alex
                (Setup.Get("LaunchSkinType") = 4 AndAlso Setup.Get("LaunchSkinSlim"))) Then '或选用 Alex 皮肤
-            Hint("此 Minecraft 版本尚不支持 Alex 皮肤，你的皮肤可能会显示为 Steve！", HintType.Critical)
+            Hint("此 Minecraft 版本尚不支持 Alex 皮肤，你的皮肤可能会显示为 Steve！", HintType.Red)
         End If
 
         '离线皮肤资源包
@@ -2125,9 +2132,9 @@ IgnoreCustomSkin:
 
         '获取自定义命令
         Dim CustomCommandGlobal As String = Setup.Get("LaunchAdvanceRun")
-        If CustomCommandGlobal <> "" Then CustomCommandGlobal = ArgumentReplace(CustomCommandGlobal, True)
+        If CustomCommandGlobal <> "" Then CustomCommandGlobal = ArgumentReplace(CustomCommandGlobal)
         Dim CustomCommandVersion As String = Setup.Get("VersionAdvanceRun", Version:=McVersionCurrent)
-        If CustomCommandVersion <> "" Then CustomCommandVersion = ArgumentReplace(CustomCommandVersion, True)
+        If CustomCommandVersion <> "" Then CustomCommandVersion = ArgumentReplace(CustomCommandVersion)
 
         '输出 bat
         Try
@@ -2283,7 +2290,7 @@ IgnoreCustomSkin:
         '获取窗口标题
         Dim WindowTitle As String = Setup.Get("VersionArgumentTitle", Version:=McVersionCurrent)
         If WindowTitle = "" Then WindowTitle = Setup.Get("LaunchArgumentTitle")
-        WindowTitle = ArgumentReplace(WindowTitle, False)
+        WindowTitle = ArgumentReplace(WindowTitle, ReplaceTime:=False)
 
         '初始化等待
         Dim Watcher As New Watcher(Loader, McVersionCurrent, WindowTitle)
@@ -2331,47 +2338,6 @@ IgnoreCustomSkin:
         Setup.Set("SystemLaunchCount", Setup.Get("SystemLaunchCount") + 1)
 
     End Sub
-
-    ''' <summary>
-    ''' 在启动结束时，对 PCL 约定的替换标记进行处理。
-    ''' </summary>
-    Private Function ArgumentReplace(Raw As String, ReplaceTimeAndDate As Boolean) As String
-        If Raw Is Nothing Then Return Nothing
-        '路径替换
-        Raw = Raw.Replace("{minecraft}", PathMcFolder)
-        Raw = Raw.Replace("{verpath}", McVersionCurrent.Path)
-        Raw = Raw.Replace("{verindie}", McVersionCurrent.PathIndie)
-        Raw = Raw.Replace("{java}", McLaunchJavaSelected.PathFolder)
-        '普通替换
-        Raw = Raw.Replace("{user}", McLoginLoader.Output.Name)
-        Raw = Raw.Replace("{uuid}", McLoginLoader.Output.Uuid)
-        If ReplaceTimeAndDate Then '设置窗口标题时需要动态替换日期和时间
-            Raw = Raw.Replace("{date}", Date.Now.ToString("yyyy/M/d"))
-            Raw = Raw.Replace("{time}", Date.Now.ToString("HH:mm:ss"))
-        End If
-        Select Case McLoginLoader.Input.Type
-            Case McLoginType.Legacy
-                If PageLinkHiper.HiperState = LoadState.Finished Then
-                    Raw = Raw.Replace("{login}", "联机离线")
-                Else
-                    Raw = Raw.Replace("{login}", "离线")
-                End If
-            Case McLoginType.Ms
-                Raw = Raw.Replace("{login}", "正版")
-            Case McLoginType.Nide
-                Raw = Raw.Replace("{login}", "统一通行证")
-            Case McLoginType.Auth
-                Raw = Raw.Replace("{login}", "Authlib-Injector")
-        End Select
-        Raw = Raw.Replace("{name}", McVersionCurrent.Name)
-        If {"unknown", "old", "pending"}.Contains(McVersionCurrent.Version.McName.ToLower) Then
-            Raw = Raw.Replace("{version}", McVersionCurrent.Name)
-        Else
-            Raw = Raw.Replace("{version}", McVersionCurrent.Version.McName)
-        End If
-        Raw = Raw.Replace("{path}", Path)
-        Return Raw
-    End Function
 
 #End Region
 

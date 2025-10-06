@@ -46,7 +46,7 @@
     Sub(sender, e) If sender IsNot Nothing Then CType(sender, MyImage).Source = e.NewValue.ToString())))
 
     ''' <summary>
-    ''' 若 Source 是一个网络图片，该地址将作为第二下载源。
+    ''' 若 Source 是一个网络图片，该地址将作为第二图片源。
     ''' </summary>
     Public Property FallbackSource As String
         Get
@@ -120,11 +120,12 @@
         End If
         RunInNewThread(
         Sub()
+            Dim IsLocalFallback As Boolean = FallbackSource IsNot Nothing AndAlso Not FallbackSource.StartsWithF("http")
             Try
                 '下载
                 ActualSource = LoadingSource '显示加载中的占位图片
                 NetDownloadByLoader(
-                    If(String.IsNullOrEmpty(FallbackSource), {Source}, {Source, FallbackSource}),
+                    If(String.IsNullOrEmpty(FallbackSource) OrElse IsLocalFallback, {Source}, {Source, FallbackSource}),
                     TempPath, SimulateBrowserHeaders:=True)
                 If EnableCache Then
                     '保存缓存并显示
@@ -139,7 +140,19 @@
                     If TempPath IsNot Nothing Then File.Delete(TempPath)
                 Catch
                 End Try
-                Log(ex, $"下载图片失败", LogLevel.Hint)
+                '加载本地备用图片
+                If IsLocalFallback Then
+                    Try
+                        RunInUiWait(Sub() ActualSource = FallbackSource)
+                        Log(ex, $"下载图片失败，使用本地备用图片（{Source}）")
+                        Return
+                    Catch exx As Exception
+                        Log(ex, $"下载图片失败（{Source}）", LogLevel.Hint)
+                        Log(exx, $"加载备用图片失败（{FallbackSource}）", LogLevel.Hint)
+                    End Try
+                Else
+                    Log(ex, $"下载图片失败（{Source}，备用：{FallbackSource}）", LogLevel.Hint)
+                End If
             End Try
         End Sub, "MyImage PicLoader " & GetUuid() & "#", ThreadPriority.BelowNormal)
     End Sub

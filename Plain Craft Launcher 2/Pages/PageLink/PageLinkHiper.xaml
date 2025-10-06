@@ -83,7 +83,7 @@
                                 <local:ValidateRegex Regex="^[^\u4e00-\u9fa5]{6,}$" />
                             </local:MyTextBox.ValidateRules>
                         </local:MyTextBox>
-                        <local:MyButton Grid.Column="4" Grid.Row="4" Margin="0,0,15,0" Text="获取索引码" Padding="13,8" EventType="打开网页" EventData="https://shimo.im/docs/KrkEVXz1K0frowAJ" />
+                        <local:MyButton Grid.Column="4" Grid.Row="4" Margin="0,0,15,0" Text="获取索引码" Padding="13,8" local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://shimo.im/docs/KrkEVXz1K0frowAJ" />
                         <local:MyButton x:Name="BtnCertDone" Grid.Column="5" Grid.Row="4" Text="确定" ColorType="Highlight" Padding="13,8" IsEnabled="False" />
                     </Grid>
                 </local:MyCard>
@@ -229,7 +229,6 @@
             </Grid>
         </Grid>
         <Grid x:Name="PanAlways" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="15" Opacity="0.5">
-            <local:MyTextButton Text="联机服务由 速聚 授权提供" EventType="打开网页" EventData="https://www.the.bb/zh-CN.html" />
         </Grid>
     </Grid>
 </local:MyPageRight>

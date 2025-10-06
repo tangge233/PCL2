@@ -998,20 +998,18 @@ StartThread:
                 If ModeDebug AndAlso Response.RequestMessage.RequestUri.ToString <> Th.Source.Url Then Log($"[Download] {LocalName}：重定向至 {Response.RequestMessage.RequestUri}")
                 '文件大小校验
                 ContentLength = Response.Content.Headers.ContentLength.GetValueOrDefault(-1)
-                If ContentLength = -1 Then
+                If ContentLength < 0 Then
                     If FileSize > 1 Then
                         If Th.DownloadStart = 0 Then
                             Log($"[Download] {LocalName}：文件大小未知，但已从其他下载源获取，不作处理")
                         Else
-                            Log($"[Download] {LocalName}：ContentLength 返回了 -1，无法确定是否支持分段下载，视作不支持")
+                            Log($"[Download] {LocalName}：ContentLength 返回了 {ContentLength}，无法确定是否支持分段下载，视作不支持")
                             GoTo NotSupportRange
                         End If
                     Else
                         FileSize = -1 : IsUnknownSize = True
                         Log($"[Download] {LocalName}：文件大小未知")
                     End If
-                ElseIf ContentLength < 0 Then
-                    Throw New Exception("获取片大小失败，结果为 " & ContentLength & "。")
                 ElseIf Th.IsFirstThread Then
                     If Check IsNot Nothing Then
                         If ContentLength < Check.MinSize AndAlso Check.MinSize > 0 Then
@@ -1040,15 +1038,11 @@ StartThread:
                 ElseIf Th.DownloadStart > 0 AndAlso ContentLength = FileSize Then
 NotSupportRange:
                     SyncLock LockSource
-                        If SourcesOnce.Contains(Th.Source) Then
-                            GoTo SourceBreak
-                        Else
-                            SourcesOnce.Add(Th.Source)
-                        End If
+                        If SourcesOnce.Contains(Th.Source) Then GoTo SourceBreak
                     End SyncLock
-                    Throw New WebException($"该下载源不支持分段下载：Range 起始于 {Th.DownloadStart}，预期 ContentLength 为 {FileSize - Th.DownloadStart}，返回 ContentLength 为 {ContentLength}，总文件大小 {FileSize}")
+                    Throw New RangeNotSupportedException($"该下载源不支持分段下载：Range 起始于 {Th.DownloadStart}，预期 ContentLength 为 {FileSize - Th.DownloadStart}，返回 ContentLength 为 {ContentLength}，总文件大小 {FileSize}")
                 ElseIf Not FileSize - Th.DownloadStart = ContentLength Then
-                    Throw New WebException($"获取到的分段大小不一致：Range 起始于 {Th.DownloadStart}，预期 ContentLength 为 {FileSize - Th.DownloadStart}，返回 ContentLength 为 {ContentLength}，总文件大小 {FileSize}")
+                    Throw New RangeNotSupportedException($"获取到的分段大小不一致：Range 起始于 {Th.DownloadStart}，预期 ContentLength 为 {FileSize - Th.DownloadStart}，返回 ContentLength 为 {ContentLength}，总文件大小 {FileSize}")
                 End If
                 'Log($"[Download] {LocalName} {Info.Uuid}#：通过大小检查，文件大小 {FileSize}，起始点 {Info.DownloadStart}，ContentLength {ContentLength}")
                 Th.State = NetState.Get
@@ -1061,6 +1055,7 @@ NotSupportRange:
                     Cache = New MemoryStream
                     ResultStream = Cache
                 Else
+                    Directory.CreateDirectory(PathTemp & "Download")
                     Th.Temp = $"{PathTemp}Download\{Uuid}_{Th.Uuid}_{RandomInteger(0, 999999)}.tmp"
                     ResultStream = New FileStream(Th.Temp, FileMode.Create, FileAccess.Write, FileShare.Read)
                 End If
@@ -1165,9 +1160,10 @@ SourceBreak:
             Th.State = NetState.Error
             Th.Source.Ex = ex
             '根据情况判断，是否在多线程下禁用下载源（连续错误过多，或不支持断点续传）
-            If IsMergeFailure OrElse
-               ex.Message.Contains("该下载源不支持") OrElse ex.Message.Contains("未能解析") OrElse ex.Message.Contains("(404)") OrElse
-               ex.Message.Contains("(502)") OrElse ex.Message.Contains("无返回数据") OrElse ex.Message.Contains("空间不足") OrElse ex.Message.Contains("获取到的分段大小不一致") OrElse
+            Dim IsRangeNotSupported As Boolean = TypeOf ex Is RangeNotSupportedException OrElse ex.Message.Contains("(416)")
+            If IsMergeFailure OrElse IsRangeNotSupported OrElse
+               ex.Message.Contains("(502)") OrElse ex.Message.Contains("(404)") OrElse
+               ex.Message.Contains("未能解析") OrElse ex.Message.Contains("无返回数据") OrElse ex.Message.Contains("空间不足") OrElse
                ((ex.Message.Contains("(403)") OrElse ex.Message.Contains("(429)")) AndAlso Not Th.Source.Url.ContainsF("bmclapi")) OrElse 'BMCLAPI 的部分源在高频率请求下会返回 403/429，所以不应因此禁用下载源
                (Th.Source.FailCount >= MathClamp(NetTaskThreadLimit, 5, 30) AndAlso DownloadDone < 1) OrElse Th.Source.FailCount > NetTaskThreadLimit + 2 Then
                 '当一个下载源有多个线程在下载时，只选择其中一个线程进行后续处理
@@ -1180,9 +1176,9 @@ SourceBreak:
                 End SyncLock
                 '……后续处理
                 If IsThisFail Then
-                    Log($"[Download] {LocalName}：下载源被禁用（{Th.Source.Id}）：{Th.Source.Url}")
+                    Log($"[Download] {LocalName}：下载源被禁用（{Th.Source.Id}，Range 问题：{IsRangeNotSupported}）：{Th.Source.Url}")
                     Log(ex, $"{If(SourcesOnce.FirstOrDefault?.SingleThread Is Nothing, "", "单线程")}下载源 {Th.Source.Id} 已被禁用",
-                        If(ex.Message.Contains("不支持分段下载") OrElse ex.Message.Contains("(404)") OrElse ex.Message.Contains("(416)"), LogLevel.Developer, LogLevel.Debug))
+                        If(IsRangeNotSupported OrElse ex.Message.Contains("(404)"), LogLevel.Developer, LogLevel.Debug))
                     SyncLock LockSource
                         SourcesOnce.Remove(Th.Source)
                     End SyncLock
@@ -1191,9 +1187,10 @@ SourceBreak:
                         Fail(ex)
                     ElseIf HasAvailableSource() AndAlso Not IsMergeFailure Then
                         '当前源失败，但还有下载源：正常地继续执行
-                    ElseIf Not Retried AndAlso Sources.Count > 1 Then
+                    ElseIf Not Retried Then
                         '合并失败或首次下载失败，未重试：将所有下载源重新标记为不允许断点续传的下载源，逐个重新尝试下载
-                        Hint($"{LocalName}：文件下载失败，正在自动重试……", If(ModeDebug, HintType.Critical, HintType.Info)) '在调试模式下给出红色提示
+                        '若所有源均不支持 Range，也会走到这里重试
+                        If Not IsRangeNotSupported Then Hint($"{LocalName}：文件下载失败，正在自动重试……", If(ModeDebug, HintType.Red, HintType.Blue)) '在调试模式下给出红色提示
                         Retried = True
                         SyncLock LockSource
                             SourcesOnce.Clear()
@@ -1387,6 +1384,12 @@ Retry:
             Next
         End Sub
 
+    End Class
+    Private Class RangeNotSupportedException
+        Inherits WebException
+        Public Sub New(Message As String)
+            MyBase.New(Message)
+        End Sub
     End Class
     ''' <summary>
     ''' 下载一系列文件的加载器。
@@ -1890,7 +1893,6 @@ Retry:
                     Catch ex As Exception
                         Log(ex, "清理下载缓存失败")
                     End Try
-                    Directory.CreateDirectory(PathTemp & "Download")
                 End If
                 IsDownloadCacheCleared = True
             End SyncLock

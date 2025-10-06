@@ -22,7 +22,8 @@ Public Class PageVersionExport
     Private Sub PageVersionExport_Loaded() Handles Me.Loaded
         AniControlEnabled += 1
         If CurrentVersion <> PageVersionLeft.Version.Path Then RefreshAll() '切换到了另一个版本，重置页面
-        BtnAdvancedHelp.EventData = If(VersionBranchName = "Release", "指南/整合包制作 - Public.json", "指南/整合包制作 - Snapshot.json")
+        CustomEventService.SetEventData(BtnAdvancedHelp,
+            If(VersionBranchName = "Release", "指南/整合包制作 - Public.json", "指南/整合包制作 - Snapshot.json"))
         AniControlEnabled -= 1
     End Sub
     Public Sub RefreshAll() Implements IRefreshable.Refresh
@@ -35,7 +36,7 @@ Public Class PageVersionExport
         TextExportVersion.HintText = "1.0.0"
         CheckAdvancedInclude.Checked = False
         CheckAdvancedModrinth.Checked = False
-        GetExportOption(CheckOptionsBasic).Description = PageVersionLeft.Version.GetDefaultDescription()
+        GetExportOption(CheckOptionsBasic).Description = PageVersionLeft.Version.GetVersionDescription()
         ResetConfigOverrides()
         ReloadAllSubOptions()
         RefreshAllOptionsUI()
@@ -341,7 +342,7 @@ Public Class PageVersionExport
             ConfigLines.AddRange(GetExtraFileLines())
             '结束
             WriteFile(ConfigPath, ConfigLines.Join(vbCrLf))
-            Hint("已保存配置文件：" & ConfigPath, HintType.Finish)
+            Hint("已保存配置文件：" & ConfigPath, HintType.Green)
             OpenExplorer(ConfigPath)
         Catch ex As Exception
             Log(ex, "保存配置失败", LogLevel.Msgbox)
@@ -378,7 +379,7 @@ Public Class PageVersionExport
                 ExtraFiles = Nothing
             End If
             '结束
-            Hint("已读取配置文件：" & ConfigPath, HintType.Finish)
+            Hint("已读取配置文件：" & ConfigPath, HintType.Green)
         Catch ex As Exception
             Log(ex, "读取配置失败", LogLevel.Msgbox)
         End Try
@@ -517,13 +518,13 @@ Public Class PageVersionExport
                     If Directory.Exists(Line) Then
                         CopyDirectory(Line, BaseFolder & GetFolderNameFromPath(Line) & "\")
                     Else
-                        Hint($"未找到配置文件中指定的文件夹：{Line}", HintType.Critical)
+                        Hint($"未找到配置文件中指定的文件夹：{Line}", HintType.Red)
                     End If
                 Else
                     If File.Exists(Line) Then
                         CopyFile(Line, BaseFolder & GetFileNameFromPath(Line))
                     Else
-                        Hint($"未找到配置文件中指定的单个文件：{Line}", HintType.Critical)
+                        Hint($"未找到配置文件中指定的单个文件：{Line}", HintType.Red)
                     End If
                 End If
             Next

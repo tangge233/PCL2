@@ -31,7 +31,7 @@ Public Module ModModpack
         Try
             '字符校验
             Dim TargetFolder As String = $"{PathMcFolder}versions\{VersionName}\"
-            If TargetFolder.Contains("!") OrElse TargetFolder.Contains(";") Then Hint("游戏路径中不能含有感叹号或分号：" & TargetFolder, HintType.Critical) : Throw New CancelledException
+            If TargetFolder.Contains("!") OrElse TargetFolder.Contains(";") Then Hint("游戏路径中不能含有感叹号或分号：" & TargetFolder, HintType.Red) : Throw New CancelledException
             '获取整合包种类与关键 Json
             Dim PackType As Integer = -1
             Try
@@ -344,7 +344,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = "CurseForge 整合包安装：" & VersionName & " "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
 
@@ -485,7 +485,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = $"Modrinth 整合包安装：{VersionName} "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
 
@@ -540,7 +540,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = "HMCL 整合包安装：" & VersionName & " "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
         '启动
@@ -639,8 +639,8 @@ Retry:
         '构造版本安装请求
         If PackJson("components") Is Nothing Then Throw New Exception("该 MMC 整合包未提供游戏版本信息，无法安装！")
         Dim Request As New McInstallRequest With {.TargetVersionName = VersionName, .TargetVersionFolder = $"{PathMcFolder}versions\{VersionName}\"}
-        For Each Component In PackJson("components")
-            If Not Component.Contains("uid") Then Continue For
+        For Each Component As JObject In PackJson("components")
+            If Not Component.ContainsKey("uid") Then Continue For
             Select Case Component("uid").ToString
                 Case "org.lwjgl"
                     Log("[ModPack] 已跳过 LWJGL 项")
@@ -667,7 +667,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = "MMC 整合包安装：" & VersionName & " "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
 
@@ -725,7 +725,7 @@ Retry:
         Next
         If Not Addons.ContainsKey("game") Then Throw New Exception("该 MCBBS 整合包未提供游戏版本信息，无法安装！")
         If Addons.ContainsKey("quilt") Then
-            Hint("PCL 暂不支持安装需要 Quilt 的整合包！", HintType.Critical)
+            Hint("PCL 暂不支持安装需要 Quilt 的整合包！", HintType.Red)
             Throw New CancelledException
         End If
         Dim Request As New McInstallRequest With {
@@ -746,7 +746,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = "MCBBS 整合包安装：" & VersionName & " "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
 
@@ -766,7 +766,7 @@ Retry:
         MyMsgBox("接下来请选择一个空文件夹，它会被安装到这个文件夹里。", "安装", "继续", ForceWait:=True)
         Dim TargetFolder As String = SelectFolder("选择安装目标（必须是一个空文件夹）")
         If String.IsNullOrEmpty(TargetFolder) Then Throw New CancelledException
-        If Directory.GetFileSystemEntries(TargetFolder).Length > 0 Then Hint("请选择一个空文件夹作为安装目标！", HintType.Critical) : Throw New CancelledException
+        If Directory.GetFileSystemEntries(TargetFolder).Length > 0 Then Hint("请选择一个空文件夹作为安装目标！", HintType.Red) : Throw New CancelledException
         '解压
         Dim Loader As New LoaderCombo(Of String)("解压压缩包", {
             New LoaderTask(Of String, Integer)("解压压缩包",
@@ -843,8 +843,8 @@ Retry:
         MyMsgBox("接下来请选择一个空文件夹，它会被安装到这个文件夹里。", "安装", "继续", ForceWait:=True)
         Dim TargetFolder As String = SelectFolder("选择安装目标（必须是一个空文件夹）")
         If String.IsNullOrEmpty(TargetFolder) Then Throw New CancelledException
-        If TargetFolder.Contains("!") OrElse TargetFolder.Contains(";") Then Hint("Minecraft 文件夹路径中不能含有感叹号或分号！", HintType.Critical) : Throw New CancelledException
-        If Directory.GetFileSystemEntries(TargetFolder).Length > 0 Then Hint("请选择一个空文件夹作为安装目标！", HintType.Critical) : Throw New CancelledException
+        If TargetFolder.Contains("!") OrElse TargetFolder.Contains(";") Then Hint("Minecraft 文件夹路径中不能含有感叹号或分号！", HintType.Red) : Throw New CancelledException
+        If Directory.GetFileSystemEntries(TargetFolder).Length > 0 Then Hint("请选择一个空文件夹作为安装目标！", HintType.Red) : Throw New CancelledException
         '解压
         Dim Loader As New LoaderCombo(Of String)("解压压缩包", {
             New LoaderTask(Of String, Integer)("解压压缩包",

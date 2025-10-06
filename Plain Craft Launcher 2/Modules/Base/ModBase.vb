@@ -13,13 +13,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.10.8" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.10.8." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.10.9" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.10.9." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
-    Public Const VersionCode As Integer = 367 'Release
+    Public Const VersionCode As Integer = 369 'Release
 #Else
-    Public Const VersionCode As Integer = 370 'Snapshot
+    Public Const VersionCode As Integer = 371 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -69,7 +69,7 @@ Public Module ModBase
     ''' <summary>
     ''' 识别码。
     ''' </summary>
-    Public UniqueAddress As String = SecretGetUniqueAddress()
+    Public Identify As String = SecretGetIdentify()
     ''' <summary>
     ''' 程序是否已结束。
     ''' </summary>
@@ -761,7 +761,6 @@ Public Module ModBase
         If FilePath.Contains("\") Then FilePath = FilePath.Substring(FilePath.LastIndexOfF("\") + 1)
         Dim length As Integer = FilePath.Length
         If length = 0 Then Throw New Exception("不包含文件名：" & FilePath)
-        If length > 250 Then Throw New PathTooLongException("文件名过长：" & FilePath)
         Return FilePath
     End Function
     ''' <summary>
@@ -1400,12 +1399,13 @@ RetryDir:
 
     ''' <summary>
     ''' 若路径长度大于指定值，则将长路径转换为短路径。
+    ''' 如果路径不存在，则返回原始路径。
     ''' </summary>
     Public Function ShortenPath(LongPath As String) As String
         If LongPath.Length <= 200 OrElse LongPath.StartsWithF("http", True) Then Return LongPath
         If Not Directory.Exists(LongPath) AndAlso Not File.Exists(LongPath) Then Return LongPath
         Dim ShortPath As New StringBuilder(260)
-        GetShortPathName(LongPath, ShortPath, 260)
+        GetShortPathName(LongPath.Replace("/", "\"), ShortPath, 260) '第一个参数也会在调用后被修改，使用 Replace 后不会影响原始字符串
         ShortenPath = ShortPath.ToString
         If String.IsNullOrEmpty(ShortenPath) Then Return LongPath
     End Function
@@ -1509,6 +1509,19 @@ RetryDir:
     ''' <param name="EnumData">一个已经实例化的枚举类型。</param>
     Public Function GetStringFromEnum(EnumData As [Enum]) As String
         Return [Enum].GetName(EnumData.GetType, EnumData)
+    End Function
+    ''' <summary>
+    ''' 将字符串转换为枚举类型，支持数字或原文两种格式，若为空字符串则返回 0。
+    ''' 若转换失败会抛出异常。
+    ''' </summary>
+    <Extension> Public Function ParseToEnum(Of T)(Str As String) As T
+        If String.IsNullOrEmpty(Str) Then
+            Return CType(0, Object)
+        ElseIf IsNumeric(Str) Then
+            Return CType(CInt(Str), Object)
+        Else
+            Return [Enum].Parse(GetType(T), Str, True)
+        End If
     End Function
     ''' <summary>
     ''' 将文件大小转化为适合的文本形式，如“1.28 M”。
@@ -2579,7 +2592,7 @@ Retry:
                     Log(ex, "可能由于剪贴板被其他程序占用，文本复制失败", LogLevel.Hint)
                 End If
             End Try
-            If ShowSuccessHint Then Hint("已成功复制！", HintType.Finish)
+            If ShowSuccessHint Then Hint("已成功复制！", HintType.Green)
         End Sub)
     End Sub
 
@@ -2716,6 +2729,11 @@ Retry:
     ''' 将 XML 转换为对应 UI 对象。
     ''' </summary>
     Public Function GetObjectFromXML(Str As String) As Object
+        Str = Str. '兼容旧版自定义事件写法
+            Replace("EventType=""", "local:CustomEventService.EventType=""").
+            Replace("EventData=""", "local:CustomEventService.EventData=""").
+            Replace("Property=""EventType""", "Property=""local:CustomEventService.EventType""").
+            Replace("Property=""EventData""", "Property=""local:CustomEventService.EventData""")
         Using Stream As New MemoryStream(Encoding.UTF8.GetBytes(Str))
             '类型检查
             Using Reader As New XamlXmlReader(Stream)
@@ -2831,7 +2849,7 @@ Retry:
                 File.Create(Path & "PCL\Log1.txt").Dispose()
             Catch ex As IOException
                 IsInitSuccess = False
-                Hint("可能同时开启了多个 PCL，程序可能会出现未知问题！", HintType.Critical)
+                Hint("可能同时开启了多个 PCL，程序可能会出现未知问题！", HintType.Red)
                 Log(ex, "日志初始化失败（疑似文件占用问题）")
             Catch ex As Exception
                 IsInitSuccess = False
@@ -2884,6 +2902,7 @@ Retry:
 
         '输出日志
         Dim AppendText As String = $"[{GetTimeNow()}] <{If(Thread.CurrentThread.Name = "", "主线程", Thread.CurrentThread.Name)}> {Text}{vbCrLf}" '减轻同步锁占用
+        AppendText = FilterUserName(FilterAccessToken(AppendText, "*"), "*")
         If ModeDebug Then
             SyncLock LogListLock
                 LogList.Append(AppendText)
@@ -2903,16 +2922,16 @@ Retry:
         Select Case Level
 #If DEBUG Then
             Case LogLevel.Developer
-                Hint("[开发者模式] " & Text, HintType.Info, False)
+                Hint("[开发者模式] " & Text, HintType.Blue, False)
             Case LogLevel.Debug
-                Hint("[调试模式] " & Text, HintType.Info, False)
+                Hint("[调试模式] " & Text, HintType.Blue, False)
 #Else
             Case LogLevel.Developer
             Case LogLevel.Debug
-                If ModeDebug Then Hint("[调试模式] " & Text, HintType.Info, False)
+                If ModeDebug Then Hint("[调试模式] " & Text, HintType.Blue, False)
 #End If
             Case LogLevel.Hint
-                Hint(Text, HintType.Critical, False)
+                Hint(Text, HintType.Red, False)
             Case LogLevel.Msgbox
                 MyMsgBox(Text, Title, IsWarn:=True)
             Case LogLevel.Feedback
@@ -2955,6 +2974,7 @@ Retry:
 
         '输出日志
         Dim AppendText As String = $"[{GetTimeNow()}] <{If(Thread.CurrentThread.Name = "", "主线程", Thread.CurrentThread.Name)}> {Desc}：{Ex.GetDetail(True)}{vbCrLf}" '减轻同步锁占用
+        AppendText = FilterUserName(FilterAccessToken(AppendText, "*"), "*")
         If ModeDebug Then
             SyncLock LogListLock
                 LogList.Append(AppendText)
@@ -2973,19 +2993,19 @@ Retry:
 #If DEBUG Then
             Case LogLevel.Developer
                 Dim ExLine As String = Desc & "：" & Ex.GetBrief()
-                Hint("[开发者模式] " & ExLine, HintType.Info, False)
+                Hint("[开发者模式] " & ExLine, HintType.Blue, False)
             Case LogLevel.Debug
                 Dim ExLine As String = Desc & "：" & Ex.GetBrief()
-                Hint("[调试模式] " & ExLine, HintType.Info, False)
+                Hint("[调试模式] " & ExLine, HintType.Blue, False)
 #Else
             Case LogLevel.Developer
             Case LogLevel.Debug
                 Dim ExLine As String = Desc & "：" & Ex.GetBrief()
-                If ModeDebug Then Hint("[调试模式] " & ExLine, HintType.Info, False)
+                If ModeDebug Then Hint("[调试模式] " & ExLine, HintType.Blue, False)
 #End If
             Case LogLevel.Hint
                 Dim ExLine As String = Desc & "：" & Ex.GetBrief()
-                Hint(ExLine, HintType.Critical, False)
+                Hint(ExLine, HintType.Red, False)
             Case LogLevel.Msgbox
                 MyMsgBox(ExFull, Title, IsWarn:=True)
             Case LogLevel.Feedback

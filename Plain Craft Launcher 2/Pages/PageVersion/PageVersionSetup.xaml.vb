@@ -98,7 +98,7 @@
             JavaSearchLoader.Start(IsForceRestart:=True)
 
             Log("[Setup] 已初始化版本独立设置")
-            Hint("已初始化版本独立设置！", HintType.Finish, False)
+            Hint("已初始化版本独立设置！", HintType.Green, False)
         Catch ex As Exception
             Log(ex, "初始化版本独立设置失败", LogLevel.Msgbox)
         End Try
