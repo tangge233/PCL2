@@ -883,7 +883,7 @@ NextFile:
         Text = Text.RegexReplaceEach("\{hint\}", Function() Replacer(PageOtherTest.GetRandomHint()))
         Text = Text.RegexReplaceEach("\{cave\}", Function() Replacer(PageOtherTest.GetRandomCave()))
         Text = Text.RegexReplaceEach("\{setup:([a-zA-Z0-9]+)\}", Function(m) Replacer(Setup.GetSafe(m.Groups(1).Value, McVersionCurrent)))
-        Text = Text.RegexReplaceEach("\{varible:([^\}]+)\}", Function(m) Replacer(ReadReg("CustomEvent" & m.Groups(1).Value, Nothing)))
+        Text = Text.RegexReplaceEach("\{varible:([^:\}]+)(?::([^\}]+))?\}", Function(m) Replacer(ReadReg("CustomEvent" & m.Groups(1).Value, m.Groups(2).Value)))
         Return Text
     End Function
 
