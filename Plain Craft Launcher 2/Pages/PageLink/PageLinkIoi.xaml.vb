@@ -121,26 +121,7 @@ Public Class PageLinkIoi
     ''' 获取当前的玩家名。
     ''' </summary>
     Public Shared Function GetPlayerName() As String
-        '自动生成玩家名
-        If AutogenPlayerName Is Nothing Then
-            If IsPlayerNameValid(McLoginName) Then
-                AutogenPlayerName = McLoginName()
-            Else
-                AutogenPlayerName = "玩家 " & CType(GetHash(If(UniqueAddress, "")) Mod 1048576, Integer).ToString("x5").ToUpper
-            End If
-        End If
-        '获取玩家自定义的名称
-        Dim CustomName As String = Setup.Get("LinkName").ToString.Trim()
-        If CustomName <> "" Then
-            If IsPlayerNameValid(CustomName) Then
-                Return CustomName.Trim
-            Else
-                Hint("你所设置的玩家名存在异常，已被重置！", HintType.Critical)
-                Setup.Set("LinkName", "")
-            End If
-        End If
-        '使用自动生成的玩家名
-        Return AutogenPlayerName
+        Return ""
     End Function
     Private Shared AutogenPlayerName As String = Nothing '并非由玩家自定义，而是自动生成的玩家名
     ''' <summary>

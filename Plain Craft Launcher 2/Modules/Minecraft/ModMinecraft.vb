@@ -68,7 +68,7 @@ Public Module ModMinecraft
             For Each Folder As String In Setup.Get("LaunchFolders").Split("|")
                 If Folder = "" Then Continue For
                 If Not Folder.Contains(">") OrElse Not Folder.EndsWithF("\") Then
-                    Hint(GetLang("LangModMinecraftInvalidMcFolder", Folder), HintType.Critical)
+                    Hint(GetLang("LangModMinecraftInvalidMcFolder", Folder), HintType.Red)
                     Continue For
                 End If
                 Dim Name As String = Folder.Split(">")(0)
@@ -86,7 +86,7 @@ Public Module ModMinecraft
                     Next
                     If Not Renamed Then CacheMcFolderList.Add(New McFolder With {.Name = Name, .Path = Path, .Type = McFolderType.Custom})
                 Catch ex As Exception
-                    MyMsgBox(GetLang("LangModMinecraftInvalidMcFolder", Path, GetExceptionSummary(ex)), GetLang("LangModMinecraftDialogTitleInvalidMcFolder"), IsWarn:=True)
+                    MyMsgBox(GetLang("LangModMinecraftInvalidMcFolder", Path, ex.GetBrief()), GetLang("LangModMinecraftDialogTitleInvalidMcFolder"), IsWarn:=True)
                     Log(ex, $"无法访问 Minecraft 文件夹 {Path}")
                 End Try
             Next
@@ -261,6 +261,12 @@ Public Module ModMinecraft
         ''' 显示的描述文本。
         ''' </summary>
         Public Info As String = GetLang("LangModMinecraftNotLoaded")
+        Public ReadOnly Property HasCustomInfo As Boolean
+            Get
+                Return ReadIni(Path & "PCL\Setup.ini", "CustomInfo") <> ""
+            End Get
+        End Property
+
         ''' <summary>
         ''' 该版本的列表检查原始结果，不受自定义影响。
         ''' </summary>
@@ -695,7 +701,7 @@ Recheck:
             Catch ex As Exception
                 Log(ex, "依赖版本检查出错（" & Name & "）")
                 State = McVersionState.Error
-                Info = GetLang("LangModMinecraftCheckStatusUnknownError") & GetExceptionSummary(ex)
+                Info = GetLang("LangModMinecraftCheckStatusUnknownError") & ex.GetBrief()
                 Return False
             End Try
 
@@ -784,7 +790,17 @@ ExitDataLoad:
                 End If
                 '确定版本描述
                 Dim CustomInfo As String = ReadIni(Path & "PCL\Setup.ini", "CustomInfo")
-                Info = If(CustomInfo <> "", CustomInfo, GetDefaultDescription())
+                If CustomInfo <> "" Then
+                    Info = CustomInfo
+                Else
+                    Info = GetVersionDescription()
+                    If State = McVersionState.Fool Then
+                        Info = GetMcFoolName(Version.McName)
+                    ElseIf State <> McVersionState.Error Then
+                        If Setup.Get("VersionServerLogin", Version:=Me) = 3 Then Info += ", 统一通行证验证"
+                        If Setup.Get("VersionServerLogin", Version:=Me) = 4 Then Info += ", Authlib 验证"
+                    End If
+                End If
                 '确定版本收藏状态
                 IsStar = ReadIni(Path & "PCL\Setup.ini", "IsStar", False)
                 '确定版本显示种类
@@ -808,7 +824,7 @@ ExitDataLoad:
                     WriteIni(Path & "PCL\Setup.ini", "VersionOriginalSub", Version.McCodeSub)
                 End If
             Catch ex As Exception
-                Info = GetLang("LangModMinecraftCheckStatusUnknownError") & GetExceptionSummary(ex)
+                Info = GetLang("LangModMinecraftCheckStatusUnknownError") & ex.GetBrief()
                 Logo = PathImage & "Blocks/RedstoneBlock.png"
                 State = McVersionState.Error
                 Log(ex, "加载版本失败（" & Name & "）", LogLevel.Feedback)
@@ -817,11 +833,13 @@ ExitDataLoad:
             End Try
             Return Me
         End Function
+        Public IsLoaded As Boolean = False
         ''' <summary>
-        ''' 获取版本的默认描述。
+        ''' 获取对该版本的简短描述。
+        ''' 例如 “快照 16w01a”、“原版 1.12.2”、“愚人节版本 2.0”。
         ''' </summary>
-        Public Function GetDefaultDescription() As String
-            Dim Info As String = ""
+        Public Function GetVersionDescription() As String
+            Dim Info As String
             Select Case State
                 Case McVersionState.Snapshot
                     If Version.McName.ContainsF("pre", True) Then
@@ -838,21 +856,38 @@ ExitDataLoad:
                 Case McVersionState.Original, McVersionState.Forge, McVersionState.NeoForge, McVersionState.Fabric, McVersionState.OptiFine, McVersionState.LiteLoader
                     Info = Version.ToString
                 Case McVersionState.Fool
-                    Info = GetMcFoolName(Version.McName)
+                    Info = "愚人节版本 " & Version.McName
                 Case McVersionState.Error
                     Return Me.Info '已有错误信息
                 Case Else
                     Info = GetLang("LangModMinecraftUnknownError")
             End Select
-            If Not State = McVersionState.Error Then
-                If Setup.Get("VersionServerLogin", Version:=Me) = 3 Then Info += ", " & GetLang("LangModMinecraftNideAuth")
-                If Setup.Get("VersionServerLogin", Version:=Me) = 4 Then Info += ", " & GetLang("LangModMinecraftAuthlibAuth")
-            End If
             Return Info
         End Function
 
-        Public IsLoaded As Boolean = False
+        Public Function ToListItem() As MyListItem
+            Dim NewItem As New MyListItem With {.Info = Info, .Height = 42, .Tag = Me, .SnapsToDevicePixels = True, .Type = MyListItem.CheckType.Clickable}
+            '标题
+            NewItem.Inlines.Clear()
+            NewItem.Inlines.Add(New Run(Name))
+            If HasCustomInfo Then '如果版本设置了自定义描述，在标题后面以淡灰色显示其版本号
+                NewItem.Inlines.Add(New Run("  |  " & GetVersionDescription()) With {.Foreground = New MyColor(215, 215, 215), .FontSize = 12})
+            End If
+            'Logo
+            Try
+                If Logo.EndsWith("PCL\Logo.png") Then
+                    NewItem.Logo = Path & "PCL\Logo.png" '修复老版本中，存储的自定义 Logo 使用完整路径，导致移动后无法加载的 Bug
+                Else
+                    NewItem.Logo = Logo
+                End If
+            Catch ex As Exception
+                Log(ex, "加载版本图标失败", LogLevel.Hint)
+                NewItem.Logo = "pack://application:,,,/images/Blocks/RedstoneBlock.png"
+            End Try
+            Return NewItem
+        End Function
 
+        '运算符支持
         Public Overrides Function Equals(obj As Object) As Boolean
             Dim version = TryCast(obj, McVersion)
             Return version IsNot Nothing AndAlso Path = version.Path
@@ -865,7 +900,6 @@ ExitDataLoad:
         Public Shared Operator <>(a As McVersion, b As McVersion) As Boolean
             Return Not (a = b)
         End Operator
-
     End Class
     Public Enum McVersionState
         [Error]
@@ -1186,6 +1220,7 @@ OnLoaded:
             If Setup.Get("SystemDebugDelay") Then Thread.Sleep(RandomInteger(200, 3000))
         Catch ex As ThreadInterruptedException
         Catch ex As Exception
+            If Loader.IsAborted Then Return '#5617
             WriteIni(Path & "PCL.ini", "VersionCache", "") '要求下次重新加载
             Log(ex, "加载 .minecraft 版本列表失败", LogLevel.Feedback)
         End Try
@@ -1566,12 +1601,12 @@ OnLoaded:
         Try
             Dim Image As New MyBitmap(FileName)
             If Image.Pic.Width <> 64 OrElse Not (Image.Pic.Height = 32 OrElse Image.Pic.Height = 64) Then
-                Hint(GetLang("LangModMinecraftSkinSizeErrorA"), HintType.Critical)
+                Hint(GetLang("LangModMinecraftSkinSizeErrorA"), HintType.Red)
                 Return New McSkinInfo With {.IsVaild = False}
             End If
             Dim FileInfo As New FileInfo(FileName)
             If FileInfo.Length > 24 * 1024 Then
-                Hint(GetLang("LangModMinecraftSkinSizeErrorB") & " " & Math.Round(FileInfo.Length / 1024, 2) & " KB", HintType.Critical)
+                Hint(GetLang("LangModMinecraftSkinSizeErrorB") & " " & Math.Round(FileInfo.Length / 1024, 2) & " KB", HintType.Red)
                 Return New McSkinInfo With {.IsVaild = False}
             End If
         Catch ex As Exception
@@ -1592,11 +1627,11 @@ OnLoaded:
     ''' <summary>
     ''' 获取 Uuid 对应的皮肤文件地址，失败将抛出异常。
     ''' </summary>
-    Public Function McSkinGetAddress(Uuid As String, Type As String) As String
-        If Uuid = "" Then Throw New Exception(GetLang("LangModMinecraftExceptionEmptyUuid"))
-        If Uuid.StartsWithF("00000") Then Throw New Exception(GetLang("LangModMinecraftExceptionUuidNoOnlineProfile"))
+    Public Function McSkinGetAddress(UUID As String, Type As String) As String
+        If UUID = "" Then Throw New Exception(GetLang("LangModMinecraftExceptionEmptyUuid"))
+        If UUID.StartsWithF("00000") AndAlso Type <> "Auth" Then Throw New Exception(GetLang("LangModMinecraftExceptionUuidNoOnlineProfile", UUID))
         '尝试读取缓存
-        Dim CacheSkinAddress As String = ReadIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", Uuid)
+        Dim CacheSkinAddress As String = ReadIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", UUID)
         If Not CacheSkinAddress = "" Then Return CacheSkinAddress
         '获取皮肤地址
         Dim Url As String
@@ -1610,7 +1645,7 @@ OnLoaded:
             Case Else
                 Throw New ArgumentException(GetLang("LangModMinecraftExceptionSkinTypeInvalid", If(Type, "null")))
         End Select
-        Dim SkinString = NetRequestByClientRetry(Url & Uuid)
+        Dim SkinString = NetRequestByClientRetry(Url & UUID, RequireJson:=True)
         If SkinString = "" Then Throw New Exception(GetLang("LangModMinecraftExceptionEmptySkin"))
         '处理皮肤地址
         Dim SkinValue As String
@@ -1635,8 +1670,8 @@ OnLoaded:
             SkinValue = If(SkinUrl.Contains("minecraft.net/"), SkinUrl.Replace("http://", "https://"), SkinUrl)
         End If
         '保存缓存
-        WriteIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", Uuid, SkinValue)
-        Log("[Skin] UUID " & Uuid & " 对应的皮肤文件为 " & SkinValue)
+        WriteIni(PathTemp & "Cache\Skin\Index" & Type & ".ini", UUID, SkinValue)
+        Log("[Skin] UUID " & UUID & " 对应的皮肤文件为 " & SkinValue)
         Return SkinValue
     End Function
 
@@ -1966,7 +2001,7 @@ OnLoaded:
             Try
                 Log("[Minecraft] 开始获取统一通行证下载信息")
                 '测试链接：https://auth.mc-user.com:233/00000000000000000000000000000000/
-                DownloadInfo = GetJson(NetRequestByClientRetry("https://auth.mc-user.com:233/" & Setup.Get("VersionServerNide", Version:=Version)))
+                DownloadInfo = GetJson(NetRequestByClientRetry("https://auth.mc-user.com:233/" & Setup.Get("VersionServerNide", Version:=Version), RequireJson:=True))
             Catch ex As Exception
                 Log(ex, "获取统一通行证下载信息失败")
             End Try
@@ -1983,16 +2018,20 @@ OnLoaded:
 
         'Authlib-Injector 文件
         If Setup.Get("VersionServerLogin", Version:=Version) = 4 Then
-            Dim TargetFile = PathPure & "\authlib-injector.jar"
+            Dim TargetFile = PathPure & "authlib-injector.jar"
             Dim DownloadInfo As JObject = Nothing
             '获取下载信息
             Try
                 Log("[Minecraft] 开始获取 Authlib-Injector 下载信息")
                 DownloadInfo = GetJson(NetRequestByClientRetry(
                         "https://authlib-injector.yushi.moe/artifact/latest.json",
-                        BackupUrl:="https://bmclapi2.bangbang93.com/mirrors/authlib-injector/artifact/latest.json"))
+                        BackupUrl:="https://bmclapi2.bangbang93.com/mirrors/authlib-injector/artifact/latest.json", RequireJson:=True))
             Catch ex As Exception
-                Log(ex, "获取 Authlib-Injector 下载信息失败")
+                If File.Exists(TargetFile) Then
+                    Log(ex, "获取 Authlib-Injector 下载信息失败")
+                Else
+                    Throw New Exception("获取 Authlib-Injector 下载信息失败", ex)
+                End If
             End Try
             '校验文件
             If DownloadInfo IsNot Nothing Then
@@ -2415,7 +2454,12 @@ NextEntry:
     Public Function FilterUserName(Raw As String, FilterChar As Char) As String
         If Raw.Contains(":\Users\") Then
             For Each Token In RegexSearch(Raw, "(?<=:\\Users\\)[^\\]+")
-                Raw = Raw.Replace("\" & Token, "\" & New String(FilterChar, Token.Count))
+                Raw = Raw.Replace("\Users\" & Token, "\Users\" & New String(FilterChar, Token.Count))
+            Next
+        End If
+        If Raw.Contains(":/Users/") Then
+            For Each Token In RegexSearch(Raw, "(?<=:/Users/)[^/]+")
+                Raw = Raw.Replace("/Users/" & Token, "/Users/" & New String(FilterChar, Token.Count))
             Next
         End If
         Return Raw

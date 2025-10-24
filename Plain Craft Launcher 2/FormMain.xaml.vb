@@ -11,6 +11,14 @@ Public Class FormMain
         Dim FeatureList As New List(Of KeyValuePair(Of Integer, String))
         '统计更新日志条目
 #If BETA Then
+        If LastVersion < 369 Then 'Release 2.10.8
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "新增：允许在版本设置中设置禁止更新 Mod，以防整合包玩家误操作"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：若整合包需要 PCL 不兼容的加载器，允许选择跳过它的安装"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "删除：由于已不再需要，删除手动安装包下载功能"))
+            FeatureCount += 21
+            BugCount += 32
+        End If
         If LastVersion < 367 Then 'Release 2.10.6
             FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：启用 MCIM 社区资源镜像源，以缓解社区资源难以下载的问题"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：正版登录出错时无法给出正确的错误信息"))
@@ -96,6 +104,28 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 371 Then 'Snapshot 2.10.9
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：如果版本设置了自定义描述，会在标题后面以淡灰色显示其版本号"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：支持为一个控件设置多个自定义事件"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：修改变量、弹出提示自定义事件"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：添加大量替换标记，允许在更多设置和 XAML 中使用更多替换标记"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法安装 MMC 整合包"))
+            FeatureCount += 33
+            BugCount += 11
+        End If
+        If LastVersion < 370 Then 'Snapshot 2.10.8
+            If LastVersion >= 368 Then FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
+            FeatureCount += 3
+            BugCount += 4
+        End If
+        If LastVersion < 368 Then 'Snapshot 2.10.7
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "新增：允许在版本设置中设置禁止更新 Mod，以防整合包玩家误操作"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：若整合包需要 PCL 不兼容的加载器，允许选择跳过它的安装"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "删除：由于已不再需要，删除手动安装包下载功能"))
+            FeatureCount += 19
+            BugCount += 28
+        End If
         If LastVersion < 366 Then 'Snapshot 2.10.6
             FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：启用 MCIM 社区资源镜像源，以缓解社区资源难以下载的问题"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：正版登录出错时无法给出正确的错误信息"))
@@ -297,7 +327,7 @@ Public Class FormMain
         FrmLaunchRight.PageState = MyPageRight.PageStates.ContentStay
         '模式提醒
 #If DEBUG Then
-        Hint("[开发者模式] PCL 正以开发者模式运行，这可能会造成严重的性能下降，请务必立即向开发者反馈此问题！", HintType.Critical)
+        Hint("[开发者模式] PCL 正以开发者模式运行，这可能会造成严重的性能下降，请务必立即向开发者反馈此问题！", HintType.Red)
 #End If
         If ModeDebug Then Hint(GetLang("LangHintDebugWarning"))
         '尽早执行的加载池
@@ -581,7 +611,7 @@ Public Class FormMain
                 FeedbackInfo()
                 Log(GetLang("LangCrashReport"))
                 IsLogShown = True
-                ShellOnly(Path & "PCL\Log1.txt")
+                StartProcess(Path & "PCL\Log1.txt")
             End If
             Thread.Sleep(500) '防止 PCL 在记事本打开前就被掐掉
         End If
@@ -665,9 +695,9 @@ Public Class FormMain
         If e.Key = Key.F12 Then
             PageSetupUI.HiddenForceShow = Not PageSetupUI.HiddenForceShow
             If PageSetupUI.HiddenForceShow Then
-                Hint(GetLang("LangHintHideModeOff"), HintType.Finish)
+                Hint(GetLang("LangHintHideModeOff"), HintType.Green)
             Else
-                Hint(GetLang("LangHintHideModeOn"), HintType.Finish)
+                Hint(GetLang("LangHintHideModeOn"), HintType.Green)
             End If
             PageSetupUI.HiddenRefresh()
             Return
@@ -763,12 +793,12 @@ Public Class FormMain
                         Dim AuthlibServer As String = Net.WebUtility.UrlDecode(Str.Substring("authlib-injector:yggdrasil-server:".Length))
                         Log("[System] Authlib 拖拽：" & AuthlibServer)
                         If Not String.IsNullOrEmpty(New ValidateHttp().Validate(AuthlibServer)) Then
-                            Hint(GetLang("LangHintAuthlibUrlIncorrect", AuthlibServer), HintType.Critical)
+                            Hint(GetLang("LangHintAuthlibUrlIncorrect", AuthlibServer), HintType.Red)
                             Return
                         End If
                         Dim TargetVersion = If(PageCurrent = PageType.VersionSetup, PageVersionLeft.Version, McVersionCurrent)
                         If TargetVersion Is Nothing Then
-                            Hint(GetLang("LangHintAuthlibDownloadGame"), HintType.Critical)
+                            Hint(GetLang("LangHintAuthlibDownloadGame"), HintType.Red)
                             Return
                         End If
                         If AuthlibServer = "https://littleskin.cn/api/yggdrasil" Then
@@ -812,7 +842,7 @@ Public Class FormMain
                 '获取文件并检查
                 Dim FilePathRaw = e.Data.GetData(DataFormats.FileDrop)
                 If FilePathRaw Is Nothing Then '#2690
-                    Hint(GetLang("LangHintWindowDropExtract"), HintType.Critical)
+                    Hint(GetLang("LangHintWindowDropExtract"), HintType.Red)
                     Return
                 End If
                 e.Handled = True
@@ -830,10 +860,10 @@ Public Class FormMain
             Log("[System] 接受文件拖拽：" & FilePath & If(FilePathList.Any, $" 等 {FilePathList.Count} 个文件", ""), LogLevel.Developer)
             '基础检查
             If Directory.Exists(FilePathList.First) AndAlso Not File.Exists(FilePathList.First) Then
-                Hint(GetLang("LangHintWindowDropFolder"), HintType.Critical)
+                Hint(GetLang("LangHintWindowDropFolder"), HintType.Red)
                 Return
             ElseIf Not File.Exists(FilePathList.First) Then
-                Hint(GetLang("LangHintWindowDropFileNotFound", FilePathList.First), HintType.Critical)
+                Hint(GetLang("LangHintWindowDropFileNotFound", FilePathList.First), HintType.Red)
                 Return
             End If
             '多文件拖拽
@@ -841,7 +871,7 @@ Public Class FormMain
                 '必须要求全部为 jar 文件
                 For Each File In FilePathList
                     If Not {"jar", "litemod", "disabled", "old"}.Contains(File.AfterLast(".").ToLower) Then
-                        Hint(GetLang("LangHintWindowDropFileOneFileAtATime"), HintType.Critical)
+                        Hint(GetLang("LangHintWindowDropFileOneFileAtATime"), HintType.Red)
                         Return
                     End If
                 Next
@@ -860,7 +890,7 @@ Public Class FormMain
                 Sub()
                     Setup.Set("UiCustomType", 1)
                     FrmLaunchRight.ForceRefresh()
-                    Hint(GetLang("LangHintLoadedCustomHomePage"), HintType.Finish)
+                    Hint(GetLang("LangHintLoadedCustomHomePage"), HintType.Green)
                 End Sub)
                 Return
             End If
@@ -970,9 +1000,9 @@ Public Class FormMain
 #Region "切换页面"
 
     '页面种类与属性
-    '注意，这一枚举在 “切换页面” EventType 中调用，应视作公开 API 的一部分
     ''' <summary>
     ''' 页面种类。
+    ''' 该枚举在自定义事件中使用，是公开 API 的一部分。
     ''' </summary>
     Public Enum PageType
         ''' <summary>
@@ -1018,21 +1048,16 @@ Public Class FormMain
     End Enum
     ''' <summary>
     ''' 次要页面种类。其数值必须与 StackPanel 中的下标一致。
+    ''' 该枚举在自定义事件中使用，是公开 API 的一部分。
     ''' </summary>
     Public Enum PageSubType
         [Default] = 0
-        DownloadInstall = 1
-        DownloadClient = 4
-        DownloadOptiFine = 5
-        DownloadForge = 6
-        DownloadNeoForge = 7
-        DownloadFabric = 8
-        DownloadLiteLoader = 9
-        DownloadMod = 11
-        DownloadPack = 12
-        DownloadDataPack = 13
-        DownloadResourcePack = 14
-        DownloadShader = 15
+        DownloadInstall = 0
+        DownloadMod = 2
+        DownloadPack = 3
+        DownloadDataPack = 4
+        DownloadResourcePack = 5
+        DownloadShader = 6
         SetupLaunch = 0
         SetupUI = 1
         SetupSystem = 2
@@ -1466,7 +1491,7 @@ Public Class FormMain
     '投降
     Public Sub AprilGiveup() Handles BtnExtraApril.Click
         If IsAprilEnabled AndAlso Not IsAprilGiveup Then
-            Hint("=D", HintType.Finish)
+            Hint("=D", HintType.Green)
             IsAprilGiveup = True
             FrmLaunchLeft.AprilScaleTrans.ScaleX = 1
             FrmLaunchLeft.AprilScaleTrans.ScaleY = 1
@@ -1484,7 +1509,7 @@ Public Class FormMain
             For Each Watcher In McWatcherList
                 Watcher.Kill()
             Next
-            Hint(GetLang("LangHintCloseMinecraftSuccess"), HintType.Finish)
+            Hint(GetLang("LangHintCloseMinecraftSuccess"), HintType.Green)
         Catch ex As Exception
             Log(ex, GetLang("LangHintCloseMinecraftFailed"), LogLevel.Feedback)
         End Try
@@ -1510,7 +1535,8 @@ Public Class FormMain
     End Function
     Private Function BtnExtraBack_GetRealChild() As MyScrollViewer
         If PanMainRight.Child Is Nothing OrElse TypeOf PanMainRight.Child IsNot MyPageRight Then Return Nothing
-        Return CType(PanMainRight.Child, MyPageRight).PanScroll
+        Dim Page As MyPageRight = PanMainRight.Child
+        Return Page.FindName(Page.PanScroll)
     End Function
 
 #End Region

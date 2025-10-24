@@ -3,16 +3,16 @@
     Public PageUuid As Integer = GetUuid()
 
     '“返回顶部” 按钮检测的滚动区域
-    Public Property PanScroll As MyScrollViewer
+    Public Property PanScroll As String '需要在 Loaded 之后才能获取到控件，所以不能用 Binding 直接绑定（#6664）
         Get
             Return GetValue(PanScrollProperty)
         End Get
-        Set(value As MyScrollViewer)
+        Set(value As String)
             SetValue(PanScrollProperty, value)
         End Set
     End Property
     Private Shared ReadOnly PanScrollProperty =
-        DependencyProperty.Register("PanScroll", GetType(MyScrollViewer), GetType(MyPageRight), New PropertyMetadata(Nothing))
+        DependencyProperty.Register("PanScroll", GetType(String), GetType(MyPageRight), New PropertyMetadata(Nothing))
 
     '当前状态
     Public Enum PageStates

@@ -28,7 +28,7 @@
             Setup.Reset("LinkHiperCertWarn")
 
             Log("[Setup] 已初始化联机页设置")
-            Hint("已初始化联机页设置！", HintType.Finish, False)
+            Hint("已初始化联机页设置！", HintType.Green, False)
         Catch ex As Exception
             Log(ex, "初始化联机页设置失败", LogLevel.Msgbox)
         End Try
