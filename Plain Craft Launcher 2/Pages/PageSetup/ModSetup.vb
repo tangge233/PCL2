@@ -636,8 +636,6 @@
                 Else
                     FrmSetupUI.HintCustom.Visibility = Visibility.Visible
                     FrmSetupUI.HintCustom.Text = GetLang("LangSetHomePagePresetSCOnly")
-                    FrmSetupUI.HintCustom.EventType = ""
-                    FrmSetupUI.HintCustom.EventData = ""
                 End If
                 FrmSetupUI.HintCustomWarn.Visibility = Visibility.Collapsed
         End Select

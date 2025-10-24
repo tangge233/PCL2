@@ -213,7 +213,7 @@
                         Hint(GetLang("LangSelectVersionDeletedPermanently", Version.Name), HintType.Green)
                     Else
                         FileIO.FileSystem.DeleteDirectory(Version.Path, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                        Hint(GetLang("LangSelectVersionDeletedToRecycleBin", Version.Name), HintType.Finish)
+                        Hint(GetLang("LangSelectVersionDeletedToRecycleBin", Version.Name), HintType.Green)
                     End If
                 Case 2
                     Return

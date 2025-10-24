@@ -336,7 +336,7 @@
             <local:MyCard Margin="0,0,0,15" Title="{StaticResource LangPageOtherAboutLawInfo}" IsSwapped="True" CanSwap="True">
                 <StackPanel Margin="25,39,23,20">
                     <TextBlock Text="{StaticResource LangPageOtherAboutLawInfoTelemetryTitle}" TextWrapping="Wrap" Margin="0,6,0,4" FontWeight="Bold" />
-                    <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{StaticResource angPageOtherAboutLawInfoTelemetryContent}&#xa;详情：https://github.com/Meloong-Git/PCL/discussions/7036" TextWrapping="Wrap" />
+                    <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{StaticResource angPageOtherAboutLawInfoTelemetryContent}" TextWrapping="Wrap" />
                     <TextBlock Text="{StaticResource LangPageOtherAboutLawInfoPrivacyTitle}" TextWrapping="Wrap" Margin="0,10,0,4" FontWeight="Bold" />
                     <TextBlock Margin="0,0,0,2" LineHeight="17" Text="{StaticResource LangPageOtherAboutLawInfoPrivacyContent}" TextWrapping="Wrap" />
                     <TextBlock Text="{StaticResource LangPageOtherAboutLawInfoOtherTitle}" TextWrapping="Wrap" Margin="0,10,0,4" FontWeight="Bold" />
