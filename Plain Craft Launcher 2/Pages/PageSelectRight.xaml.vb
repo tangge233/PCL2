@@ -210,10 +210,10 @@
                     IniClearCache(Version.Path & "PCL\Setup.ini")
                     If IsShiftPressed Then
                         DeleteDirectory(Version.Path)
-                        Hint(GetLang("LangSelectVersionDeletedA", Version.Name), HintType.Green)
+                        Hint(GetLang("LangSelectVersionDeletedPermanently", Version.Name), HintType.Green)
                     Else
                         FileIO.FileSystem.DeleteDirectory(Version.Path, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                        Hint(GetLang("LangSelectVersionDeletedB", Version.Name), HintType.Finish)
+                        Hint(GetLang("LangSelectVersionDeletedToRecycleBin", Version.Name), HintType.Finish)
                     End If
                 Case 2
                     Return

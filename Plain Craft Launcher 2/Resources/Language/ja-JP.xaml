@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
     <s:String x:Key="LangTaskAbort">キャンセルされました！</s:String>
     <s:String x:Key="LangDialogBtnOK">確認</s:String>
     <s:String x:Key="LangDialogBtnCancel">キャンセル</s:String>
@@ -13,6 +13,7 @@
     <s:String x:Key="LangReset">リセット</s:String>
     <s:String x:Key="LangRefresh">リフレッシュ</s:String>
     <s:String x:Key="LangRefreshing">リフレッシュ中……</s:String>
+    <s:String x:Key="LangRefreshed">已刷新！</s:String>
     <s:String x:Key="LangApplicationExceptionNoAccessPermission">PCL は {0} へのアクセス権がありません</s:String>
     <s:String x:Key="LangApplicationDialogTitleCacheFolderUnavailable">キャッシュフォルダーが利用できません</s:String>
     <s:String x:Key="LangApplicationDialogContentCacheFolderUnavailable">PCL はキャッシュフォルダーにアクセスできず、プログラムが正常に動作しないか、エラーが発生する可能性があります。
@@ -140,7 +141,6 @@
     <s:String x:Key="LangDialogCustomPageOverwriteConfirmationContent">現在レイアウトファイルが存在します、指導文書の生成は既存のレイアウトファイルを上書きします！</s:String>
     <s:String x:Key="LangDialogCustomPageOverwriteFail">指導文書の生成に失敗しました</s:String>
     <s:String x:Key="LangHintCustomPageOverwriteSuccess">指導文書が生成されました！</s:String>
-    <s:String x:Key="LangHintCustomPageRefreshed">ホームページが更新されました！</s:String>
     <s:String x:Key="LangDialogCustomPageTeachContent">1.「指導文書生成」ボタンをクリックすると、PCLフォルダに Custom.xaml レイアウトファイルが生成されます。
 2. このファイルをメモ帳などで開いて編集し、編集後に保存してください。
 3.「ホームページ更新」ボタンをクリックして、ホームページがどのように変わったか確認してください。
@@ -368,7 +368,6 @@
     <s:String x:Key="LangSelectVersionNoHiddenTip">バージョンは隠されていません。バージョン設定のバージョンカテゴリーオプションでバージョンを隠すことができます。
 もう一度 F11 を押すと、隠されたバージョンの表示モードを終了します。</s:String>
     <s:String x:Key="LangSelectVersionListLoadFail">バージョンリストの表示変換に失敗しました</s:String>
-    <s:String x:Key="LangSelectVersionListLoadIconFail">バージョンアイコンの読み込みに失敗しました</s:String>
     <s:String x:Key="LangSelectBtnFavorite">お気に入りに追加</s:String>
     <s:String x:Key="LangSelectBtnCancelFavorite">お気に入りを解除</s:String>
     <s:String x:Key="LangSelectBtnSet">設定</s:String>
@@ -377,8 +376,8 @@
     <s:String x:Key="LangSelectDeleteVersionContentA">本当にバージョン {0} を削除しますか？</s:String>
     <s:String x:Key="LangSelectDeleteVersionContentB">本当にバージョン {0} を永久に削除しますか？</s:String>
     <s:String x:Key="LangSelectDeleteVersionContentC">このバージョンはバージョン隔離が有効になっているため、バージョンを削除すると、対応するセーブデータ、リソースパック、Mod などが一緒に削除されます！</s:String>
-    <s:String x:Key="LangSelectVersionDeletedA">バージョン {0} が永久に削除されました！</s:String>
-    <s:String x:Key="LangSelectVersionDeletedB">バージョン {0} がゴミ箱に移動されました！</s:String>
+    <s:String x:Key="LangSelectVersionDeletedPermanently">バージョン {0} が永久に削除されました！</s:String>
+    <s:String x:Key="LangSelectVersionDeletedToRecycleBin">バージョン {0} がゴミ箱に移動されました！</s:String>
     <s:String x:Key="LangSelectVersionDeleteCancelled">バージョン {0} の削除がキャンセルされました</s:String>
     <s:String x:Key="LangSelectVersionDeleteFail">バージョン {0} の削除に失敗しました</s:String>
     <s:String x:Key="LangSpeedTotalProgress">総進捗</s:String>
@@ -487,13 +486,6 @@
     <s:String x:Key="LangDownloadInstallOptiFabricManually">古いバージョンの Fabric と互換性がありません。OptiFabric Origins を手動でダウンロードしてください。</s:String>
     <s:String x:Key="LangDownloadPageLeftRefresh">リフレッシュ</s:String>
     <s:String x:Key="LangDownloadPageLeftAutoInstall">ゲームのダウンロード</s:String>
-    <s:String x:Key="LangDownloadPageLeftManualInstall">▼ 手動インストールパッケージ</s:String>
-    <s:String x:Key="LangDownloadPageLeftDialogManualInstallContent">手動インストールパッケージ機能では OptiFine、Forge などのコンポーネントの JAR インストールファイルをダウンロードできますが、自動インストールはできません。
-自動インストールページでまず MC バージョンを選択し、その後 OptiFine、Forge などのコンポーネントを選択することで、PCL が自動的にインストールを行います。</s:String>
-    <s:String x:Key="LangDownloadPageLeftDialogManualInstallTitle">自動インストールのヒント</s:String>
-    <s:String x:Key="LangDownloadPageLeftDialogManualInstallBtn1">自動インストールに戻る</s:String>
-    <s:String x:Key="LangDownloadPageLeftDialogManualInstallBtn2">手動インストールパッケージのダウンロードを続ける</s:String>
-    <s:String x:Key="LangDownloadPageLeftManualInstallFold">手動インストールパッケージ</s:String>
     <s:String x:Key="LangDownloadPageLeftResource">コミュニティリソース</s:String>
     <s:String x:Key="LangDownloadPageLeftMods">Mod</s:String>
     <s:String x:Key="LangDownloadPageLeftModsL"> Mod </s:String>
@@ -1344,12 +1336,11 @@ MC起動前に特定のコマンドまたはプログラムを実行します。
     <s:String x:Key="LangModMainExceptionNoHelpFound">利用可能なヘルプが見つかりませんでした；ヘルプページが必要ない場合は、設定 → パーソナライズ → 機能の非表示 で非表示にできます</s:String>
     <s:String x:Key="LangModMainExceptionNoFileFound">未找到帮助文件：{0}</s:String>
     <s:String x:Key="LangModMainExceptionNoTitleArgFound">未找到 Title 项</s:String>
-    <s:String x:Key="LangModMainExceptionNoEventTypeArgFound">未找到 EventType 项</s:String>
     <s:String x:Key="LangModMainExceptionNoXamlFileFound">未找到帮助条目 .json 对应的 .xaml 文件（{0}）</s:String>
     <s:String x:Key="LangModEventOpeningWeb">開いています、しばらくお待ちください……</s:String>
     <s:String x:Key="LangModEventStartInstance">{0} を起動中です……</s:String>
     <s:String x:Key="LangModEventChoseAnInstance">まず Minecraft のバージョンを選んでください！</s:String>
-    <s:String x:Key="LangModEventHomePageRefreshed">ホームページをリフレッシュしました！</s:String>
+    <s:String x:Key="LangModEventNoRefreshSupport">当前页面不支持刷新操作！</s:String>
     <s:String x:Key="LangModEventDialogDownloadIncorrectContent">EventData は http:// または https:// で始まるURLでなければなりません。
 PCL は他の様々なダウンロードプロトコルをサポートしていません。</s:String>
     <s:String x:Key="LangModEventDialogEventFailTitle">イベント実行失敗</s:String>
@@ -1509,6 +1500,7 @@ URL：{0}</s:String>
     <s:String x:Key="LangModBaseExceptionOutOfMemoryException">コンピュータのメモリが不足しています。不要なプログラムを閉じてから再試行してください。</s:String>
     <s:String x:Key="LangModBaseExceptionCOMException">オペレーティングシステムまたはグラフィックカードに問題があるため、エラーが発生しました。PCL を再起動してください。</s:String>
     <s:String x:Key="LangModBaseExceptionBadNetwork">ネットワーク接続が不安定なため、サーバーへの接続が困難です。インターネット接続を確認し、何度か再試行してください。</s:String>
+    <s:String x:Key="LangModBaseExceptionWSAStartup">请尝试卸载中国移动云盘，然后再试。</s:String>
     <s:String x:Key="LangModLaunchStartStageGetJava">Java を取得しています</s:String>
     <s:String x:Key="LangModLaunchStartStageCompleteFile">ファイルを補完しています</s:String>
     <s:String x:Key="LangModLaunchStartStageGetParameters">起動パラメータを取得しています</s:String>
@@ -1607,6 +1599,7 @@ URL：{0}</s:String>
     <s:String x:Key="LangModJavaManuallyImport">手動インポート</s:String>
     <s:String x:Key="LangModJava32Bit">32 ビット</s:String>
     <s:String x:Key="LangModJavaExceptionFileNotFound">ファイル {0} が見つかりません</s:String>
+    <s:String x:Key="LangModJavaExceptionUnsupportedPDFBookmarkJava">不兼容 PDF Bookmark 的 Java</s:String>
     <s:String x:Key="LangModJavaExceptionTryRunFail">Java の実行に失敗しました</s:String>
     <s:String x:Key="LangModJavaExceptionRunFail">Java を実行できません。/lib/ext フォルダを削除してから再試行してください</s:String>
     <s:String x:Key="LangModJavaExceptionVersionNotFound">Java のバージョン番号が見つかりません</s:String>
@@ -1735,8 +1728,6 @@ VPNや加速器を使用している場合は、それらをオフにするか�
     <s:String x:Key="LangModModpackTaskOrganizeFiles">ファイルを最終整理しています</s:String>
     <s:String x:Key="LangModModpackTaskCurseForgeModpackInstall">CurseForge 統合パックのインストール：</s:String>
     <s:String x:Key="LangModModpackHintInstalling">統合パックのインストール中です！</s:String>
-    <s:String x:Key="LangModModpackHintQuiltNotSupport">PCL は現在、Quilt を必要とする統合パックのインストールをサポートしていません！</s:String>
-    <s:String x:Key="LangModModpackHintUnknownModLoader">統合パックのインストール中に未知の Mod ローダー {0} が出現しました！</s:String>
     <s:String x:Key="LangModModpackTaskDownloadExtraFile">追加ファイルをダウンロードしています</s:String>
     <s:String x:Key="LangModModpackTaskModrinthModpackInstall">Modrinth 統合パックのインストール：</s:String>
     <s:String x:Key="LangModModpackTaskRenameInstanceJsonFileSideLoader">バージョン Json をリネームしています（副ローダー用）</s:String>
@@ -1776,7 +1767,6 @@ VPNや加速器を使用している場合は、それらをオフにするか�
     <s:String x:Key="LangModBaseExceptionRenameSubKeyNotSupport">子キーに子キーを含む名前変更はサポートされていません：{0}。</s:String>
     <s:String x:Key="LangModBaseExceptionPathIncorrect">パスが含まれていません：{0}</s:String>
     <s:String x:Key="LangModBaseExceptionFileNameIncorrect">ファイル名が含まれていません：{0}</s:String>
-    <s:String x:Key="LangModBaseExceptionFileNameTooLong">ファイル名が長すぎます：{0}</s:String>
     <s:String x:Key="LangModBaseExceptionCopyFileFail">ファイルのコピーに失敗しました：{0} → {1}</s:String>
     <s:String x:Key="LangModBaseSelectFolder">フォルダを選択してください</s:String>
     <s:String x:Key="LangModBaseExceptionEmptyFolderName">フォルダ名を空にすることはできません！</s:String>
@@ -1966,12 +1956,10 @@ MixinBootstrap をインストールしてみてください。インストー�
     <s:String x:Key="LangModCrashCrashReasonReasonBB">複数の同一の Mod を繰り返しインストールしたため、ゲームの読み込みを続行できなくなった可能性があります。
 
 各 Mod は 1 回しか表示できません。重複した Mod を削除してからゲームを再度開始してください。 </s:String>
-    <s:String x:Key="LangModCrashCrashReasonReasonBC">ゲームにはエンティティ {0} に問題があるようです。
-
-新しいワールドを作成し、このエンティティのインスタンスを生成し、ゲームの実行を観察できます。</s:String>
-    <s:String x:Key="LangModCrashCrashReasonReasonBD">ワールド内のいくつかのエンティティが原因でゲームに問題が発生しているようです。
-
-新しい世界を作成し、さまざまなエンティティを生成して、ゲームの動作を観察できます。</s:String>
+    <s:String x:Key="LangModCrashCrashReasonReasonTargetPlayerEntity">游戏因为位于 {0} 的玩家实体导致了崩溃。</s:String>
+    <s:String x:Key="LangModCrashCrashReasonReasonPlayerEntity">游戏因为玩家实体导致了崩溃。</s:String>
+    <s:String x:Key="LangModCrashCrashReasonReasonTargetEntity">游戏因为实体 {0} 导致了崩溃。</s:String>
+    <s:String x:Key="LangModCrashCrashReasonReasonTargetEntities">游戏因为下列实体导致了崩溃：{0}</s:String>
     <s:String x:Key="LangModCrashCrashReasonReasonBE">OptiFine が現在のバージョンの Forge と互換性がないため、ゲームがクラッシュしました。
 
 OptiFine 公式 Web サイト (https://optifine.net/downloads) にアクセスして、OptiFine と互換性のある Forge バージョンを確認し、対応するバージョンに従って厳密にゲームを再インストールしてください。 </s:String>
@@ -2077,7 +2065,6 @@ PCLを更新するには、「設定 → その他 → ランチャー → 更�
     <s:String x:Key="LangModExceptionDownloadFail">直接下载文件失败（{0}）</s:String>
     <s:String x:Key="LangModExceptionCreateDirectoryFail">预处理下载文件路径失败（{0}）</s:String>
     <s:String x:Key="LangModExceptionUnknown">未知错误</s:String>
-    <s:String x:Key="LangModExceptionTimeOutAskCheck">连接服务器超时，请检查你的网络环境是否良好（{0}）</s:String>
     <s:String x:Key="LangModExceptionRequestFailed">网络请求失败（{0}）</s:String>
     <s:String x:Key="LangModExceptionReturnErrorCode">服务器返回错误（{0}）</s:String>
     <s:String x:Key="LangModExceptionUnknownFileStatus">文件状态未知：{0}</s:String>
