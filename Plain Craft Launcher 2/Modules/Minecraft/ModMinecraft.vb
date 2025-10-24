@@ -1926,17 +1926,29 @@ OnLoaded:
                              .OriginalName = Library("name"),
                              .Url = If(RootUrl, Library("downloads")("classifiers")("natives-windows")("url")),
                              .LocalPath = If(Library("downloads")("classifiers")("natives-windows")("path") Is Nothing,
-                                 McLibGet(Library("name"), CustomMcFolder:=CustomMcFolder).Replace(".jar", "-" & Library("natives")("windows").ToString & ".jar").Replace("${arch}", If(Environment.Is64BitOperatingSystem, "64", "32")),
-                                 CustomMcFolder & "libraries\" & Library("downloads")("classifiers")("natives-windows")("path").ToString.Replace("/", "\")),
+                                 McLibGet(Library("name"), CustomMcFolder:=CustomMcFolder).
+                                    Replace(".jar", "-" & Library("natives")("windows").ToString & ".jar").
+                                    Replace("${arch}", If(Environment.Is64BitOperatingSystem, "64", "32")),
+                                    $"{CustomMcFolder}libraries\{Library("downloads")("classifiers")("natives-windows")("path").ToString.Replace("/", "\")}"),
                              .Size = Val(Library("downloads")("classifiers")("natives-windows")("size").ToString),
                              .IsNatives = True,
                              .SHA1 = Library("downloads")("classifiers")("natives-windows")("sha1").ToString})
                     Else
-                        BasicArray.Add(New McLibToken With {.OriginalName = Library("name"), .Url = RootUrl, .LocalPath = McLibGet(Library("name"), CustomMcFolder:=CustomMcFolder).Replace(".jar", "-" & Library("natives")("windows").ToString & ".jar").Replace("${arch}", If(Environment.Is64BitOperatingSystem, "64", "32")), .Size = 0, .IsNatives = True, .SHA1 = Nothing})
+                        BasicArray.Add(
+                        New McLibToken With {.OriginalName = Library("name"), .Url = RootUrl, .Size = 0, .IsNatives = True, .SHA1 = Nothing,
+                            .LocalPath = McLibGet(Library("name"), CustomMcFolder:=CustomMcFolder).
+                                 Replace(".jar", $"-{Library("natives")("windows")}.jar").
+                                 Replace("${arch}", If(Environment.Is64BitOperatingSystem, "64", "32"))
+                        })
                     End If
                 Catch ex As Exception
                     Log(ex, "处理实际支持库列表失败（有 Natives，" & If(Library("name"), "Nothing").ToString & "）")
-                    BasicArray.Add(New McLibToken With {.OriginalName = Library("name"), .Url = RootUrl, .LocalPath = McLibGet(Library("name"), CustomMcFolder:=CustomMcFolder).Replace(".jar", "-" & Library("natives")("windows").ToString & ".jar").Replace("${arch}", If(Environment.Is64BitOperatingSystem, "64", "32")), .Size = 0, .IsNatives = True, .SHA1 = Nothing})
+                    BasicArray.Add(
+                        New McLibToken With {.OriginalName = Library("name"), .Url = RootUrl, .Size = 0, .IsNatives = True, .SHA1 = Nothing,
+                             .LocalPath = McLibGet(Library("name"), CustomMcFolder:=CustomMcFolder).
+                                 Replace(".jar", $"-{Library("natives")("windows")}.jar").
+                                 Replace("${arch}", If(Environment.Is64BitOperatingSystem, "64", "32"))
+                        })
                 End Try
             End If
 
@@ -2130,19 +2142,12 @@ OnLoaded:
     ''' <param name="WithHead">是否包含 Lib 文件夹头部，若不包含，则会类似以 com\xxx\ 开头。</param>
     Public Function McLibGet(Original As String, Optional WithHead As Boolean = True, Optional IgnoreLiteLoader As Boolean = False, Optional CustomMcFolder As String = Nothing) As String
         CustomMcFolder = If(CustomMcFolder, PathMcFolder)
+        '有时候原始的有四段，例如 net.minecraftforge:forge:1.21.4-54.0.34:client
+        '文件夹名应该忽略最后一段（client），但文件名需要保留
+        '参见 #7306（以及 #5376 也是因为这里没有处理好导致的）
         Dim Splited = Original.Split(":")
         McLibGet = If(WithHead, CustomMcFolder & "libraries\", "") &
-                   Splited(0).Replace(".", "\") & "\" & Splited(1) & "\" & Splited(2) & "\" & Splited(1) & "-" & Splited(2) & ".jar"
-        '判断 OptiFine 是否应该使用 installer
-        If McLibGet.Contains("optifine\OptiFine\1.") AndAlso Splited(2).Split(".").Count > 1 Then
-            Dim MajorVersion As Integer = Val(Splited(2).Split(".")(1).BeforeFirst("_"))
-            Dim MinorVersion As Integer = If(Splited(2).Split(".").Count > 2, Val(Splited(2).Split(".")(2).BeforeFirst("_")), 0)
-            If (MajorVersion = 12 OrElse (MajorVersion = 20 AndAlso MinorVersion >= 4) OrElse MajorVersion >= 21) AndAlso '仅在 1.12 (无法追溯) 和 1.20.4+ (#5376) 遇到此问题
-                File.Exists($"{CustomMcFolder}libraries\{Splited(0).Replace(".", "\")}\{Splited(1)}\{Splited(2)}\{Splited(1)}-{Splited(2)}-installer.jar") Then
-                McLaunchLog("已将 " & Original & " 替换为对应的 Installer 文件")
-                McLibGet = McLibGet.Replace(".jar", "-installer.jar")
-            End If
-        End If
+            $"{Splited(0).Replace(".", "\")}\{Splited(1)}\{Splited(2)}\{Splited.Skip(1).Join("-")}.jar"
     End Function
 
     ''' <summary>

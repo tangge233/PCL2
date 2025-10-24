@@ -13,13 +13,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.10.9" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.10.9." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.11.0" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.11.0." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
-    Public Const VersionCode As Integer = 369 'Release
+    Public Const VersionCode As Integer = 372 'Release
 #Else
-    Public Const VersionCode As Integer = 371 'Snapshot
+    Public Const VersionCode As Integer = 373 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -498,6 +498,7 @@ Public Module ModBase
             RealNum += Digit * Scale
             Scale *= FromRadix
         Next
+        If RealNum = 0 Then Return "0"
         '转换为指定进制
         Dim Result = ""
         While RealNum > 0
@@ -1300,10 +1301,12 @@ Re:
                 Dim TotalCount As Long = Archive.Entries.Count
                 For Each Entry As ZipArchiveEntry In Archive.Entries
                     If ProgressIncrementHandler IsNot Nothing AndAlso TotalCount > 0 Then ProgressIncrementHandler(1 / TotalCount)
-                    Dim DestinationPath As String = IO.Path.Combine(DestDirectory, Entry.FullName)
-                    If DestinationPath.EndsWithF("\") OrElse DestinationPath.EndsWithF("/") Then Continue For '不创建空文件夹
-                    Directory.CreateDirectory(GetPathFromFullPath(DestinationPath))
-                    Entry.ExtractToFile(DestinationPath, True)
+                    Dim DestinationFullPath As String = IO.Path.Combine(DestDirectory, Entry.FullName)
+                    If Not IO.Path.GetFullPath(DestinationFullPath).StartsWithF(IO.Path.GetFullPath(DestDirectory), True) Then Continue For 'ZipSlip 漏洞修复
+                    If DestinationFullPath.EndsWithF("\") OrElse DestinationFullPath.EndsWithF("/") Then Continue For '不创建空文件夹
+                    Dim DestinationDirectory As String = GetPathFromFullPath(DestinationFullPath)
+                    Directory.CreateDirectory(DestinationDirectory)
+                    Entry.ExtractToFile(DestinationFullPath.Replace(DestinationDirectory, ShortenPath(DestinationDirectory)), True) '#7329
                 Next
             End Using
         End If
@@ -2368,7 +2371,7 @@ NextElement:
     ''' <param name="Arguments">运行参数。</param>
     ''' <param name="Timeout">等待该程序结束的最长时间（毫秒）。超时会抛出错误。</param>
     Public Function StartProcessAndGetOutput(FileName As String, Optional Arguments As String = "", Optional Timeout As Integer = 1000000,
-                                      Optional WorkingDirectory As String = Nothing) As String
+        Optional WorkingDirectory As String = Nothing, Optional Encoding As Encoding = Nothing, Optional PrintLog As Boolean = True) As String
         Dim Info = New ProcessStartInfo With {
             .Arguments = Arguments,
             .FileName = ShortenPath(FileName),
@@ -2376,7 +2379,9 @@ NextElement:
             .CreateNoWindow = True,
             .RedirectStandardError = True,
             .RedirectStandardOutput = True,
-            .WorkingDirectory = ShortenPath(If(WorkingDirectory, Path.TrimEnd("\"c)))
+            .WorkingDirectory = ShortenPath(If(WorkingDirectory, Path.TrimEnd("\"c))),
+            .StandardErrorEncoding = Encoding,
+            .StandardOutputEncoding = Encoding
         }
         If WorkingDirectory IsNot Nothing Then
             If Info.EnvironmentVariables.ContainsKey("appdata") Then
@@ -2385,7 +2390,7 @@ NextElement:
                 Info.EnvironmentVariables.Add("appdata", WorkingDirectory)
             End If
         End If
-        Log("[System] 执行外部命令并等待返回结果：" & FileName & " " & Arguments)
+        If PrintLog Then Log("[System] 执行命令并等待返回结果：" & FileName & " " & Arguments)
         Using Program As New Process With {.StartInfo = Info}
             Program.Start()
             Dim Result As String = Program.StandardOutput.ReadToEnd & Program.StandardError.ReadToEnd
@@ -3111,7 +3116,7 @@ Retry:
     End Function
 
     ''' <summary>
-    ''' 取随机整数。
+    ''' 取随机整数（包含）。
     ''' </summary>
     Public Function RandomInteger(min As Integer, max As Integer) As Integer
         Return Math.Floor((max - min + 1) * Random.NextDouble) + min

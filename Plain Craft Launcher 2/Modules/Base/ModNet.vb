@@ -1063,7 +1063,7 @@ NotSupportRange:
                 ResponseStream = Response.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
                 If Setup.Get("SystemDebugDelay") Then Threading.Thread.Sleep(RandomInteger(50, 3000))
                 Dim ResponseBytes As Byte() = New Byte(16384) {}
-                HttpDataCount = ResponseStream.ReadAsync(ResponseBytes, 0, 16384, CancelToken.Token).GetAwaiter().GetResult()
+                HttpDataCount = ReadWithTimeout(ResponseStream, ResponseBytes, 0, 16384, Timeout)
                 While (IsUnknownSize OrElse Th.DownloadUndone > 0) AndAlso '判断是否下载完成
                             HttpDataCount > 0 AndAlso Not IsProgramEnded AndAlso State < NetState.Merge AndAlso (Not Th.Source.IsFailed OrElse Th.Source.SingleThread = Th)
                     '限速
@@ -1113,7 +1113,7 @@ NotSupportRange:
                         '无数据，且已超时
                         Throw New TimeoutException("操作超时，无数据。")
                     End If
-                    HttpDataCount = ResponseStream.Read(ResponseBytes, 0, 16384)
+                    HttpDataCount = ReadWithTimeout(ResponseStream, ResponseBytes, 0, 16384, Timeout)
                 End While
 SourceBreak:
                 If State = NetState.Error OrElse (Th.Source.IsFailed AndAlso Th.Source.SingleThread <> Th) OrElse (Th.DownloadUndone > 0 AndAlso Not IsUnknownSize) Then
@@ -1190,7 +1190,7 @@ SourceBreak:
                     ElseIf Not Retried Then
                         '合并失败或首次下载失败，未重试：将所有下载源重新标记为不允许断点续传的下载源，逐个重新尝试下载
                         '若所有源均不支持 Range，也会走到这里重试
-                        If Not IsRangeNotSupported Then Hint($"{LocalName}：文件下载失败，正在自动重试……", If(ModeDebug, HintType.Red, HintType.Blue)) '在调试模式下给出红色提示
+                        If Not IsRangeNotSupported Then Log($"[Download] {LocalName}：文件下载失败，正在自动重试……", LogLevel.Debug)
                         Retried = True
                         SyncLock LockSource
                             SourcesOnce.Clear()
@@ -1642,9 +1642,12 @@ Retry:
             Next
             OnFail(File.Ex)
         End Sub
+        Public Overrides Sub Failed(Ex As Exception)
+            OnFail(New List(Of Exception) From {Ex})
+        End Sub
         Public Sub OnFail(ExList As List(Of Exception))
             SyncLock LockState
-                If State > LoadState.Loading Then Return
+                If State >= LoadState.Finished Then Return
                 If ExList Is Nothing OrElse Not ExList.Any() Then ExList = New List(Of Exception) From {New Exception("未知错误！")}
                 '寻找有效的错误信息
                 Dim UsefulExs = ExList.Where(Function(e) TypeOf e IsNot OperationCanceledException AndAlso TypeOf e IsNot ThreadInterruptedException).ToList
@@ -1980,6 +1983,29 @@ Retry:
             "(408)", "超时", "timeout", "网络请求失败", "连接尝试失败", "远程主机强迫关闭了", "远程方已关闭传输流", "未能解析此远程名称",
             "由于目标计算机积极拒绝", "基础连接已经关闭"
         }.Any(Function(k) Detail.ContainsF(k, True))
+    End Function
+
+    ''' <summary>
+    ''' 随机获取一个可用的端口。
+    ''' </summary>
+    Public Function GetAvailablePort() As Integer
+        Dim Listener As New TcpListener(IPAddress.Loopback, 0)
+        Listener.Start()
+        Dim port As Integer = CType(Listener.LocalEndpoint, IPEndPoint).Port
+        Listener.Stop()
+        Return port
+    End Function
+
+    ''' <summary>
+    ''' 带有 Timeout 的读取 Stream 方法。
+    ''' </summary>
+    Private Function ReadWithTimeout(TargetStream As Stream, Buffer() As Byte, Offset As Integer, Count As Integer, ReadTimeoutMs As Integer) As Integer
+        Dim ReadTask = TargetStream.ReadAsync(Buffer, Offset, Count)
+        Dim DelayTask = Task.Delay(ReadTimeoutMs)
+        If Task.WhenAny(ReadTask, DelayTask).GetAwaiter().GetResult() Is DelayTask Then
+            Throw New TimeoutException($"读取数据超时（{ReadTimeoutMs} ms）")
+        End If
+        Return ReadTask.GetAwaiter().GetResult()
     End Function
 
 End Module

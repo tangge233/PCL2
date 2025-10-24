@@ -183,30 +183,29 @@ Public Class MyLoading
         IsLooping = True
         ErrorAnimationWaiting = True
         AniStart({
-                    AaRotateTransform(PathPickaxe, -20 - CType(PathPickaxe.RenderTransform, RotateTransform).Angle, 350, 250, New AniEaseInBack(AniEasePower.Weak)),
-                    AaRotateTransform(PathPickaxe, 50, 900,, New AniEaseOutFluent, True),
-                    AaRotateTransform(PathPickaxe, 25, 900,, New AniEaseOutElastic(AniEasePower.Weak)),
-                    AaCode(Sub()
-                               PathLeft.Opacity = 1
-                               PathLeft.Margin = New Thickness(7, 41, 0, 0)
-                               PathRight.Opacity = 1
-                               PathRight.Margin = New Thickness(14, 41, 0, 0)
-                               ErrorAnimationWaiting = False
-                           End Sub),
-                    AaOpacity(PathLeft, -1, 100, 50),
-                    AaX(PathLeft, -5, 180,, New AniEaseOutFluent),
-                    AaY(PathLeft, -6, 180,, New AniEaseOutFluent),
-                    AaOpacity(PathRight, -1, 100, 50),
-                    AaX(PathRight, 5, 180,, New AniEaseOutFluent),
-                    AaY(PathRight, -6, 180,, New AniEaseOutFluent),
-                    AaCode(Sub()
-                               IsLooping = False
-                               AniLoop()
-                           End Sub,, True)
-            }, "MyLoader Loop " & Uuid & "/" & GetUuid())
-        If ShowProgress Then
-
-        End If
+            AaRotateTransform(PathPickaxe, -20 - CType(PathPickaxe.RenderTransform, RotateTransform).Angle, 350, 250, New AniEaseInBack(AniEasePower.Weak)),
+            AaRotateTransform(PathPickaxe, 50, 900,, New AniEaseOutFluent, True),
+            AaRotateTransform(PathPickaxe, 25, 900,, New AniEaseOutElastic(AniEasePower.Weak)),
+            AaCode(
+            Sub()
+                PathLeft.Opacity = 1
+                PathLeft.Margin = New Thickness(7, 41, 0, 0)
+                PathRight.Opacity = 1
+                PathRight.Margin = New Thickness(14, 41, 0, 0)
+                ErrorAnimationWaiting = False
+            End Sub),
+            AaOpacity(PathLeft, -1, 100, 50),
+            AaX(PathLeft, -5, 180,, New AniEaseOutFluent),
+            AaY(PathLeft, -6, 180,, New AniEaseOutFluent),
+            AaOpacity(PathRight, -1, 100, 50),
+            AaX(PathRight, 5, 180,, New AniEaseOutFluent),
+            AaY(PathRight, -6, 180,, New AniEaseOutFluent),
+            AaCode(
+            Sub()
+                IsLooping = False
+                AniLoop()
+            End Sub,, True)
+        }, "MyLoader Loop " & Uuid & "/" & GetUuid())
     End Sub
 
     ''' <summary>

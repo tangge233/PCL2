@@ -281,9 +281,16 @@ Friend Module ModSecret
 
 #End Region
 
-#Region "联网通知"
+#Region "联网配置"
 
-    Public ServerLoader As New LoaderTask(Of Integer, Integer)("PCL 服务", Sub() Log("[Server] 该版本中不包含更新通知功能……"), Priority:=ThreadPriority.BelowNormal)
+    ''' <summary>
+    ''' 联网获取的配置信息。
+    ''' 若获取失败或仍在获取中，可能为 Nothing。
+    ''' </summary>
+    Public ServerConfig As JObject
+
+    Public ServerLoader As New LoaderTask(Of Integer, Integer)("PCL 配置更新", Sub() Log("[Server] 该版本中不包含更新通知功能……"), Priority:=ThreadPriority.BelowNormal) With
+        {.ReloadTimeout = 1000 * 60 * 60} '超时 1 小时
 
 #End Region
 

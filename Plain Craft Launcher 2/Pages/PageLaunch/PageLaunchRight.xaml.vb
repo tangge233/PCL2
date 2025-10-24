@@ -113,14 +113,14 @@ Public Class PageLaunchRight
                 Log("[Page] 主页自定义数据来源：联网缓存文件")
                 Content = ReadFile(PathTemp & "Cache\Custom.xaml")
                 '后台更新缓存
-                OnlineLoader.Start(Url)
+                OnlineLoader.Start(New Tuple(Of String, Boolean)(Url, False))
             Else
                 '缓存不可用
                 Log("[Page] 主页自定义数据来源：联网全新下载")
                 Hint("正在加载主页……")
                 RunInUiWait(Sub() LoadContent(Nothing)) '在加载结束前清空页面
                 Setup.Set("CacheSavedPageVersion", "")
-                OnlineLoader.Start(Url) '下载完成后将会再次触发更新
+                OnlineLoader.Start(New Tuple(Of String, Boolean)(Url, True)) '下载完成后将会再次触发更新
                 Return
             End If
         End If
@@ -130,9 +130,10 @@ Public Class PageLaunchRight
     Private RefreshLock As New Object
 
     '联网获取主页文件
-    Private OnlineLoader As New LoaderTask(Of String, Integer)("下载主页", AddressOf OnlineLoaderSub) With {.ReloadTimeout = 10 * 60 * 1000}
-    Private Sub OnlineLoaderSub(Task As LoaderTask(Of String, Integer))
-        Dim Address As String = Task.Input '#3721 中连续触发两次导致内容变化
+    Private OnlineLoader As New LoaderTask(Of Tuple(Of String, Boolean), Integer)("下载主页", AddressOf OnlineLoaderSub) With {.ReloadTimeout = 10 * 60 * 1000}
+    Private Sub OnlineLoaderSub(Task As LoaderTask(Of Tuple(Of String, Boolean), Integer))
+        Dim Address As String = Task.Input.Item1 '#3721 中连续触发两次导致内容变化
+        Dim ShouldRefresh As Boolean = Task.Input.Item2
         Try
             '替换自定义变量与设置
             Address = ArgumentReplace(Address, AddressOf WebUtility.HtmlEncode)
@@ -168,7 +169,7 @@ Public Class PageLaunchRight
             Setup.Set("CacheSavedPageVersion", Version)
             WriteFile(PathTemp & "Cache\Custom.xaml", FileContent)
             '若内容变更则要求刷新
-            If LoadedContentHash <> FileContent.GetHashCode() Then Refresh()
+            If LoadedContentHash <> FileContent.GetHashCode() AndAlso ShouldRefresh Then Refresh()
         Catch ex As Exception
             Log(ex, $"下载主页失败（{Address}）", If(ModeDebug, LogLevel.Msgbox, LogLevel.Hint))
         End Try
@@ -195,7 +196,7 @@ Public Class PageLaunchRight
     ''' </summary>
     Private Sub ClearCache()
         LoadedContentHash = -1
-        OnlineLoader.Input = ""
+        OnlineLoader.Input = New Tuple(Of String, Boolean)("", True)
         Setup.Set("CacheSavedPageUrl", "")
         Setup.Set("CacheSavedPageVersion", "")
         Log("[Page] 已清空主页缓存")
