@@ -20,8 +20,8 @@
 Причина ошибки: {0}</s:String>
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">Выбранный вручную каталог кэша недоступен, PCL будет использовать каталог кэша по умолчанию вместо этого.
 Причина ошибки: {0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">Предупреждение среды</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">Извлеките PCL из сжатого файла или переместите его в другую папку перед продолжением использования!
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">Предупреждение среды</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">Извлеките PCL из сжатого файла или переместите его в другую папку перед продолжением использования!
 В настоящее время программа запущена во временной папке, настройки, сохранения и т. д. могут не сохраниться, а некоторые функции могут быть недоступны.</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">PCL и более новая версия Minecraft больше не поддерживают 32-битные системы, некоторые функции будут недоступны.
 Настоятельно рекомендуется переустановить игру после перехода на 64-битную систему!</s:String>
@@ -43,6 +43,8 @@
     <s:String x:Key="LangDialogBtnUpdateFullLog">Полный список изменений</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL {0} Обновлён</s:String>
     <s:String x:Key="LangDialogPolicyContent">Перед использованием PCL, пожалуйста, согласитесь с Условиями использования и Отказом от ответственности PCL.</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">Согласие и авторизация</s:String>
     <s:String x:Key="LangDialogBtnAgree">Согласен</s:String>
     <s:String x:Key="LangDialogBtnDeny">Отклонить</s:String>
@@ -686,6 +688,10 @@ PCL рекомендует включить опцию "Изоляция экз�
     <s:String x:Key="LangMySkinCapeNameHome">家园披风</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">入侵披风</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">渴望披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">Нет</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">Выбор</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">Свойства</s:String>
@@ -703,7 +709,6 @@ PCL рекомендует включить опцию "Изоляция экз�
     <s:String x:Key="LangLaunchLeftStageDownload">Скорость</s:String>
     <s:String x:Key="LangLaunchLeftTip">Разное</s:String>
     <s:String x:Key="LangLaunchLeftInit">Инициализация</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">Оффлайн-хостинг</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">Оффлайн</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">Microsoft</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">Единый пароль</s:String>

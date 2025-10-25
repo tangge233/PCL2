@@ -20,8 +20,8 @@
 Error cause: {0}</s:String>
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">The manually set cache folder is unavailable, PCL will use the default one instead.
 Error cause: {0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">Environment warning</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">Please extract PCL from the compressed file before continuing to use!
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">Environment warning</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">Please extract PCL from the compressed file before continuing to use!
 Running in the current environment may result in the loss of game saves or settings, and some features may not function as expected!</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">PCL and newer versions of Minecraft no longer support 32-bit systems, and some features are unavailable.
 It is strongly recommended to switch to a 64-bit system before continuing!</s:String>
@@ -44,6 +44,8 @@ If installation fails, try again after uninstalling the higher version of the .N
     <s:String x:Key="LangDialogBtnUpdateFullLog">Full changelog</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL {0} updated</s:String>
     <s:String x:Key="LangDialogPolicyContent">Before using PCL, please review and agree to the Terms of Service and Disclaimer.</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">ToS &amp; Disclaimer authorization</s:String>
     <s:String x:Key="LangDialogBtnAgree">Agree</s:String>
     <s:String x:Key="LangDialogBtnDeny">Decline</s:String>
@@ -688,6 +690,10 @@ Please check your internet and try again.</s:String>
     <s:String x:Key="LangMySkinCapeNameHome">Home</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">Menace</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">Yearn</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">None</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">Selection</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">Properties</s:String>
@@ -705,7 +711,6 @@ Please check your internet and try again.</s:String>
     <s:String x:Key="LangLaunchLeftStageDownload">Speed</s:String>
     <s:String x:Key="LangLaunchLeftTip">Trivia</s:String>
     <s:String x:Key="LangLaunchLeftInit">Initialize</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">Hosting offline</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">Offline</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">Microsoft</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">Unified Pass</s:String>

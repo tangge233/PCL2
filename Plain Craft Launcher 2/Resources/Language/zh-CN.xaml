@@ -22,9 +22,9 @@
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">手动设置的缓存文件夹不可用，PCL 将使用默认缓存文件夹。
 
 错误原因：{0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">环境警告</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">请将 PCL 从压缩包中解压之后再使用！
-在当前环境下运行可能会导致丢失游戏存档或设置，部分功能也可能无法使用！</s:String>
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">尚未解压</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">请将 PCL 从压缩包中解压之后再使用！
+如果不会解压，可以在网上寻找教程。</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">PCL 和新版 Minecraft 均不再支持 32 位系统，部分功能将无法使用。
 非常建议重装为 64 位系统后再进行游戏！</s:String>
     <s:String x:Key="LangApplicationDialogTitleInitError">PCL 初始化错误</s:String>
@@ -46,6 +46,8 @@
     <s:String x:Key="LangDialogBtnUpdateFullLog">完整更新日志</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL 已更新至 {0}</s:String>
     <s:String x:Key="LangDialogPolicyContent">在使用 PCL 前，请同意 PCL 的用户协议与免责声明。</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">协议授权</s:String>
     <s:String x:Key="LangDialogBtnAgree">同意</s:String>
     <s:String x:Key="LangDialogBtnDeny">拒绝</s:String>
@@ -488,7 +490,7 @@
     <s:String x:Key="LangDownloadInstallNeoForgeIncompatible">与 NeoForge 不兼容</s:String>
     <s:String x:Key="LangDownloadInstallOptiFabricManually">不兼容老版本 Fabric，请手动下载 OptiFabric Origins</s:String>
     <s:String x:Key="LangDownloadPageLeftRefresh">刷新</s:String>
-    <s:String x:Key="LangDownloadPageLeftAutoInstall">游戏下载</s:String>
+    <s:String x:Key="LangDownloadPageLeftAutoInstall">原版游戏</s:String>
     <s:String x:Key="LangDownloadPageLeftResource">社区资源</s:String>
     <s:String x:Key="LangDownloadPageLeftMods">Mod</s:String>
     <s:String x:Key="LangDownloadPageLeftModsL"> Mod </s:String>
@@ -690,6 +692,10 @@
     <s:String x:Key="LangMySkinCapeNameHome">家园披风</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">入侵披风</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">渴望披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">无披风</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">版本选择</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">版本设置</s:String>
@@ -707,7 +713,6 @@
     <s:String x:Key="LangLaunchLeftStageDownload">下载速度</s:String>
     <s:String x:Key="LangLaunchLeftTip">你知道吗</s:String>
     <s:String x:Key="LangLaunchLeftInit">初始化</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">联机离线登录</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">离线登录</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">正版登录</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">统一通行证登录</s:String>
@@ -843,7 +848,7 @@
 你可以在 设置 → 其他 → 启动器 中关闭上报，不过龙猫就不知道你遇到了什么 Bug 了……
 详情：https://github.com/Meloong-Git/PCL/discussions/7036</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoPrivacyTitle">隐私声明与个人信息保护政策</s:String>
-    <s:String x:Key="LangPageOtherAboutLawInfoPrivacyContent">PCL 没有收集个人信息，所以这里其实啥都不用写……
+    <s:String x:Key="LangPageOtherAboutLawInfoPrivacyContent">PCL 没有收集个人信息，包括联机功能也没有收集，所以这里其实啥都不用写……
 留个这个其实只是为了让你知道 PCL 没有收集个人信息，诶嘿。</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoOtherTitle">其他信息</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoOtherContent">Copyright © 龙腾猫跃 2016. All Rights Reserved.

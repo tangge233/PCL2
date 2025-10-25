@@ -20,8 +20,8 @@
 Error Cause: {0}</s:String>
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">The manually selected cache folder is unavailable, PCL will use the default cache folder instead.
 Error Cause: {0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">Upozornenie prostredia</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">Prosím, extrahujte súbor PCL z komprimovaného archívu alebo zmeňte priečinok pred pokračovaním v používaní!
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">Upozornenie prostredia</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">Prosím, extrahujte súbor PCL z komprimovaného archívu alebo zmeňte priečinok pred pokračovaním v používaní!
 Program sa momentálne spúšťa v dočasnom priečinku a nastavenia, uložené hry a pod. nemusia byť uložené a niektoré funkcie nemusia byť dostupné.</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">PCL a nové verzie Minecraftu už nepodporujú 32-bitové systémy a niektoré funkcie nemusia byť dostupné.
 Dôrazne sa odporúča preinštalovať na 64-bitový systém pred pokračovaním v hraní!</s:String>
@@ -43,6 +43,8 @@ Dôrazne sa odporúča preinštalovať na 64-bitový systém pred pokračovaním
     <s:String x:Key="LangDialogBtnUpdateFullLog">Celý záznam zmien</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL {0} Aktualizovaný</s:String>
     <s:String x:Key="LangDialogPolicyContent">Pred použitím PCL, prosím, súhlaste s Podmienkami používania a Zrieknutím sa zodpovednosti PCL.</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">Agreement Authorization</s:String>
     <s:String x:Key="LangDialogBtnAgree">Súhlasiť</s:String>
     <s:String x:Key="LangDialogBtnDeny">Odmietnuť</s:String>
@@ -686,6 +688,10 @@ Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
     <s:String x:Key="LangMySkinCapeNameHome">家园披风</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">入侵披风</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">渴望披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">Žiadny</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">Výber</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">Vlastnosti</s:String>
@@ -703,7 +709,6 @@ Prosím, skontrolujte internet a potom sa znovu pokúste.</s:String>
     <s:String x:Key="LangLaunchLeftStageDownload">Rýchlosť</s:String>
     <s:String x:Key="LangLaunchLeftTip">Tipy</s:String>
     <s:String x:Key="LangLaunchLeftInit">Inicializácia</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">Hostovanie offline</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">Offline</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">Microsoft</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">Jednotné heslo</s:String>

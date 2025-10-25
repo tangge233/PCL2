@@ -20,8 +20,8 @@
 錯誤原因：{0}</s:String>
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">手動設定的快取資料夾不可用，PCL 將使用預設快取資料夾。
 錯誤原因：{0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">環境警告</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">請將 PCL 從壓縮檔中解壓之後再使用！
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">環境警告</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">請將 PCL 從壓縮檔中解壓之後再使用！
 在目前環境下執行可能會導致遺失遊戲存檔或設定，部分功能也可能無法使用！</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">PCL 和新版 Minecraft 均不再支援 32 位元系統，部分功能將無法使用。
 非常建議重新安裝為 64 位系統後再進行遊戲！</s:String>
@@ -44,6 +44,8 @@
     <s:String x:Key="LangDialogBtnUpdateFullLog">完整更新日誌</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL 已更新至 {0}</s:String>
     <s:String x:Key="LangDialogPolicyContent">在使用 PCL 前，請同意 PCL 的使用者協議與免責聲明。</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">協議授權</s:String>
     <s:String x:Key="LangDialogBtnAgree">同意</s:String>
     <s:String x:Key="LangDialogBtnDeny">拒絕</s:String>
@@ -688,6 +690,10 @@
     <s:String x:Key="LangMySkinCapeNameHome">家園披風</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">入侵披風</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">渴望披風</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">無披風</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">實例選擇</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">實例設定</s:String>
@@ -705,7 +711,6 @@
     <s:String x:Key="LangLaunchLeftStageDownload">下載速度</s:String>
     <s:String x:Key="LangLaunchLeftTip">你知道嗎</s:String>
     <s:String x:Key="LangLaunchLeftInit">初始化</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">連線離線登入</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">離線登入</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">正版登入</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">統一通行證登入</s:String>

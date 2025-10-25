@@ -20,8 +20,8 @@
 Causa del Error: {0}</s:String>
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">La carpeta de caché seleccionada manualmente no está disponible, PCL utilizará la carpeta de caché predeterminada en su lugar.
 Causa del Error: {0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">Advertencia de Entorno</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">¡Extraiga el archivo PCL del archivo comprimido o muévalo a una carpeta diferente antes de continuar usándolo!
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">Advertencia de Entorno</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">¡Extraiga el archivo PCL del archivo comprimido o muévalo a una carpeta diferente antes de continuar usándolo!
 El programa se está ejecutando actualmente en una carpeta temporal, es posible que no se guarden las configuraciones, los archivos guardados, etc., y es posible que algunas funciones no estén disponibles.</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">PCL y la versión más nueva de Minecraft ya no son compatibles con los sistemas de 32 bits, por lo que algunas funciones no estarán disponibles.
 ¡Se recomienda encarecidamente reinstalar el juego después de cambiar a un sistema de 64 bits!</s:String>
@@ -43,6 +43,8 @@ El programa se está ejecutando actualmente en una carpeta temporal, es posible 
     <s:String x:Key="LangDialogBtnUpdateFullLog">Registro de Cambios Completo</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL {0} Actualizado</s:String>
     <s:String x:Key="LangDialogPolicyContent">Antes de usar PCL, por favor, acepte los Términos de Servicio y el Descargo de Responsabilidad de PCL.</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">Autorización de Acuerdo</s:String>
     <s:String x:Key="LangDialogBtnAgree">Aceptar</s:String>
     <s:String x:Key="LangDialogBtnDeny">Negar</s:String>
@@ -680,6 +682,10 @@ Esta página proporciona la descarga del instalador de NeoForge. Después de des
     <s:String x:Key="LangMySkinCapeNameHome">家园披风</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">入侵披风</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">渴望披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">Ninguna</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">Selección</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">Propiedades</s:String>
@@ -697,7 +703,6 @@ Esta página proporciona la descarga del instalador de NeoForge. Después de des
     <s:String x:Key="LangLaunchLeftStageDownload">Velocidad</s:String>
     <s:String x:Key="LangLaunchLeftTip">Trivia</s:String>
     <s:String x:Key="LangLaunchLeftInit">Inicializar</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">Alojamiento sin conexión</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">Sin conexión</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">Microsoft</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">Pase Unificado</s:String>

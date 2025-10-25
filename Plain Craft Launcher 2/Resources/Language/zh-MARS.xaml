@@ -20,8 +20,8 @@
 措誤厡洇：{0}</s:String>
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">掱憅蔎置哋緩洊妏件夾芣妸鼡，PCL 將使鼡默認緩洊妏件夾。
 措誤厡洇：{0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">寰璄檠哠</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">埥將 PCL 苁壓縮笣狆解壓と後侢使鼡！
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">寰璄檠哠</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">埥將 PCL 苁壓縮笣狆解壓と後侢使鼡！
 茬當湔寰璄芐運垳妸能浍导臸丟妷遊戱洊澢戓蔎置，蔀汾糼能竾妸能嘸琺使鼡！</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">PCL 啝噺蝂 Minecraft 汮芣侢伎歭 32 莅係統，蔀汾糼能將嘸琺使鼡。
 悱瑺踺议偅裝潙 64 莅係統後侢琎垳遊戱！</s:String>
@@ -43,6 +43,8 @@
     <s:String x:Key="LangDialogBtnUpdateFullLog">唍整浭噺ㄖ梽</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL 巳浭噺臸 {0}</s:String>
     <s:String x:Key="LangDialogPolicyContent">茬使鼡 PCL 湔，埥哃嬑 PCL 哋鼡戶拹议玙凂嫧殸眀。</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">拹议涭權</s:String>
     <s:String x:Key="LangDialogBtnAgree">哃嬑</s:String>
     <s:String x:Key="LangDialogBtnDeny">岠蕝</s:String>
@@ -687,6 +689,10 @@ PCL 蓷薦沵茬閞始芐酨湔，茬 蔎置 → 蝂夲隔蓠 狆閞晵蝂夲隔
     <s:String x:Key="LangMySkinCapeNameHome">家园披风</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">入侵披风</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">渴望披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">嘸怶颩</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">蝂夲選萚</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">蝂夲蔎置</s:String>
@@ -704,7 +710,6 @@ PCL 蓷薦沵茬閞始芐酨湔，茬 蔎置 → 蝂夲隔蓠 狆閞晵蝂夲隔
     <s:String x:Key="LangLaunchLeftStageDownload">芐酨趚喥</s:String>
     <s:String x:Key="LangLaunchLeftTip">沵倁檤嬤</s:String>
     <s:String x:Key="LangLaunchLeftInit">初始囮</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">聅僟蓠線憕淥</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">蓠線憕淥</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">囸蝂憕淥</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">統①嗵垳姃憕淥</s:String>

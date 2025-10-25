@@ -155,11 +155,11 @@ WaitRetry:
             Log("[Location] 当前系统环境是否为中国大陆：" & IsLocationZH())
             '检测异常环境
             If Path.Contains(IO.Path.GetTempPath()) OrElse Path.Contains("AppData\Local\Temp\") Then
-                MyMsgBox(GetLang("LangApplicationDialogContentRunInTemp"), GetLang("LangApplicationDialogTitleRunInTemp"), GetLang("LangDialogThemeUnlockGameAccept"), IsWarn:=True)
+                MyMsgBox(GetLang("LangApplicationDialogContentUnzipLauncher"), GetLang("LangApplicationDialogTitleUnzipLauncher"), GetLang("LangDialogThemeUnlockGameAccept"), IsWarn:=True)
                 FormMain.EndProgramForce(ProcessReturnValues.Cancel)
             End If
             If Is32BitSystem Then
-                MyMsgBox(GetLang("LangApplicationDialogContent32BitWarn"), GetLang("LangApplicationDialogTitleRunInTemp"), GetLang("LangDialogThemeUnlockGameAccept"), IsWarn:=True)
+                MyMsgBox(GetLang("LangApplicationDialogContent32BitWarn"), GetLang("LangApplicationDialogTitleUnzipLauncher"), GetLang("LangDialogThemeUnlockGameAccept"), IsWarn:=True)
             End If
             '设置初始化
             Setup.Load("SystemDebugMode")

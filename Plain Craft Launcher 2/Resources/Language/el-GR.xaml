@@ -20,8 +20,8 @@
 Αιτίες Σφάλματος: {0}</s:String>
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">Ο χειριστικά επιλεγμένος φάκελο κρυφής μνήμης είναι αδιαθέσιμος, PCL θα χρησιμοποιήσει τον προεπιλεγμένο φάκελο κρυφής μνήμης αντίθετα.
 Αιτίες Σφάλματος: {0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">Περιβαλλοντική Προειδοποίηση</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">Εξαγάγετε το PCL από το συμπιεσμένο αρχείο ή μετακινήστε το σε διαφορετικό φάκελο πριν συνεχίσετε να χρησιμοποιείτε!
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">Περιβαλλοντική Προειδοποίηση</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">Εξαγάγετε το PCL από το συμπιεσμένο αρχείο ή μετακινήστε το σε διαφορετικό φάκελο πριν συνεχίσετε να χρησιμοποιείτε!
 Το πρόγραμμα εκτελείται αυτήν τη στιγμή σε προσωρινό φάκελο, ενδέχεται να μην αποθηκευτούν ρυθμίσεις, αποθηκεύσεις κ.λπ. και ορισμένες λειτουργίες ενδέχεται να μην είναι διαθέσιμες.</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">Το PCL και η νεότερη έκδοση του Minecraft δεν υποστηρίζουν πλέον συστήματα 32-bit, ορισμένες λειτουργίες δεν θα είναι διαθέσιμες.
 Συνιστάται ιδιαίτερα η επανεγκατάσταση του παιχνιδιού μετά τη μετάβαση σε σύστημα 64-bit!</s:String>
@@ -43,6 +43,8 @@
     <s:String x:Key="LangDialogBtnUpdateFullLog">Πλήρες Ημερολόγιο Ενημερώσεων</s:String>
     <s:String x:Key="LangDialogUpdateTo">Το PCL έχει ενημερωθεί σε {0}</s:String>
     <s:String x:Key="LangDialogPolicyContent">Πριν χρησιμοποιήσετε το PCL, συμφωνήστε με τη Συμφωνία Χρήστη του PCL και την Αποποίηση ευθυνών.</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">Έγκριση πρωτοκόλλου</s:String>
     <s:String x:Key="LangDialogBtnAgree">Συμφωνώ</s:String>
     <s:String x:Key="LangDialogBtnDeny">Απόρριψη</s:String>
@@ -686,6 +688,10 @@
     <s:String x:Key="LangMySkinCapeNameHome">家园披风</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">入侵披风</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">渴望披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">Κανένα</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">Επιλογή</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">Ιδιότητες</s:String>
@@ -703,7 +709,6 @@
     <s:String x:Key="LangLaunchLeftStageDownload">Ταχύτητα</s:String>
     <s:String x:Key="LangLaunchLeftTip">Πρωτότυπα</s:String>
     <s:String x:Key="LangLaunchLeftInit">Αρχικοποίηση</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">Φιλοξενία Εκτός Σύνδεσης</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">Εκτός Σύνδεσης</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">Microsoft</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">Ενοποιημένο Πάσο</s:String>

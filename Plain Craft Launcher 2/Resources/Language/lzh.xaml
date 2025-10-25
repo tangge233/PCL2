@@ -20,8 +20,8 @@
 錯之故：{0}</s:String>
     <s:String x:Key="LangApplicationDialogContentCustomCacheFolderUnavailable">汝設之臨時資料夾不得用，以既定臨時資料夾替之。
 錯之故：{0}</s:String>
-    <s:String x:Key="LangApplicationDialogTitleRunInTemp">告</s:String>
-    <s:String x:Key="LangApplicationDialogContentRunInTemp">汝用 PCL 於臨時資料夾，設與存檔之類或不得存，或致功效弗可用。
+    <s:String x:Key="LangApplicationDialogTitleUnzipLauncher">告</s:String>
+    <s:String x:Key="LangApplicationDialogContentUnzipLauncher">汝用 PCL 於臨時資料夾，設與存檔之類或不得存，或致功效弗可用。
 請於減縮文卷之中抽取 PCL，或易資料夾後用！</s:String>
     <s:String x:Key="LangApplicationDialogContent32BitWarn">PCL 和新版 Minecraft 均不再支持 32 位系统，部分功能将无法使用。
 非常建议重装为 64 位系统后再进行游戏！</s:String>
@@ -43,6 +43,8 @@
     <s:String x:Key="LangDialogBtnUpdateFullLog">全更新志</s:String>
     <s:String x:Key="LangDialogUpdateTo">PCL 已更至 {0}</s:String>
     <s:String x:Key="LangDialogPolicyContent">用 PCL 前，請允 PCL 之用戶約與免責言。</s:String>
+    <s:String x:Key="LangDialogPolicyContentModified">PCL 的用户协议与免责声明已更新。
+请阅读更新后的用户协议与免责声明。</s:String>
     <s:String x:Key="LangDialogPolicyTitle">約授</s:String>
     <s:String x:Key="LangDialogBtnAgree">允</s:String>
     <s:String x:Key="LangDialogBtnDeny">否</s:String>
@@ -686,6 +688,10 @@ PCL 薦汝始下載前，於 設置 → 版本隔離 中開版本隔離選！</s
     <s:String x:Key="LangMySkinCapeNameHome">家园披风</s:String>
     <s:String x:Key="LangMySkinCapeNameMenace">入侵披风</s:String>
     <s:String x:Key="LangMySkinCapeNameYearn">渴望披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCommon">普通披风</s:String>
+    <s:String x:Key="LangMySkinCapeNamePan">薄煎饼披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameFounders">创始人披风</s:String>
+    <s:String x:Key="LangMySkinCapeNameCopper">铜披风</s:String>
     <s:String x:Key="LangMySkinCapeNameNone">無</s:String>
     <s:String x:Key="LangLaunchLeftInstanceChoose">版擇</s:String>
     <s:String x:Key="LangLaunchLeftInstanceConfig">版設</s:String>
@@ -703,7 +709,6 @@ PCL 薦汝始下載前，於 設置 → 版本隔離 中開版本隔離選！</s
     <s:String x:Key="LangLaunchLeftStageDownload">下載之速</s:String>
     <s:String x:Key="LangLaunchLeftTip">知之乎</s:String>
     <s:String x:Key="LangLaunchLeftInit">始置之</s:String>
-    <s:String x:Key="LangLaunchLeftAccountOfflineLinkLogin">聯於機，然離線登</s:String>
     <s:String x:Key="LangLaunchLeftAccountOfflineLogin">離線登</s:String>
     <s:String x:Key="LangLaunchLeftAccountMicrosoftLogin">正版登</s:String>
     <s:String x:Key="LangLaunchLeftAccountUnifiedPassLogin">大一統通關文牒登</s:String>
