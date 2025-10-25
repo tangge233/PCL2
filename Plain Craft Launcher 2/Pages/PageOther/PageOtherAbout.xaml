@@ -373,6 +373,8 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="60" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Java Launch Wrapper" TextWrapping="Wrap" FontWeight="Bold" />
                     <TextBlock Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2022 00ll00&#xa;Licensed under the MIT License." TextWrapping="Wrap" />
@@ -394,7 +396,7 @@
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/naudio/NAudio" />
                     <local:MyButton Grid.Row="5" Grid.Column="3" MinWidth="140" Text="{StaticResource LangPageOtherAboutLicenseDoc}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left" 
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/naudio/NAudio/blob/master/license.txt" />
-                    
+
                     <TextBlock Grid.Row="6" Grid.Column="0" Text="Ookii.Dialogs" TextWrapping="Wrap" FontWeight="Bold" />
                     <TextBlock Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2009 Sven Groot (Ookii.org)" TextWrapping="Wrap" />
                     <local:MyButton Grid.Row="7" Grid.Column="2" MinWidth="140" Text="{StaticResource LangPageOtherAboutLicenseWeb}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
@@ -421,9 +423,16 @@
                     <local:MyButton Grid.Row="13" Grid.Column="2" MinWidth="140" Text="{StaticResource LangPageOtherAboutLicenseWeb}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://www.iconfont.cn/" />
 
-                    <TextBlock Grid.Row="14" Grid.Column="0" Text="Costura.Fody" TextWrapping="Wrap" FontWeight="Bold" />
-                    <TextBlock Grid.Row="14" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2012 Simon Cropp and contributors" TextWrapping="Wrap" />
-                    <local:MyButton Grid.Row="15" Grid.Column="2" MinWidth="140" Text="{StaticResource LangPageOtherAboutLicenseWeb}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                    <TextBlock Grid.Row="14" Grid.Column="0" Text="EasyTier" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="14" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2024-present Easytier Programme within The Commons Conservancy&#xa;Licensed under the GNU Lesser General Public License." TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="15" Grid.Column="2" MinWidth="140" Text="查看来源网站" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://easytier.cn/" />
+                    <local:MyButton Grid.Row="15" Grid.Column="3" MinWidth="140" Text="查看许可文档" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left" 
+                                    local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/EasyTier/EasyTier/blob/main/LICENSE" />
+                    
+                    <TextBlock Grid.Row="16" Grid.Column="0" Text="Costura.Fody" TextWrapping="Wrap" FontWeight="Bold" />
+                    <TextBlock Grid.Row="16" Grid.Column="2" Grid.ColumnSpan="2" Text="Copyright © 2012 Simon Cropp and contributors" TextWrapping="Wrap" />
+                    <local:MyButton Grid.Row="17" Grid.Column="2" MinWidth="140" Text="{StaticResource LangPageOtherAboutLicenseWeb}" Padding="13,0" Margin="0,7,20,18" HorizontalAlignment="Left"
                                     local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://github.com/Fody/Costura" />
 
                 </Grid>

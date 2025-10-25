@@ -111,11 +111,7 @@
         '修改登陆方式
         Select Case Setup.Get("LoginType")
             Case McLoginType.Legacy
-                If PageLinkHiper.HiperState = LoadState.Finished Then
-                    LabLaunchingMethod.Text = GetLang("LangLaunchLeftAccountOfflineLinkLogin")
-                Else
-                    LabLaunchingMethod.Text = GetLang("LangLaunchLeftAccountOfflineLogin")
-                End If
+                LabLaunchingMethod.Text = GetLang("LangLaunchLeftAccountOfflineLogin")
             Case McLoginType.Ms
                 LabLaunchingMethod.Text = GetLang("LangLaunchLeftAccountMicrosoftLogin")
             Case McLoginType.Nide

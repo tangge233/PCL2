@@ -1210,11 +1210,11 @@ Retry:
         Function(Project As CompProject) As Double
             Select Case Request.Type
                 Case CompType.Mod, CompType.ModPack
-                    Return If(Project.FromCurseForge, 1, 7)
+                    Return If(Project.FromCurseForge, 1, 5)
                 Case CompType.DataPack
                     Return If(Project.FromCurseForge, 10, 1)
                 Case CompType.ResourcePack, CompType.Shader
-                    Return If(Project.FromCurseForge, 1, 5)
+                    Return If(Project.FromCurseForge, 1, 4)
                 Case Else
                     Return 1
             End Select

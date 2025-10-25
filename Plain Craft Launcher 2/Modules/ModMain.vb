@@ -239,10 +239,6 @@ EndHint:
         If Title = "提示" Then Title = GetLang("LangDialogTitleTip")
         Dim Converter As New MyMsgBoxConverter With {.Type = MyMsgBoxType.Text, .Button1 = Button1, .Button2 = Button2, .Button3 = Button3, .Text = Caption, .IsWarn = IsWarn, .Title = Title, .HighLight = HighLight, .ForceWait = True, .Button1Action = Button1Action, .Button2Action = Button2Action, .Button3Action = Button3Action}
         WaitingMyMsgBox.Add(Converter)
-        If RunInUi() Then
-            '若为 UI 线程，立即执行弹窗刻， 避免快速（连点器）点击时多次弹窗
-            MyMsgBoxTick()
-        End If
         If Button2.Length > 0 OrElse ForceWait Then
             '若有多个按钮则开始等待
             If FrmMain Is Nothing OrElse FrmMain.PanMsg Is Nothing AndAlso RunInUi() Then
@@ -266,6 +262,7 @@ EndHint:
             Else
                 Try
                     FrmMain.DragStop()
+                    If RunInUi() Then MyMsgBoxTick()
                     ComponentDispatcher.PushModal()
                     Dispatcher.PushFrame(Converter.WaitFrame)
                 Finally
@@ -299,6 +296,7 @@ EndHint:
         '虽然我也不知道这是啥但是能用就成了 :)
         Try
             If FrmMain IsNot Nothing Then FrmMain.DragStop()
+            If RunInUi() Then MyMsgBoxTick()
             ComponentDispatcher.PushModal()
             Dispatcher.PushFrame(Converter.WaitFrame)
         Finally
@@ -323,6 +321,7 @@ EndHint:
         '虽然我也不知道这是啥但是能用就成了 :)
         Try
             If FrmMain IsNot Nothing Then FrmMain.DragStop()
+            If RunInUi() Then MyMsgBoxTick()
             ComponentDispatcher.PushModal()
             Dispatcher.PushFrame(Converter.WaitFrame)
         Finally
@@ -345,7 +344,7 @@ EndHint:
             ElseIf WaitingMyMsgBox.Any Then
                 '没有弹窗，显示一个等待的弹窗
                 FrmMain.PanMsg.Visibility = Visibility.Visible
-                Select Case CType(WaitingMyMsgBox(0), MyMsgBoxConverter).Type
+                Select Case WaitingMyMsgBox(0).Type
                     Case MyMsgBoxType.Input
                         FrmMain.PanMsg.Children.Add(New MyMsgInput(WaitingMyMsgBox(0)))
                     Case MyMsgBoxType.Select
@@ -358,7 +357,7 @@ EndHint:
                 WaitingMyMsgBox.RemoveAt(0)
             Else
                 '没有弹窗，没有等待的弹窗
-                If Not FrmMain.PanMsg.Visibility = Visibility.Collapsed Then FrmMain.PanMsg.Visibility = Visibility.Collapsed
+                If FrmMain.PanMsg.Visibility <> Visibility.Collapsed Then FrmMain.PanMsg.Visibility = Visibility.Collapsed
             End If
         Catch ex As Exception
             Log(ex, "处理等待中的弹窗失败", LogLevel.Feedback)
@@ -383,11 +382,7 @@ EndHint:
     Public FrmSpeedRight As PageSpeedRight
 
     '联机页面声明
-    Public FrmLinkLeft As PageLinkLeft
-    Public FrmLinkIoi As PageLinkIoi
-    Public FrmLinkHiper As PageLinkHiper
-    Public FrmLinkHelp As PageOtherHelpDetail
-    Public FrmLinkFeedback As PageLinkFeedback
+    Public FrmLinkMain As PageLinkMain
 
     '下载页面声明
     Public FrmDownloadLeft As PageDownloadLeft
@@ -869,7 +864,7 @@ NextFile:
         '登录信息
         If McLoginLoader.State = LoadState.Finished Then
             Text = Text.Replace("{user}", Replacer(McLoginLoader.Output.Name))
-            Text = Text.Replace("{uuid}", Replacer(McLoginLoader.Output.Uuid.ToLower))
+            Text = Text.Replace("{uuid}", Replacer(McLoginLoader.Output.Uuid?.ToLower))
             Select Case McLoginLoader.Input.Type
                 Case McLoginType.Legacy
                     Text = Text.Replace("{login}", Replacer("离线"))
@@ -890,6 +885,7 @@ NextFile:
         Text = Text.RegexReplaceEach("\{cave\}", Function() Replacer(PageOtherTest.GetRandomCave()))
         Text = Text.RegexReplaceEach("\{setup:([a-zA-Z0-9]+)\}", Function(m) Replacer(Setup.GetSafe(m.Groups(1).Value, McVersionCurrent)))
         Text = Text.RegexReplaceEach("\{varible:([^:\}]+)(?::([^\}]+))?\}", Function(m) Replacer(ReadReg("CustomEvent" & m.Groups(1).Value, m.Groups(2).Value)))
+        Text = Text.RegexReplaceEach("\{variable:([^:\}]+)(?::([^\}]+))?\}", Function(m) Replacer(ReadReg("CustomEvent" & m.Groups(1).Value, m.Groups(2).Value)))
         Return Text
     End Function
 

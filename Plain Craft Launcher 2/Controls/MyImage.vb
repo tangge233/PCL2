@@ -120,12 +120,12 @@
         End If
         RunInNewThread(
         Sub()
-            Dim IsLocalFallback As Boolean = FallbackSource IsNot Nothing AndAlso Not FallbackSource.StartsWithF("http")
+            Dim IsLocalFallback As Boolean = Not String.IsNullOrEmpty(FallbackSource) AndAlso Not FallbackSource.StartsWithF("http")
             Try
                 '下载
                 ActualSource = LoadingSource '显示加载中的占位图片
                 NetDownloadByLoader(
-                    If(String.IsNullOrEmpty(FallbackSource) OrElse IsLocalFallback, {Source}, {Source, FallbackSource}),
+                    If(FallbackSource?.StartsWithF("http"), {Source, FallbackSource}, {Source}),
                     TempPath, SimulateBrowserHeaders:=True)
                 If EnableCache Then
                     '保存缓存并显示

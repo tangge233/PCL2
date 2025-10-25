@@ -11,6 +11,15 @@ Public Class FormMain
         Dim FeatureList As New List(Of KeyValuePair(Of Integer, String))
         '统计更新日志条目
 #If BETA Then
+        If LastVersion < 372 Then 'Release 2.10.9
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：如果版本设置了自定义描述，会在标题后面以淡灰色显示其版本号"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：支持为一个控件设置多个自定义事件"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：修改变量、弹出提示自定义事件"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：添加大量替换标记，允许在更多设置和 XAML 中使用更多替换标记"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法安装 MMC 整合包"))
+            FeatureCount += 33
+            BugCount += 11
+        End If
         If LastVersion < 369 Then 'Release 2.10.8
             FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "新增：允许在版本设置中设置禁止更新 Mod，以防整合包玩家误操作"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：网络与下载稳定性优化"))
@@ -104,6 +113,11 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 373 Then 'Snapshot 2.11.0
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "新增：联机功能！"))
+            FeatureCount += 7
+            BugCount += 10
+        End If
         If LastVersion < 371 Then 'Snapshot 2.10.9
             FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：如果版本设置了自定义描述，会在标题后面以淡灰色显示其版本号"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "新增：支持为一个控件设置多个自定义事件"))
@@ -407,11 +421,16 @@ Public Class FormMain
         RunInNewThread(
         Sub()
             'EULA 提示
-            If Not Setup.Get("SystemEula") Then
-                Select Case MyMsgBox(GetLang("LangDialogPolicyContent"), GetLang("LangDialogPolicyTitle"), GetLang("LangDialogBtnAgree"), GetLang("LangDialogBtnDeny"), GetLang("LangDialogBtnPolicyContent"),
+            Const EulaVersion As Integer = 2
+            If Setup.Get("SystemEulaVersion") < EulaVersion Then
+                Select Case MyMsgBox(
+                    If(Setup.Get("SystemEulaVersion") = 0,
+                        GetLang("LangDialogPolicyContent"),
+                        GetLang("LangDialogPolicyContentModified")),
+                        GetLang("LangDialogPolicyTitle"), GetLang("LangDialogBtnAgree"), GetLang("LangDialogBtnDeny"), GetLang("LangDialogBtnPolicyContent"),
                         Button3Action:=Sub() OpenWebsite("https://shimo.im/docs/rGrd8pY8xWkt6ryW"))
                     Case 1
-                        Setup.Set("SystemEula", True)
+                        Setup.Set("SystemEulaVersion", EulaVersion)
                     Case 2
                         EndProgram(False)
                 End Select
@@ -475,6 +494,8 @@ Public Class FormMain
             Log("[Start] 最高版本号从 " & LowerVersionCode & " 升高到 " & VersionCode)
         End If
 #End If
+        '迁移 EULA 版本
+        If Setup.Get("SystemEula") AndAlso Setup.Get("SystemEulaVersion") = 0 Then Setup.Set("SystemEulaVersion", 1)
         '被移除的窗口设置选项
         If Setup.Get("LaunchArgumentWindowType") = 5 Then Setup.Set("LaunchArgumentWindowType", 1)
         '修改主题设置项名称
@@ -553,20 +574,20 @@ Public Class FormMain
     ''' </summary>
     ''' <param name="SendWarning">是否在还有下载任务未完成时发出警告。</param>
     Public Sub EndProgram(SendWarning As Boolean)
-        '发出警告
-        If SendWarning AndAlso HasDownloadingTask() Then
-            If MyMsgBox(GetLang("LangDialogCloseOnDownloading"), GetLang("LangDialogTitleTip"), GetLang("LangDialogBtnOK"), GetLang("LangDialogBtnCancel")) = 1 Then
-                '强行结束下载任务
-                RunInNewThread(
-                Sub()
-                    Log("[System] 正在强行停止任务")
-                    For Each Task As LoaderBase In LoaderTaskbar.ToList()
-                        Task.Abort()
-                    Next
-                End Sub, "强行停止下载任务")
-            Else
-                Return
-            End If
+        '强行结束下载任务？
+        If HasDownloadingTask() Then
+            If SendWarning AndAlso MyMsgBox(GetLang("LangDialogCloseOnDownloading"), GetLang("LangDialogTitleTip"), GetLang("LangDialogBtnOK"), GetLang("LangDialogBtnCancel")) = 2 Then Return
+            RunInNewThread(
+            Sub()
+                Log("[System] 正在强行停止任务")
+                For Each Task As LoaderBase In LoaderTaskbar.ToList()
+                    Task.Abort()
+                Next
+            End Sub, "强行停止下载任务")
+        End If
+        '关闭联机？
+        If FrmLinkMain IsNot Nothing Then
+            If FrmLinkMain.TryExit(SendWarning) Then Return
         End If
         '关闭
         RunInUiWait(
@@ -1059,14 +1080,10 @@ Public Class FormMain
         DownloadResourcePack = 5
         DownloadShader = 6
         SetupLaunch = 0
-        SetupUI = 1
-        SetupSystem = 2
-        SetupLink = 3
-        LinkHiper = 1
-        LinkIoi = 2
-        LinkSetup = 4
-        LinkHelp = 5
-        LinkFeedback = 6
+        SetupLink = 1
+        SetupUI = 2
+        SetupSystem = 3
+        LinkMain = 0
         OtherHelp = 0
         OtherAbout = 1
         OtherTest = 2
@@ -1294,8 +1311,8 @@ Public Class FormMain
                     'PageGet 方法会在未设置 SubType 时指定默认值，并建立相关页面的实例
                     PageChangeAnim(FrmDownloadLeft, FrmDownloadLeft.PageGet(SubType))
                 Case PageType.Link '联机
-                    If FrmLinkLeft Is Nothing Then FrmLinkLeft = New PageLinkLeft
-                    PageChangeAnim(FrmLinkLeft, FrmLinkLeft.PageGet(SubType))
+                    If FrmLinkMain Is Nothing Then FrmLinkMain = New PageLinkMain
+                    PageChangeAnim(New MyPageLeft, FrmLinkMain)
                 Case PageType.Setup '设置
                     If FrmSetupLeft Is Nothing Then FrmSetupLeft = New PageSetupLeft
                     PageChangeAnim(FrmSetupLeft, FrmSetupLeft.PageGet(SubType))

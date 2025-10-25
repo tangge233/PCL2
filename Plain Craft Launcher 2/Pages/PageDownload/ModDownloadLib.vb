@@ -1,5 +1,4 @@
 ﻿Imports System.IO.Compression
-Imports System.Net.Http
 
 Public Module ModDownloadLib
 
@@ -1800,7 +1799,7 @@ Retry:
                         Dim RawJson As JObject = GetJson(NetRequestByLoader(DlSourceLauncherOrMetaGet(DlClientListGet(Inherit)), IsJson:=True))
                         '[net.minecraft:client:1.17.1-20210706.113038:mappings@txt] 或 @tsrg]
                         Dim OriginalName As String = Json("data")("MOJMAPS")("client").ToString.Trim("[]".ToCharArray()).BeforeFirst("@")
-                        Dim Address = McLibGet(OriginalName).Replace(".jar", "-mappings." & Json("data")("MOJMAPS")("client").ToString.Trim("[]".ToCharArray()).Split("@")(1))
+                        Dim Address = McLibGet(OriginalName).Replace(".jar", "." & Json("data")("MOJMAPS")("client").ToString.Trim("[]".ToCharArray()).Split("@")(1))
                         Dim ClientMappings As JToken = RawJson("downloads")("client_mappings")
                         Libs.Add(New McLibToken With {
                                  .IsNatives = False, .LocalPath = Address, .OriginalName = OriginalName,

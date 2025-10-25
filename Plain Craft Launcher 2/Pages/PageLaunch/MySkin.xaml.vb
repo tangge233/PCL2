@@ -243,8 +243,8 @@ Retry:
                             {"Minecon2013", GetLang("LangMySkinCapeNameMinecon2013")}, {"Minecon2015", GetLang("LangMySkinCapeNameMinecon2015")}, {"Minecon2016", GetLang("LangMySkinCapeNameMinecon2016")},
                             {"Cherry Blossom", GetLang("LangMySkinCapeNameCherryBlossom")}, {"15th Anniversary", GetLang("LangMySkinCapeName15th-Anniversary")}, {"Purple Heart", GetLang("LangMySkinCapeNamePurpleHeart")},
                             {"Follower's", GetLang("LangMySkinCapeNameFollower's")}, {"MCC 15th Year", GetLang("LangMySkinCapeNameMCC15thYear")}, {"Minecraft Experience", GetLang("LangMySkinCapeNameMinecraftExperience")},
-                            {"Mojang Office", GetLang("LangMySkinCapeNameMojangOffice")}, {"Home", GetLang("LangMySkinCapeNameHome")}, {"Menace", GetLang("LangMySkinCapeNameMenace")}, {"Yearn", GetLang("LangMySkinCapeNameYearn")},
-                            {"Common", "普通披风"}, {"Pan", "薄煎饼披风"}, {"Founder's", "创始人披风"}, {"Copper", "铜披风"}
+                            {"Mojang Office", GetLang("LangMySkinCapeNameMojangOffice")}, {"Waiting", GetLang("LangMySkinCapeNameHome")}, {"Menace", GetLang("LangMySkinCapeNameMenace")}, {"Yearn", GetLang("LangMySkinCapeNameYearn")},
+                            {"Common", GetLang("LangMySkinCapeNameCommon")}, {"Pan", GetLang("LangMySkinCapeNamePan")}, {"Founder's", GetLang("LangMySkinCapeNameFounders")}, {"Copper", GetLang("LangMySkinCapeNameCopper")}
                         }
                         Dim SelectionControl As New List(Of IMyRadio) From {New MyRadioBox With {.Text = GetLang("LangMySkinCapeNameNone")}}
                         For Each Cape In SkinData("capes")

@@ -24,7 +24,8 @@
         {"HintMoreAdvancedSetup", New SetupEntry(False, Source:=SetupSource.Registry)},
         {"HintIndieSetup", New SetupEntry(False, Source:=SetupSource.Registry)},
         {"HintExportConfig", New SetupEntry(False, Source:=SetupSource.Registry)},
-        {"SystemEula", New SetupEntry(False, Source:=SetupSource.Registry)},
+        {"SystemEula", New SetupEntry(False, Source:=SetupSource.Registry)}, '仅老版本兼容，现已换用 SystemEulaVersion
+        {"SystemEulaVersion", New SetupEntry(0, Source:=SetupSource.Registry)},
         {"SystemCount", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
         {"SystemLaunchCount", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
         {"SystemLastVersionReg", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
@@ -42,6 +43,7 @@
         {"SystemSystemUpdate", New SetupEntry(0)},
         {"SystemSystemActivity", New SetupEntry(0)},
         {"SystemSystemTelemetry", New SetupEntry(True, Source:=SetupSource.Registry)},
+        {"CacheConfig", New SetupEntry(0, Source:=SetupSource.Registry)},
         {"CacheExportConfig", New SetupEntry("", Source:=SetupSource.Registry)},
         {"CacheSavedPageUrl", New SetupEntry("", Source:=SetupSource.Registry)},
         {"CacheSavedPageVersion", New SetupEntry("", Source:=SetupSource.Registry)},
@@ -109,12 +111,9 @@
         {"LaunchAdvanceGraphicCard", New SetupEntry(True, Source:=SetupSource.Registry)},
         {"LaunchRamType", New SetupEntry(0)},
         {"LaunchRamCustom", New SetupEntry(15)},
-        {"LinkEula", New SetupEntry(False, Source:=SetupSource.Registry)},
-        {"LinkName", New SetupEntry("", Source:=SetupSource.Registry)},
-        {"LinkHiperCertLast", New SetupEntry("", Source:=SetupSource.Registry)},
-        {"LinkHiperCertTime", New SetupEntry("", Source:=SetupSource.Registry)},
-        {"LinkHiperCertWarn", New SetupEntry(True, Source:=SetupSource.Registry)},
-        {"LinkIoiVersion", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
+        {"LinkOfflineHint", New SetupEntry(False, Source:=SetupSource.Registry)},
+        {"LinkShareMode", New SetupEntry(True, Source:=SetupSource.Registry)},
+        {"LinkEasyTierVersion", New SetupEntry(-1, Source:=SetupSource.Registry)},
         {"ToolHelpLanguage", New SetupEntry(True, Source:=SetupSource.Registry)},
         {"ToolDownloadThread", New SetupEntry(63, Source:=SetupSource.Registry)},
         {"ToolDownloadSpeed", New SetupEntry(42, Source:=SetupSource.Registry)},
@@ -419,8 +418,6 @@
 #If BETA Then
         If Key = "UiLauncherTheme" Then Return "0"
 #End If
-        If Key = "UiHiddenPageLink" Then Return True
-        If Key = "UiHiddenSetupLink" Then Return True
         Return Nothing
     End Function
 

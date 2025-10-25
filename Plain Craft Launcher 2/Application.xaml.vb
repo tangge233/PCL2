@@ -156,6 +156,7 @@ WaitRetry:
             '检测异常环境
             If Path.Contains(IO.Path.GetTempPath()) OrElse Path.Contains("AppData\Local\Temp\") Then
                 MyMsgBox(GetLang("LangApplicationDialogContentRunInTemp"), GetLang("LangApplicationDialogTitleRunInTemp"), GetLang("LangDialogThemeUnlockGameAccept"), IsWarn:=True)
+                FormMain.EndProgramForce(ProcessReturnValues.Cancel)
             End If
             If Is32BitSystem Then
                 MyMsgBox(GetLang("LangApplicationDialogContent32BitWarn"), GetLang("LangApplicationDialogTitleRunInTemp"), GetLang("LangDialogThemeUnlockGameAccept"), IsWarn:=True)

@@ -236,7 +236,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\Behaviors\ClipboardInterceptor.vb" />
-    <Compile Include="Controls\Behaviors\IMyRadio.vb" />
     <Compile Include="Controls\Behaviors\Interfaces.vb" />
     <Compile Include="Controls\MyComboBox.vb" />
     <Compile Include="Controls\MyComboBoxItem.vb" />
@@ -335,20 +334,11 @@
     <Compile Include="Pages\PageLaunch\PageLoginNideSkin.xaml.vb">
       <DependentUpon>PageLoginNideSkin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\PageLink\PageLinkFeedback.xaml.vb">
-      <DependentUpon>PageLinkFeedback.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageLink\PageLinkHiper.xaml.vb">
-      <DependentUpon>PageLinkHiper.xaml</DependentUpon>
+    <Compile Include="Pages\PageLink\PageLinkMain.xaml.vb">
+      <DependentUpon>PageLinkMain.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageOther\PageOtherHelpDetail.xaml.vb">
       <DependentUpon>PageOtherHelpDetail.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageLink\PageLinkIoi.xaml.vb">
-      <DependentUpon>PageLinkIoi.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageLink\PageLinkLeft.xaml.vb">
-      <DependentUpon>PageLinkLeft.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageVersion\PageVersionExport.xaml.vb">
       <DependentUpon>PageVersionExport.xaml</DependentUpon>
@@ -604,25 +594,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </None>
-    <Page Include="Pages\PageLink\PageLinkFeedback.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\PageLink\PageLinkHiper.xaml">
+    <Page Include="Pages\PageLink\PageLinkMain.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\PageOther\PageOtherHelpDetail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageLink\PageLinkIoi.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageLink\PageLinkLeft.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\PageVersion\PageVersionExport.xaml">
       <SubType>Designer</SubType>

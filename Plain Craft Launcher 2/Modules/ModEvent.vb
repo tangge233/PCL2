@@ -207,7 +207,14 @@ Public Class CustomEvent
                 Case EventType.复制文本
                     ClipboardSet(Arg)
 
-                Case EventType.刷新主页, EventType.刷新页面
+                Case EventType.刷新主页
+                    RunInUi(
+                    Sub()
+                        FrmLaunchRight.ForceRefresh()
+                        If String.IsNullOrEmpty(Arg) Then Hint("已刷新！", HintType.Green)
+                    End Sub)
+
+                Case EventType.刷新页面
                     If TypeOf FrmMain.PageRight Is IRefreshable Then
                         RunInUiWait(Sub() CType(FrmMain.PageRight, IRefreshable).Refresh())
                         If String.IsNullOrEmpty(Arg) Then Hint(GetLang("LangRefreshed"), HintType.Green)
@@ -250,18 +257,21 @@ Public Class CustomEvent
                         Return
                     End If
                     If Not EventSafetyConfirm("即将从该网址下载文件：" & vbCrLf & Args(0)) Then Return
-                    Try
-                        Select Case Args.Length
-                            Case 1
-                                PageOtherTest.StartCustomDownload(Args(0), GetFileNameFromPath(Args(0)))
-                            Case 2
-                                PageOtherTest.StartCustomDownload(Args(0), Args(1))
-                            Case Else
-                                PageOtherTest.StartCustomDownload(Args(0), Args(1), Args(2))
-                        End Select
-                    Catch
-                        PageOtherTest.StartCustomDownload(Args(0), "未知")
-                    End Try
+                    RunInUi(
+                    Sub()
+                        Try
+                            Select Case Args.Length
+                                Case 1
+                                    PageOtherTest.StartCustomDownload(Args(0), GetFileNameFromPath(Args(0)))
+                                Case 2
+                                    PageOtherTest.StartCustomDownload(Args(0), Args(1))
+                                Case Else
+                                    PageOtherTest.StartCustomDownload(Args(0), Args(1), Args(2))
+                            End Select
+                        Catch
+                            PageOtherTest.StartCustomDownload(Args(0), "未知")
+                        End Try
+                    End Sub)
 
                 Case EventType.修改设置, EventType.写入设置
                     If Args.Length = 1 Then Throw New Exception($"EventType {Type} 需要至少 2 个以 | 分割的参数，例如 UiLauncherTransparent|400")

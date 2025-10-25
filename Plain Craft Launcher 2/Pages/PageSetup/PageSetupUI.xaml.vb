@@ -508,7 +508,7 @@ Refresh:
                 '顶部栏未被全部隐藏
                 FrmMain.PanTitleSelect.Visibility = Visibility.Visible
                 FrmMain.BtnTitleSelect1.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageDownload"), Visibility.Collapsed, Visibility.Visible)
-                FrmMain.BtnTitleSelect2.Visibility = Visibility.Collapsed 'If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageLink"), Visibility.Collapsed, Visibility.Visible)
+                FrmMain.BtnTitleSelect2.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageLink"), Visibility.Collapsed, Visibility.Visible)
                 FrmMain.BtnTitleSelect3.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageSetup"), Visibility.Collapsed, Visibility.Visible)
                 FrmMain.BtnTitleSelect4.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageOther"), Visibility.Collapsed, Visibility.Visible)
             End If
@@ -521,7 +521,7 @@ Refresh:
             If FrmSetupLeft IsNot Nothing Then
                 FrmSetupLeft.ItemLaunch.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupLaunch"), Visibility.Collapsed, Visibility.Visible)
                 FrmSetupLeft.ItemUI.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupUi"), Visibility.Collapsed, Visibility.Visible)
-                FrmSetupLeft.ItemLink.Visibility = Visibility.Collapsed 'If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupLink"), Visibility.Collapsed, Visibility.Visible)
+                FrmSetupLeft.ItemLink.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupLink"), Visibility.Collapsed, Visibility.Visible)
                 FrmSetupLeft.ItemSystem.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupSystem"), Visibility.Collapsed, Visibility.Visible)
                 '隐藏左边选择卡
                 Dim AvaliableCount As Integer = 0
