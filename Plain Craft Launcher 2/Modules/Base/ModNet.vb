@@ -262,11 +262,11 @@ RequestFinished:
                     })
                 End If
             End SyncLock
-            Response = RequestClient.SendAsync(Request, HttpCompletionOption.ResponseHeadersRead, CancelToken.Token).GetAwaiter().GetResult()
+            Response = RequestClient.SendAsync(Request, HttpCompletionOption.ResponseHeadersRead, CancelToken.Token).GetResultWithTimeout(CancelToken, Timeout)
             Dim ResponseStream = Response.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
             Dim ResponseBytes As Byte()
             Using Stream As New MemoryStream
-                ResponseStream.CopyToAsync(Stream, 81920, CancelToken.Token).GetAwaiter().GetResult()
+                ResponseStream.CopyToAsync(Stream, 81920, CancelToken.Token).GetResultWithTimeout(CancelToken, Timeout)
                 ResponseBytes = Stream.ToArray()
             End Using
             '输出
@@ -286,7 +286,7 @@ RequestFinished:
             Throw
         Catch ex As Exception
             RecordIPReliability(HostIp, -1)
-            If TypeOf ex Is OperationCanceledException Then 'CancellationToken 超时
+            If TypeOf ex Is OperationCanceledException OrElse TypeOf ex Is TimeoutException Then 'CancellationToken 超时
                 Throw New WebException($"连接服务器超时，请稍后再试，或使用 VPN 改善网络环境（{Method}, {Url}，IP：{HostIp}）", WebExceptionStatus.Timeout)
             ElseIf ex.IsNetworkRelated Then
                 Throw New WebException($"网络请求失败，请稍后再试，或使用 VPN 改善网络环境（{Method}, {Url}，IP：{HostIp}）", WebExceptionStatus.Timeout)
@@ -992,7 +992,7 @@ StartThread:
                 HostIp = DNSLookup(HttpRequest, CancelToken) 'DNS 预解析
                 If Not Th.IsFirstThread Then HttpRequest.Headers.Range = New RangeHeaderValue(Th.DownloadStart, Nothing)
                 Dim ContentLength As Long = 0
-                Response = ThreadClient.SendAsync(HttpRequest, HttpCompletionOption.ResponseHeadersRead, CancelToken.Token).GetAwaiter().GetResult()
+                Response = ThreadClient.SendAsync(HttpRequest, HttpCompletionOption.ResponseHeadersRead, CancelToken.Token).GetResultWithTimeout(CancelToken, Timeout)
                 If Not Response.IsSuccessStatusCode Then Throw New Exception($"错误码 {Response.StatusCode} ({CInt(Response.StatusCode)})，{Th.Source.Url}") '状态码检查
                 If State = NetState.Error Then GoTo SourceBreak '快速中断
                 If ModeDebug AndAlso Response.RequestMessage.RequestUri.ToString <> Th.Source.Url Then Log($"[Download] {LocalName}：重定向至 {Response.RequestMessage.RequestUri}")
@@ -1063,7 +1063,7 @@ NotSupportRange:
                 ResponseStream = Response.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
                 If Setup.Get("SystemDebugDelay") Then Threading.Thread.Sleep(RandomInteger(50, 3000))
                 Dim ResponseBytes As Byte() = New Byte(16384) {}
-                HttpDataCount = ReadWithTimeout(ResponseStream, ResponseBytes, 0, 16384, Timeout)
+                HttpDataCount = ResponseStream.ReadAsync(ResponseBytes, 0, 16384, CancelToken.Token).GetResultWithTimeout(CancelToken, Timeout)
                 While (IsUnknownSize OrElse Th.DownloadUndone > 0) AndAlso '判断是否下载完成
                             HttpDataCount > 0 AndAlso Not IsProgramEnded AndAlso State < NetState.Merge AndAlso (Not Th.Source.IsFailed OrElse Th.Source.SingleThread = Th)
                     '限速
@@ -1113,7 +1113,7 @@ NotSupportRange:
                         '无数据，且已超时
                         Throw New TimeoutException("操作超时，无数据。")
                     End If
-                    HttpDataCount = ReadWithTimeout(ResponseStream, ResponseBytes, 0, 16384, Timeout)
+                    HttpDataCount = ResponseStream.ReadAsync(ResponseBytes, 0, 16384, CancelToken.Token).GetResultWithTimeout(CancelToken, Timeout)
                 End While
 SourceBreak:
                 If State = NetState.Error OrElse (Th.Source.IsFailed AndAlso Th.Source.SingleThread <> Th) OrElse (Th.DownloadUndone > 0 AndAlso Not IsUnknownSize) Then
@@ -1130,7 +1130,8 @@ SourceBreak:
                     RecordIPReliability(HostIp, 0.5)
                 End If
             Catch ex As Exception
-                Log($"[Download] {LocalName}：出错，{If(TypeOf ex Is OperationCanceledException, $"已超时（{Timeout}ms）", ex.GetDetail())}，IP：{HostIp}")
+                Log($"[Download] {LocalName}：出错，{If(TypeOf ex Is OperationCanceledException OrElse TypeOf ex Is TimeoutException,
+                    $"已超时（{Timeout}ms）", ex.GetDetail())}，IP：{HostIp}")
                 RecordIPReliability(HostIp, -0.7)
                 SourceFail(Th, ex, False)
             Finally
@@ -1650,15 +1651,15 @@ Retry:
                 If State >= LoadState.Finished Then Return
                 If ExList Is Nothing OrElse Not ExList.Any() Then ExList = New List(Of Exception) From {New Exception("未知错误！")}
                 '寻找有效的错误信息
-                Dim UsefulExs = ExList.Where(Function(e) TypeOf e IsNot OperationCanceledException AndAlso TypeOf e IsNot ThreadInterruptedException).ToList
+                Dim UsefulExs = ExList.Where(Function(e) TypeOf e IsNot OperationCanceledException AndAlso TypeOf e IsNot TimeoutException AndAlso TypeOf e IsNot ThreadInterruptedException).ToList
                 [Error] = If(UsefulExs.FirstOrDefault, ExList.FirstOrDefault)
                 '获取实际失败的文件
                 For Each File In Files
                     If File.State <> NetState.Error Then Continue For
+                    If File.Sources.All(Function(s) TypeOf s.Ex Is OperationCanceledException OrElse TypeOf s.Ex Is TimeoutException OrElse TypeOf s.Ex Is ThreadInterruptedException) Then Continue For
                     Dim Detail As String = Join(File.Sources.Select(Function(s) $"{If(s.Ex Is Nothing, "无错误信息。", s.Ex.GetBrief())}（{s.Url}）"), vbCrLf)
                     [Error] = New Exception("文件下载失败：" & File.LocalPath & vbCrLf &
-                                            "各下载源的错误如下：" & vbCrLf & Detail,
-                                            [Error])
+                                            "各下载源的错误如下：" & vbCrLf & Detail, [Error])
                     '上报
                     Telemetry("文件下载失败",
                               "FileName", File.LocalName,
@@ -1953,6 +1954,45 @@ Retry:
 
 #End Region
 
+#Region "端口"
+
+    ''' <summary>
+    ''' 随机获取单个可用的端口。
+    ''' </summary>
+    Public Function FindFreePort() As Integer
+        Dim Listener As New TcpListener(IPAddress.Loopback, 0)
+        Listener.Start()
+        Dim port As Integer = CType(Listener.LocalEndpoint, IPEndPoint).Port
+        Listener.Stop()
+        Return port
+    End Function
+
+    ''' <summary>
+    ''' 获取当前已被占用的端口列表。
+    ''' </summary>
+    Public Function GetUsedPorts() As List(Of Integer)
+        Dim IPProperties = NetworkInformation.IPGlobalProperties.GetIPGlobalProperties()
+        Dim UsedPorts As New List(Of Integer)
+        UsedPorts.AddRange(IPProperties.GetActiveTcpListeners().Select(Function(ep) ep.Port))
+        UsedPorts.AddRange(IPProperties.GetActiveUdpListeners().Select(Function(ep) ep.Port))
+        UsedPorts.AddRange(IPProperties.GetActiveTcpConnections().Select(Function(conn) conn.LocalEndPoint.Port))
+        Return UsedPorts.Distinct().ToList()
+    End Function
+
+    ''' <summary>
+    ''' 寻找数个连续编号的可用端口。
+    ''' </summary>
+    Public Function FindFreePorts(ConsecutiveCount As Integer, ParamArray ExtraBlackLists As Integer()) As List(Of Integer)
+        Dim UsedPorts = GetUsedPorts().Concat(ExtraBlackLists)
+        For port = 12000 To 65000 - ConsecutiveCount
+            Dim Range = Enumerable.Range(port, ConsecutiveCount)
+            If Not Range.Any(Function(p) UsedPorts.Contains(p)) Then Return Range.ToList
+        Next
+        Throw New Exception("未能找到可用的端口！")
+    End Function
+
+#End Region
+
     ''' <summary>
     ''' 测试 Ping。失败则返回 -1。
     ''' </summary>
@@ -1983,29 +2023,6 @@ Retry:
             "(408)", "超时", "timeout", "网络请求失败", "连接尝试失败", "远程主机强迫关闭了", "远程方已关闭传输流", "未能解析此远程名称",
             "由于目标计算机积极拒绝", "基础连接已经关闭"
         }.Any(Function(k) Detail.ContainsF(k, True))
-    End Function
-
-    ''' <summary>
-    ''' 随机获取一个可用的端口。
-    ''' </summary>
-    Public Function GetAvailablePort() As Integer
-        Dim Listener As New TcpListener(IPAddress.Loopback, 0)
-        Listener.Start()
-        Dim port As Integer = CType(Listener.LocalEndpoint, IPEndPoint).Port
-        Listener.Stop()
-        Return port
-    End Function
-
-    ''' <summary>
-    ''' 带有 Timeout 的读取 Stream 方法。
-    ''' </summary>
-    Private Function ReadWithTimeout(TargetStream As Stream, Buffer() As Byte, Offset As Integer, Count As Integer, ReadTimeoutMs As Integer) As Integer
-        Dim ReadTask = TargetStream.ReadAsync(Buffer, Offset, Count)
-        Dim DelayTask = Task.Delay(ReadTimeoutMs)
-        If Task.WhenAny(ReadTask, DelayTask).GetAwaiter().GetResult() Is DelayTask Then
-            Throw New TimeoutException($"读取数据超时（{ReadTimeoutMs} ms）")
-        End If
-        Return ReadTask.GetAwaiter().GetResult()
     End Function
 
 End Module

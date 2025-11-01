@@ -141,6 +141,7 @@ Public Class CustomEvent
         写入设置
         修改变量
         写入变量
+        加入房间
     End Enum
 
     ''' <summary>
@@ -282,6 +283,17 @@ Public Class CustomEvent
                     If Args.Length = 1 Then Throw New Exception($"EventType {Type} 需要至少 2 个以 | 分割的参数，例如 VariableName|SomeValue")
                     WriteReg("CustomEvent" & Args(0), Args(1))
                     If Args.Length = 2 Then Hint($"已写入变量：{Args(0)} → {Args(1)}", HintType.Green)
+
+                Case EventType.加入房间
+                    RunInUi(
+                    Sub()
+                        If String.IsNullOrWhiteSpace(Arg) Then
+                            PageLinkMain.Join()
+                        Else
+                            If Not EventSafetyConfirm("即将加入第三方联机房间。") Then Return
+                            PageLinkMain.Join(Arg)
+                        End If
+                    End Sub)
 
                 Case Else
                     MyMsgBox("未知的事件类型：" & Type & vbCrLf & "请检查事件类型填写是否正确，或者 PCL 是否为最新版本。", "事件执行失败")

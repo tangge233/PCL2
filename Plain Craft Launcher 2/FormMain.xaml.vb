@@ -113,6 +113,17 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 374 Then 'Snapshot 2.11.1
+            If LastVersion >= 373 Then
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：使用离线登录也可以直接加入联机房间了"))
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：会从所有共享节点中自动选择负载最低的进行中继连接"))
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：若复制了邀请码，则可以直接快速加入房间"))
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：关闭 PCL 时总是会提示是否退出联机，防止在关闭 PCL 时无意地关闭或退出了房间"))
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "新增：允许自定义要连接的节点"))
+            End If
+            FeatureCount += 9
+            BugCount += 7
+        End If
         If LastVersion < 373 Then 'Snapshot 2.11.0
             FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "新增：联机功能！"))
             FeatureCount += 7
@@ -587,9 +598,7 @@ Public Class FormMain
             End Sub, "强行停止下载任务")
         End If
         '关闭联机？
-        If FrmLinkMain IsNot Nothing Then
-            If FrmLinkMain.TryExit(SendWarning) Then Return
-        End If
+        If FrmLinkMain?.TryExit(Not SendWarning, True) Then Return
         '关闭
         RunInUiWait(
         Sub()
@@ -765,6 +774,21 @@ Public Class FormMain
         Catch ex As Exception
             Log(ex, "切回窗口时出错", LogLevel.Feedback)
         End Try
+        '读取剪贴板，自动加入联机房间
+        If PageLinkMain.LinkState <> PageLinkMain.LinkStates.Waiting Then Return '已启动联机
+        Dim Code = ClipboardGetText() : If Code Is Nothing Then Return '剪贴板无文本
+        If Setup.Get("LinkLastAutoJoinInviteCode") = Code Then Return
+        If PageLinkMain.ValidateCodeFormat(Code) IsNot Nothing Then Return '不是邀请码
+        Setup.Set("LinkLastAutoJoinInviteCode", Code)
+        RunInThread(
+        Sub()
+            If MyMsgBox("嘿，是否使用复制的邀请码加入房间？", "加入联机房间", "加入", "取消") = 2 Then Return '防止弹窗阻碍主线程，所以必须放在工作线程
+            RunInUi(
+            Sub()
+                PageLinkMain.Join(Code)
+                ClipboardSet(Nothing, False)
+            End Sub)
+        End Sub)
     End Sub
 
     '文件拖放

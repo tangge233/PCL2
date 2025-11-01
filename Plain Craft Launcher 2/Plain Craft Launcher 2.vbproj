@@ -933,6 +933,8 @@
   <ItemGroup>
     <None Include="Resources\System.Net.Http.Formatting.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\Heads\EasyTier.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

@@ -5,6 +5,7 @@ Imports System.Runtime.CompilerServices
 Imports System.Security.Cryptography
 Imports System.Security.Principal
 Imports System.Text.RegularExpressions
+Imports System.Threading.Tasks
 Imports System.Xaml
 Imports Newtonsoft.Json
 
@@ -13,13 +14,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.11.0" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.11.0." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.11.1" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.11.1." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
     Public Const VersionCode As Integer = 372 'Release
 #Else
-    Public Const VersionCode As Integer = 373 'Snapshot
+    Public Const VersionCode As Integer = 374 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -1727,6 +1728,7 @@ RetryDir:
     ''' </summary>
     <Extension> <MethodImpl(MethodImplOptions.AggressiveInlining)>
     Public Function StartsWithF(Str As String, Prefix As String, Optional IgnoreCase As Boolean = False) As Boolean
+        If Str Is Nothing Then Return False
         Return Str.StartsWith(Prefix, If(IgnoreCase, StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal))
     End Function
     ''' <summary>
@@ -1734,6 +1736,7 @@ RetryDir:
     ''' </summary>
     <Extension> <MethodImpl(MethodImplOptions.AggressiveInlining)>
     Public Function EndsWithF(Str As String, Suffix As String, Optional IgnoreCase As Boolean = False) As Boolean
+        If Str Is Nothing Then Return False
         Return Str.EndsWith(Suffix, If(IgnoreCase, StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal))
     End Function
     ''' <summary>
@@ -1741,6 +1744,7 @@ RetryDir:
     ''' </summary>
     <Extension> <MethodImpl(MethodImplOptions.AggressiveInlining)>
     Public Function ContainsF(Str As String, SubStr As String, Optional IgnoreCase As Boolean = False) As Boolean
+        If Str Is Nothing Then Return False
         Return Str.IndexOf(SubStr, If(IgnoreCase, StringComparison.OrdinalIgnoreCase, StringComparison.Ordinal)) >= 0
     End Function
     ''' <summary>
@@ -1777,6 +1781,7 @@ RetryDir:
     ''' 如果输入有误，返回 0。
     ''' </summary>
     Public Function Val(Str As Object) As Double
+        If Str Is Nothing Then Return 0
         Try
             Return If(TypeOf Str Is String AndAlso Str = "&", 0, Conversion.Val(Str))
         Catch
@@ -2146,6 +2151,29 @@ RetryDir:
         Next
         Return result
     End Function
+
+    ''' <summary>
+    ''' 为 Task 设置超时，在超时时抛出 TimeoutException。
+    ''' </summary>
+    <Extension> Public Function GetResultWithTimeout(Of T)(TargetTask As Task(Of T), TokenSource As CancellationTokenSource, TimeoutMs As Integer) As T
+        Dim DelayTask = Task.Delay(TimeoutMs)
+        If Task.WhenAny(TargetTask, DelayTask).GetAwaiter().GetResult() Is DelayTask Then
+            TokenSource.Cancel()
+            Throw New TimeoutException($"任务超时（{TimeoutMs} ms）")
+        End If
+        Return TargetTask.GetAwaiter().GetResult()
+    End Function
+    ''' <summary>
+    ''' 为 Task 设置超时，在超时时抛出 TimeoutException。
+    ''' </summary>
+    <Extension> Public Sub GetResultWithTimeout(TargetTask As Task, TokenSource As CancellationTokenSource, TimeoutMs As Integer)
+        Dim DelayTask = Task.Delay(TimeoutMs)
+        If Task.WhenAny(TargetTask, DelayTask).GetAwaiter().GetResult() Is DelayTask Then
+            TokenSource.Cancel()
+            Throw New TimeoutException($"任务超时（{TimeoutMs} ms）")
+        End If
+        TargetTask.GetAwaiter().GetResult()
+    End Sub
 
     ''' <summary>
     ''' 可用于临时存放文件的，不含任何特殊字符的文件夹路径，以“\”结尾。
@@ -2586,7 +2614,7 @@ Retry:
                 RunInUi(
                 Sub()
                     My.Computer.Clipboard.Clear()
-                    My.Computer.Clipboard.SetText(Text)
+                    If Not String.IsNullOrEmpty(Text) Then My.Computer.Clipboard.SetText(Text)
                 End Sub)
             Catch ex As Exception
                 RetryCount += 1
@@ -2600,6 +2628,21 @@ Retry:
             If ShowSuccessHint Then Hint("已成功复制！", HintType.Green)
         End Sub)
     End Sub
+    ''' <summary>
+    ''' 获取剪贴板文本。将在 UI 线程运行，且不会抛出异常。
+    ''' </summary>
+    Public Function ClipboardGetText() As String
+        Dim Result As String = Nothing
+        RunInUiWait(
+        Sub()
+            Try
+                If My.Computer.Clipboard.ContainsText() Then Result = My.Computer.Clipboard.GetText()
+            Catch ex As Exception
+                Log(ex, "获取剪贴板文本失败")
+            End Try
+        End Sub)
+        Return Result
+    End Function
 
     ''' <summary>
     ''' 以 Byte() 形式获取程序中的资源。
@@ -3079,6 +3122,7 @@ Retry:
     Public Sub Telemetry([Event] As String, ParamArray Datas As String())
         If Not Setup.Get("SystemSystemTelemetry") Then Return '用户关闭了遥测
         If Not ClsBaseUrl.StartsWithF("http") Then Return '开源版没有设置遥测地址
+        If VersionBranchName = "Debug" Then Return '开发版本不上传遥测
         RunInNewThread(
         Sub()
             Try

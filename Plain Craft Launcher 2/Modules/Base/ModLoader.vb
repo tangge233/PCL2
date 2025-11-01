@@ -344,12 +344,12 @@
             LastRunningThread.Start() '不能使用 RunInNewThread，否则在函数返回前线程就会运行完，导致误判 IsAborted
         End Sub
         Public Overrides Sub Failed(ex As Exception)
+            [Error] = ex
             SyncLock LockState
                 If IsAborted OrElse State >= LoadState.Finished Then Return
                 State = LoadState.Failed
             End SyncLock
             Log(ex, $"加载线程 {Name} ({Thread.CurrentThread.ManagedThreadId}) 出错，已完成 {Math.Round(Progress * 100)}%", LogLevel.Developer)
-            [Error] = ex
             TriggerThreadAbort()
         End Sub
         Public Overrides Sub Abort()
@@ -464,11 +464,11 @@
             End Sub)
         End Sub
         Public Overrides Sub Failed(Ex As Exception)
+            [Error] = Ex '先设置错误再调整状态，防止父加载器获取不到异常
             SyncLock LockState
                 If State >= LoadState.Finished Then Return
                 State = LoadState.Failed
             End SyncLock
-            [Error] = Ex
             For Each Loader In Loaders
                 Loader.Abort()
             Next

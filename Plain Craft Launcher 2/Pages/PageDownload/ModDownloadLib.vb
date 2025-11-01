@@ -99,7 +99,8 @@ Public Module ModDownloadLib
         Sub(Task As LoaderTask(Of String, List(Of NetFile)))
             Try
                 Dim Version As New McVersion(VersionFolder)
-                Task.Output = New List(Of NetFile) From {DlClientAssetIndexGet(Version)}
+                Dim AssetIndex = DlClientAssetIndexGet(Version)
+                Task.Output = If(AssetIndex Is Nothing, New List(Of NetFile), New List(Of NetFile) From {AssetIndex})
             Catch ex As Exception
                 Throw New Exception("分析资源文件索引地址失败", ex)
             End Try

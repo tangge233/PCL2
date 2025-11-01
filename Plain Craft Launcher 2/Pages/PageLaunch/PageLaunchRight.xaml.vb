@@ -104,6 +104,9 @@ Public Class PageLaunchRight
                     Case 12
                         Log("[Page] 主页预设：PCL GitHub 仪表盘")
                         Url = "https://ddf.pcl-community.org/Custom.xaml"
+                    Case 13
+                        Log("[Page] 主页预设：PCL 更新摘要")
+                        Url = "https://raw.gitcode.com/ENC_Euphony/PCL-AI-Summary-HomePage/raw/master/Custom.xaml"
                 End Select
         End Select
         '联网下载

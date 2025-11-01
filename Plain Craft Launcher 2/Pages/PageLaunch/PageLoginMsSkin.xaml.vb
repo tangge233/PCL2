@@ -121,7 +121,7 @@ Retry:
                 Next
                 Throw New Exception("未知错误（" & Result & "）")
             Catch ex As Exception
-                If TypeOf ex Is OperationCanceledException Then
+                If TypeOf ex Is OperationCanceledException OrElse TypeOf ex Is TimeoutException Then
                     Hint("更改皮肤失败：连接皮肤服务器超时，请稍后再试，或使用 VPN 改善网络环境", HintType.Red)
                 Else
                     Log(ex, "更改皮肤失败", LogLevel.Hint)

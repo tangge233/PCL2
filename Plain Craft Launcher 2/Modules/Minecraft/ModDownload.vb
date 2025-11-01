@@ -73,8 +73,10 @@
             Sub(Task As LoaderTask(Of String, List(Of NetFile)))
                 Try
                     Dim IndexFile = DlClientAssetIndexGet(Version)
-                    Dim IndexFileInfo As New FileInfo(IndexFile.LocalPath)
-                    If AssetsIndexBehaviour <> AssetsIndexExistsBehaviour.AlwaysDownload AndAlso IndexFile.Check.Check(IndexFile.LocalPath) Is Nothing Then
+                    If IndexFile Is Nothing Then
+                        Task.Output = New List(Of NetFile)
+                        Log("[Download] 未找到版本 " & Version.Name & " 的合适的资源索引下载地址，游戏 assets 可能缺失", LogLevel.Debug)
+                    ElseIf AssetsIndexBehaviour <> AssetsIndexExistsBehaviour.AlwaysDownload AndAlso IndexFile.Check.Check(IndexFile.LocalPath) Is Nothing Then
                         Task.Output = New List(Of NetFile)
                     Else
                         Task.Output = New List(Of NetFile) From {IndexFile}
@@ -93,6 +95,11 @@
                 LoadersAssetsUpdate.Add(New LoaderTask(Of String, List(Of NetFile))("后台分析资源文件索引地址",
                 Sub(Task As LoaderTask(Of String, List(Of NetFile)))
                     Dim BackAssetsFile As NetFile = DlClientAssetIndexGet(Version)
+                    If BackAssetsFile Is Nothing Then
+                        Log("[Download] 未找到版本 " & Version.Name & " 的合适的资源索引下载地址，游戏 assets 可能缺失", LogLevel.Debug)
+                        Task.Abort()
+                        Throw New ThreadInterruptedException
+                    End If
                     RealAddress = BackAssetsFile.LocalPath
                     TempAddress = PathTemp & "Cache\" & BackAssetsFile.LocalName
                     BackAssetsFile.LocalPath = TempAddress
