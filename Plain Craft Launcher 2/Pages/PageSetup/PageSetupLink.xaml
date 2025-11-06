@@ -6,7 +6,26 @@
     PanScroll="PanBack">
     <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" x:Name="PanBack">
         <StackPanel x:Name="PanMain" Margin="25,10">
-            <local:MyCard Margin="0,15" Title="高级设置" IsSwapped="True" CanSwap="True">
+            <local:MyCard x:Name="CardArgument" Margin="0,15" Title="连接选项">
+                <StackPanel Margin="25,40,25,20">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="Name" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="60" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="28" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="模式" Margin="0,0,25,0" />
+                        <local:MyComboBox Grid.Row="0" x:Name="ComboLatencyMode" Grid.ColumnSpan="2" Tag="LinkLatencyMode" Grid.Column="1">
+                            <local:MyComboBoxItem Content="优先直连" IsSelected="True" ToolTip="尽量不进行中转，而是 P2P 直连。" />
+                            <local:MyComboBoxItem Content="优先低延迟" ToolTip="如果使用中转节点能降低延迟，就不进行直连。&#xa;不过，这会增加社区节点的负载……" />
+                        </local:MyComboBox>
+                    </Grid>
+                </StackPanel>
+            </local:MyCard>
+            <local:MyCard Margin="0,0,0,15" Title="高级设置" IsSwapped="True" CanSwap="True">
                 <Grid Margin="25,40,25,22">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -25,8 +44,8 @@
                     <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Left">
                         <local:MyButton MinWidth="140" Padding="13,5" Margin="0,0,20,0" HorizontalAlignment="Left"
                             Text=" 光荣地贡献节点！" ColorType="Highlight"
-                            ToolTip="联机功能全靠社区的各位无私贡献的节点才能存在！&#xa;如果你有空闲的服务器，欢迎搭建一个共享节点，人人为我，我为人人嘛……&#xa;&#xa;你可以在 EasyTier 的【搭建共享节点】文档中查看搭建方式，搭建好后点击这里提交。&#xa;PCL 会自动选取节点进行连接。" 
-                            local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://uptime.easytier.cn/submit" />
+                            ToolTip="联机功能全靠社区的各位无私贡献的节点才能存在！&#xa;如果你有空闲的高带宽服务器，欢迎搭建一个共享节点，人人为我，我为人人嘛……" 
+                            local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://shimo.im/docs/qKPttVvXKqPD8YDC#anchor-Dupo" />
                         <local:MyButton MinWidth="140" Padding="13,5" Margin="0,0,20,0" HorizontalAlignment="Left"
                             Text="节点状态"
                             local:CustomEventService.EventType="打开网页" local:CustomEventService.EventData="https://uptime.easytier.cn/" />

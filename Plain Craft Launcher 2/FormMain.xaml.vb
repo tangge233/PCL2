@@ -113,6 +113,14 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 375 Then 'Snapshot 2.11.2
+            If LastVersion >= 373 Then
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：对联机进行了各种各样的优化，以改善稳定性"))
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：若有加入者的网络环境比房主更好，会提示可以让那位加入者担任房主"))
+            End If
+            FeatureCount += 16
+            BugCount += 4
+        End If
         If LastVersion < 374 Then 'Snapshot 2.11.1
             If LastVersion >= 373 Then
                 FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "优化：使用离线登录也可以直接加入联机房间了"))
@@ -452,7 +460,7 @@ Public Class FormMain
                 Thread.Sleep(100)
                 DlClientListMojangLoader.Start(1) 'PCL 会同时根据这里的加载结果决定是否使用官方源进行下载
                 RunCountSub()
-                ServerLoader.Start(1)
+                ServerLoader.Start()
                 RunInNewThread(AddressOf TryClearTaskTemp, "TryClearTaskTemp", ThreadPriority.BelowNormal)
             Catch ex As Exception
                 Log(ex, "初始化加载池运行失败", LogLevel.Feedback)
@@ -776,6 +784,7 @@ Public Class FormMain
         End Try
         '读取剪贴板，自动加入联机房间
         If PageLinkMain.LinkState <> PageLinkMain.LinkStates.Waiting Then Return '已启动联机
+        If PageCurrent = PageType.Link Then Return '已在联机界面
         Dim Code = ClipboardGetText() : If Code Is Nothing Then Return '剪贴板无文本
         If Setup.Get("LinkLastAutoJoinInviteCode") = Code Then Return
         If PageLinkMain.ValidateCodeFormat(Code) IsNot Nothing Then Return '不是邀请码

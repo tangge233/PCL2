@@ -1984,7 +1984,7 @@ Retry:
     ''' </summary>
     Public Function FindFreePorts(ConsecutiveCount As Integer, ParamArray ExtraBlackLists As Integer()) As List(Of Integer)
         Dim UsedPorts = GetUsedPorts().Concat(ExtraBlackLists)
-        For port = 12000 To 65000 - ConsecutiveCount
+        For port = 12000 + RandomInteger(0, 1000) To 65000 - ConsecutiveCount
             Dim Range = Enumerable.Range(port, ConsecutiveCount)
             If Not Range.Any(Function(p) UsedPorts.Contains(p)) Then Return Range.ToList
         Next

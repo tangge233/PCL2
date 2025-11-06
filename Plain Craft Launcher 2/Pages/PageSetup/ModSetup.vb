@@ -113,6 +113,7 @@
         {"LaunchRamCustom", New SetupEntry(15)},
         {"LinkLastAutoJoinInviteCode", New SetupEntry("", Source:=SetupSource.Registry)},
         {"LinkShareMode", New SetupEntry(True, Source:=SetupSource.Registry)},
+        {"LinkLatencyMode", New SetupEntry(0, Source:=SetupSource.Registry)},
         {"LinkCustomPeer", New SetupEntry("")},
         {"LinkEasyTierVersion", New SetupEntry(-1, Source:=SetupSource.Registry)},
         {"ToolHelpChinese", New SetupEntry(True, Source:=SetupSource.Registry)},

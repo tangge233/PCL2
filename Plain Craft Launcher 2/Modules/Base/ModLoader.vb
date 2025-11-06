@@ -341,7 +341,12 @@
                     Failed(ex)
                 End Try
             End Sub) With {.Name = "L/" & Name, .Priority = ThreadPriority}
-            LastRunningThread.Start() '不能使用 RunInNewThread，否则在函数返回前线程就会运行完，导致误判 IsAborted
+            Try
+                LastRunningThread.Start() '不能使用 RunInNewThread，否则在函数返回前线程就会运行完，导致误判 IsAborted
+            Catch ex As ThreadStateException '若遇到偶发的 “线程正在运行或被终止”，则等待后重试
+                Thread.Sleep(500)
+                LastRunningThread.Start()
+            End Try
         End Sub
         Public Overrides Sub Failed(ex As Exception)
             [Error] = ex

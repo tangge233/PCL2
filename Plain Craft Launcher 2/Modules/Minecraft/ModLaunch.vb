@@ -2220,7 +2220,9 @@ IgnoreCustomSkin:
         Dim StartInfo As New ProcessStartInfo(McLaunchJavaSelected.PathJava) '使用 javaw.exe 会导致 #6263
 
         '设置环境变量
-        Dim Paths As New List(Of String)(StartInfo.EnvironmentVariables("Path").Split(";"))
+        Dim PathEnv As String = StartInfo.EnvironmentVariables("Path")
+        Dim Paths As New List(Of String)
+        If Not String.IsNullOrEmpty(PathEnv) Then Paths.AddRange(PathEnv.Split(";"))
         Paths.Add(ShortenPath(McLaunchJavaSelected.PathFolder))
         StartInfo.EnvironmentVariables("Path") = Join(Paths.Distinct.ToList, ";")
         StartInfo.EnvironmentVariables("appdata") = ShortenPath(PathMcFolder)

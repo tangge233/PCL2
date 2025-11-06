@@ -17,6 +17,7 @@
 
     End Sub
     Public Sub Reload()
+        ComboLatencyMode.SelectedIndex = Setup.Get("LinkLatencyMode")
         CheckShareMode.Checked = Setup.Get("LinkShareMode")
         TextCustomPeer.Text = Setup.Get("LinkCustomPeer")
     End Sub
@@ -24,6 +25,7 @@
     '初始化
     Public Sub Reset()
         Try
+            Setup.Reset("LinkLatencyMode")
             Setup.Reset("LinkShareMode")
             Setup.Reset("LinkCustomPeer")
 
@@ -42,6 +44,9 @@
     End Sub
     Private Shared Sub CheckBoxChange(sender As MyCheckBox, e As Object) Handles CheckShareMode.Change
         If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.Checked)
+    End Sub
+    Private Shared Sub ComboChange(sender As MyComboBox, e As Object) Handles ComboLatencyMode.SelectionChanged
+        If AniControlEnabled = 0 Then Setup.Set(sender.Tag, sender.SelectedIndex)
     End Sub
 
 End Class
