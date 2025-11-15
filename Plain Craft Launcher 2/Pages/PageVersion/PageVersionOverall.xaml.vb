@@ -30,7 +30,7 @@
         BtnFolderMods.Visibility = If(PageVersionLeft.Version.Modable, Visibility.Visible, Visibility.Collapsed)
         '刷新版本显示
         PanDisplayItem.Children.Clear()
-        ItemVersion = PageSelectRight.McVersionListItem(PageVersionLeft.Version)
+        ItemVersion = PageVersionLeft.Version.ToListItem
         ItemVersion.IsHitTestVisible = False
         PanDisplayItem.Children.Add(ItemVersion)
         FrmMain.PageNameRefresh()
@@ -109,19 +109,19 @@
             Dim OldName As String = PageVersionLeft.Version.Name
             Dim OldPath As String = PageVersionLeft.Version.Path
             '修改此部分的同时修改快速安装的版本名检测*
-            Dim NewName As String = MyMsgBoxInput("重命名版本", "", OldName, New ObjectModel.Collection(Of Validate) From {New ValidateFolderName(PathMcFolder & "versions", IgnoreCase:=False)})
+            Dim NewName As String = MyMsgBoxInput("重命名版本", "", OldName, New ObjectModel.Collection(Of Validate) From {
+                New ValidateFolderName(PathMcFolder & "versions", IgnoreCase:=False), New ValidateExceptSame(OldName & "_temp", "不能使用该名称！")})
             If String.IsNullOrWhiteSpace(NewName) Then Return
             Dim NewPath As String = PathMcFolder & "versions\" & NewName & "\"
             '获取临时中间名，以防止仅修改大小写的重命名失败
             Dim TempName As String = NewName & "_temp"
             Dim TempPath As String = PathMcFolder & "versions\" & TempName & "\"
-            Dim IsCaseChangedOnly As Boolean = NewName.ToLower = OldName.ToLower
+            Dim OnlyChangedCase As Boolean = NewName.ToLower = OldName.ToLower
             '重新读取版本 JSON 信息，避免 JsonObject 中已被合并的项被重新存储
             Dim JsonObject As JObject
+            Dim OldJsonPath As String = PageVersionLeft.Version.GetJsonPath()
             Try
-                Dim JsonPath As String = PageVersionLeft.Version.GetJsonPath()
-                JsonObject = GetJson(ReadFile(JsonPath))
-                File.Delete(JsonPath)
+                JsonObject = GetJson(ReadFile(OldJsonPath))
             Catch ex As Exception
                 Log(ex, "在重命名读取 json 时失败")
                 JsonObject = PageVersionLeft.Version.JsonObject
@@ -135,7 +135,7 @@
             '重命名 jar 文件与 natives 文件夹
             '不能进行遍历重命名，否则在版本名很短的时候容易误伤其他文件（#6443）
             If Directory.Exists($"{NewPath}{OldName}-natives") Then
-                If IsCaseChangedOnly Then
+                If OnlyChangedCase Then
                     My.Computer.FileSystem.RenameDirectory($"{NewPath}{OldName}-natives", $"{OldName}natives_temp")
                     My.Computer.FileSystem.RenameDirectory($"{NewPath}{OldName}-natives_temp", $"{NewName}-natives")
                 Else
@@ -144,7 +144,7 @@
                 End If
             End If
             If File.Exists($"{NewPath}{OldName}.jar") Then
-                If IsCaseChangedOnly Then
+                If OnlyChangedCase Then
                     My.Computer.FileSystem.RenameFile($"{NewPath}{OldName}.jar", $"{OldName}_temp.jar")
                     My.Computer.FileSystem.RenameFile($"{NewPath}{OldName}_temp.jar", $"{NewName}.jar")
                 Else
@@ -160,15 +160,16 @@
             If ReadIni(PathMcFolder & "PCL.ini", "Version") = OldName Then
                 WriteIni(PathMcFolder & "PCL.ini", "Version", NewName)
             End If
-            '写入版本 Json
+            '更新版本 Json
             Try
                 JsonObject("id") = NewName
                 WriteFile(NewPath & NewName & ".json", JsonObject.ToString)
+                File.Delete(NewPath & GetFileNameFromPath(OldJsonPath))
             Catch ex As Exception
                 Log(ex, "重命名版本 json 失败")
             End Try
             '刷新与提示
-            Hint("重命名成功！", HintType.Finish)
+            Hint("重命名成功！", HintType.Green)
             PageVersionLeft.Version = New McVersion(NewName).Load()
             If Not IsNothing(McVersionCurrent) AndAlso McVersionCurrent.Equals(PageVersionLeft.Version) Then WriteIni(PathMcFolder & "PCL.ini", "Version", NewName)
             Reload()
@@ -262,7 +263,7 @@
             If SavePath = "" Then Return
             '检查中断（等玩家选完弹窗指不定任务就结束了呢……）
             If McLaunchLoader.State = LoadState.Loading Then
-                Hint("请在当前启动任务结束后再试！", HintType.Critical)
+                Hint("请在当前启动任务结束后再试！", HintType.Red)
                 Return
             End If
             '生成脚本
@@ -283,13 +284,13 @@
         Try
             '忽略文件检查提示
             If ShouldIgnoreFileCheck(PageVersionLeft.Version) Then
-                Hint("请先关闭 [版本设置 → 设置 → 高级启动选项 → 关闭文件校验]，然后再尝试补全文件！", HintType.Info)
+                Hint("请先关闭 [版本设置 → 设置 → 高级启动选项 → 关闭文件校验]，然后再尝试补全文件！", HintType.Blue)
                 Return
             End If
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar
                 If OngoingLoader.Name <> PageVersionLeft.Version.Name & " 文件补全" Then Continue For
-                Hint("正在处理中，请稍候！", HintType.Critical)
+                Hint("正在处理中，请稍候！", HintType.Red)
                 Return
             Next
             '启动
@@ -298,11 +299,11 @@
             Sub()
                 Select Case Loader.State
                     Case LoadState.Finished
-                        Hint(Loader.Name & "成功！", HintType.Finish)
+                        Hint(Loader.Name & "成功！", HintType.Green)
                     Case LoadState.Failed
-                        Hint(Loader.Name & "失败：" & GetExceptionSummary(Loader.Error), HintType.Critical)
+                        Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Red)
                     Case LoadState.Aborted
-                        Hint(Loader.Name & "已取消！", HintType.Info)
+                        Hint(Loader.Name & "已取消！", HintType.Blue)
                 End Select
             End Sub
             Loader.Start(PageVersionLeft.Version.Name)
@@ -328,10 +329,10 @@
                     IniClearCache(PageVersionLeft.Version.Path & "PCL\Setup.ini")
                     If IsShiftPressed Then
                         DeleteDirectory(PageVersionLeft.Version.Path)
-                        Hint("版本 " & PageVersionLeft.Version.Name & " 已永久删除！", HintType.Finish)
+                        Hint("版本 " & PageVersionLeft.Version.Name & " 已永久删除！", HintType.Green)
                     Else
                         FileIO.FileSystem.DeleteDirectory(PageVersionLeft.Version.Path, FileIO.UIOption.AllDialogs, FileIO.RecycleOption.SendToRecycleBin)
-                        Hint("版本 " & PageVersionLeft.Version.Name & " 已删除到回收站！", HintType.Finish)
+                        Hint("版本 " & PageVersionLeft.Version.Name & " 已删除到回收站！", HintType.Green)
                     End If
                 Case 2
                     Return

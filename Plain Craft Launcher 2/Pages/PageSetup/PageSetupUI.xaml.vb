@@ -162,7 +162,7 @@
             Setup.Reset("UiHiddenOtherTest")
 
             Log("[Setup] 已初始化个性化设置！")
-            Hint("已初始化个性化设置", HintType.Finish, False)
+            Hint("已初始化个性化设置", HintType.Green, False)
         Catch ex As Exception
             Log(ex, "初始化个性化设置失败", LogLevel.Msgbox)
         End Try
@@ -215,7 +215,7 @@
         If MyMsgBox("即将删除背景图片文件夹中的所有文件。" & vbCrLf & "此操作不可撤销，是否确定？", "警告",, "取消", IsWarn:=True) = 1 Then
             DeleteDirectory(Path & "PCL\Pictures")
             BackgroundRefresh(False, True)
-            Hint("背景图片已清空！", HintType.Finish)
+            Hint("背景图片已清空！", HintType.Green)
         End If
     End Sub
     ''' <summary>
@@ -238,10 +238,10 @@
             If Not Pic.Any() Then
                 If Refresh Then
                     If FrmMain.ImgBack.Visibility = Visibility.Collapsed Then
-                        If IsHint Then Hint("未检测到可用背景图片！", HintType.Critical)
+                        If IsHint Then Hint("未检测到可用背景图片！", HintType.Red)
                     Else
                         FrmMain.ImgBack.Visibility = Visibility.Collapsed
-                        If IsHint Then Hint("背景图片已清除！", HintType.Finish)
+                        If IsHint Then Hint("背景图片已清除！", HintType.Green)
                     End If
                 End If
                 If Not IsNothing(FrmSetupUI) Then FrmSetupUI.BackgroundRefreshUI(False, 0)
@@ -253,7 +253,7 @@
                         FrmMain.ImgBack.Background = New MyBitmap(Address)
                         Setup.Load("UiBackgroundSuit", True)
                         FrmMain.ImgBack.Visibility = Visibility.Visible
-                        If IsHint Then Hint("背景图片已刷新：" & GetFileNameFromPath(Address), HintType.Finish, False)
+                        If IsHint Then Hint("背景图片已刷新：" & GetFileNameFromPath(Address), HintType.Green, False)
                     Catch ex As Exception
                         If ex.Message.Contains("参数无效") Then
                             Log("刷新背景图片失败，该图片文件可能并非标准格式。" & vbCrLf &
@@ -338,7 +338,7 @@ Refresh:
         Try
             File.Delete(Path & "PCL\Logo.png")
             RadioLogoType1.SetChecked(True, True)
-            Hint("标题栏图片已清空！", HintType.Finish)
+            Hint("标题栏图片已清空！", HintType.Green)
         Catch ex As Exception
             Log(ex, "清空标题栏图片失败", LogLevel.Msgbox)
         End Try
@@ -358,7 +358,7 @@ Refresh:
             PanMusicDetail.Visibility = Visibility.Visible
             BtnMusicClear.Visibility = Visibility.Visible
             CardMusic.Title = "背景音乐（" &
-                EnumerateFiles(Path & "PCL\Musics\").Count(Function(f) {".ini", ".jpg", ".txt", ".cfg", ".lrc", ".db", ".png"}.Contains(f.Extension.ToLower)) &
+                EnumerateFiles(Path & "PCL\Musics\").Count(Function(f) Not {".ini", ".jpg", ".txt", ".cfg", ".lrc", ".db", ".png"}.Contains(f.Extension.ToLower)) &
                 " 首）"
         Else
             PanMusicVolume.Visibility = Visibility.Collapsed
@@ -381,7 +381,7 @@ Refresh:
                 '删除文件
                 Try
                     DeleteDirectory(Path & "PCL\Musics")
-                    Hint("背景音乐已删除！", HintType.Finish)
+                    Hint("背景音乐已删除！", HintType.Green)
                 Catch ex As Exception
                     Log(ex, "删除背景音乐失败", LogLevel.Msgbox)
                 End Try
@@ -410,7 +410,7 @@ Refresh:
                 If MyMsgBox("当前已存在布局文件，继续生成教学文件将会覆盖现有布局文件！", "覆盖确认", "继续", "取消", IsWarn:=True) = 2 Then Return
             End If
             WriteFile(Path & "PCL\Custom.xaml", GetResources("Custom"))
-            Hint("教学文件已生成！", HintType.Finish)
+            Hint("教学文件已生成！", HintType.Green)
             OpenExplorer(Path & "PCL\Custom.xaml")
         Catch ex As Exception
             Log(ex, "生成教学文件失败", LogLevel.Feedback)
@@ -418,7 +418,7 @@ Refresh:
     End Sub
     Private Sub BtnCustomRefresh_Click() Handles BtnCustomRefresh.Click
         FrmLaunchRight.ForceRefresh()
-        Hint("已刷新主页！", HintType.Finish)
+        Hint("已刷新主页！", HintType.Green)
     End Sub
     Private Sub BtnCustomTutorial_Click(sender As Object, e As EventArgs) Handles BtnCustomTutorial.Click
         MyMsgBox("1. 点击 生成教学文件 按钮，这会在 PCL 文件夹下生成 Custom.xaml 布局文件。" & vbCrLf &
@@ -523,7 +523,7 @@ Refresh:
                 '顶部栏未被全部隐藏
                 FrmMain.PanTitleSelect.Visibility = Visibility.Visible
                 FrmMain.BtnTitleSelect1.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageDownload"), Visibility.Collapsed, Visibility.Visible)
-                FrmMain.BtnTitleSelect2.Visibility = Visibility.Collapsed 'If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageLink"), Visibility.Collapsed, Visibility.Visible)
+                FrmMain.BtnTitleSelect2.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageLink"), Visibility.Collapsed, Visibility.Visible)
                 FrmMain.BtnTitleSelect3.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageSetup"), Visibility.Collapsed, Visibility.Visible)
                 FrmMain.BtnTitleSelect4.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenPageOther"), Visibility.Collapsed, Visibility.Visible)
             End If
@@ -536,7 +536,7 @@ Refresh:
             If FrmSetupLeft IsNot Nothing Then
                 FrmSetupLeft.ItemLaunch.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupLaunch"), Visibility.Collapsed, Visibility.Visible)
                 FrmSetupLeft.ItemUI.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupUi"), Visibility.Collapsed, Visibility.Visible)
-                FrmSetupLeft.ItemLink.Visibility = Visibility.Collapsed 'If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupLink"), Visibility.Collapsed, Visibility.Visible)
+                FrmSetupLeft.ItemLink.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupLink"), Visibility.Collapsed, Visibility.Visible)
                 FrmSetupLeft.ItemSystem.Visibility = If(Not HiddenForceShow AndAlso Setup.Get("UiHiddenSetupSystem"), Visibility.Collapsed, Visibility.Visible)
                 '隐藏左边选择卡
                 Dim AvaliableCount As Integer = 0

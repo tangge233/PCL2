@@ -1,5 +1,4 @@
 ﻿Imports System.IO.Compression
-Imports System.Net.Http
 
 Public Module ModDownloadLib
 
@@ -32,7 +31,7 @@ Public Module ModDownloadLib
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"Minecraft {Id} 下载" Then Continue For
                 If Behaviour = NetPreDownloadBehaviour.ExitWhileExistsOrDownloading Then Return OngoingLoader
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return OngoingLoader
             Next
 
@@ -100,7 +99,8 @@ Public Module ModDownloadLib
         Sub(Task As LoaderTask(Of String, List(Of NetFile)))
             Try
                 Dim Version As New McVersion(VersionFolder)
-                Task.Output = New List(Of NetFile) From {DlClientAssetIndexGet(Version)}
+                Dim AssetIndex = DlClientAssetIndexGet(Version)
+                Task.Output = If(AssetIndex Is Nothing, New List(Of NetFile), New List(Of NetFile) From {AssetIndex})
             Catch ex As Exception
                 Throw New Exception("分析资源文件索引地址失败", ex)
             End Try
@@ -223,7 +223,7 @@ Public Module ModDownloadLib
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"Minecraft {Id} 服务端下载" Then Continue For
-                Hint("该服务端正在下载中！", HintType.Critical)
+                Hint("该服务端正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -241,7 +241,7 @@ Public Module ModDownloadLib
                         File.Delete(VersionFolder & Id & ".json")
                         If Not New DirectoryInfo(VersionFolder).GetFileSystemInfos.Any() Then Directory.Delete(VersionFolder)
                         Task.Output = New List(Of NetFile)
-                        Hint($"Mojang 没有给 Minecraft {Id} 提供官方服务端下载，没法下，撤退！", HintType.Critical)
+                        Hint($"Mojang 没有给 Minecraft {Id} 提供官方服务端下载，没法下，撤退！", HintType.Red)
                         Thread.Sleep(2000) '等玩家把上一个提示看完
                         Task.Abort()
                         Return
@@ -300,7 +300,7 @@ pause"
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"Minecraft {Id} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -401,7 +401,7 @@ pause"
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"OptiFine {DownloadInfo.NameDisplay} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -449,7 +449,7 @@ pause"
         '开始启动
         SyncLock InstallSyncLock
             Dim Info = New ProcessStartInfo With {
-                .FileName = Java.PathJavaw,
+                .FileName = Java.PathJava,
                 .Arguments = Arguments,
                 .UseShellExecute = False,
                 .CreateNoWindow = True,
@@ -571,7 +571,7 @@ pause"
             Dim PageData As String
             Try
                 PageData = NetRequestByClient("https://optifine.net/adloadx?f=" & DownloadInfo.NameFile,
-                    Encoding:=New UTF8Encoding(False), Timeout:=15000, Accept:="text/html", UseBrowserUserAgent:=True)
+                    Encoding:=New UTF8Encoding(False), Timeout:=15000, Accept:="text/html", SimulateBrowserHeaders:=True)
                 Task.Progress = 0.8
                 Sources.Add("https://optifine.net/" & RegexSearch(PageData, "downloadx\?f=[^""']+")(0))
                 Log("[Download] OptiFine " & DownloadInfo.NameDisplay & " 官方下载地址：" & Sources.Last)
@@ -735,7 +735,7 @@ Retry:
             Dim PageData As String
             Try
                 PageData = NetRequestByClient("https://optifine.net/adloadx?f=" & DownloadInfo.NameFile,
-                    Encoding:=New UTF8Encoding(False), Timeout:=15000, Accept:="text/html", UseBrowserUserAgent:=True)
+                    Encoding:=New UTF8Encoding(False), Timeout:=15000, Accept:="text/html", SimulateBrowserHeaders:=True)
                 Task.Progress = 0.8
                 Sources.Add("https://optifine.net/" & RegexSearch(PageData, "downloadx\?f=[^""']+")(0))
                 Log("[Download] OptiFine " & DownloadInfo.NameDisplay & " 官方下载地址：" & Sources.Last)
@@ -832,7 +832,7 @@ Retry:
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"LiteLoader {Id} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -866,7 +866,7 @@ Retry:
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"LiteLoader {Id} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -1048,7 +1048,7 @@ Retry:
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"{DisplayName} 下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -1120,7 +1120,7 @@ Retry:
         '开始启动
         SyncLock InstallSyncLock
             Dim Info = New ProcessStartInfo With {
-                .FileName = Java.PathJavaw,
+                .FileName = Java.PathJava,
                 .Arguments = Arguments,
                 .UseShellExecute = False,
                 .CreateNoWindow = True,
@@ -1345,7 +1345,7 @@ Retry:
                         Dim RawJson As JObject = GetJson(NetRequestByLoader(DlSourceLauncherOrMetaGet(DlClientListGet(Inherit)), IsJson:=True))
                         '[net.minecraft:client:1.17.1-20210706.113038:mappings@txt] 或 @tsrg]
                         Dim OriginalName As String = Json("data")("MOJMAPS")("client").ToString.Trim("[]".ToCharArray()).BeforeFirst("@")
-                        Dim Address = McLibGet(OriginalName).Replace(".jar", "-mappings." & Json("data")("MOJMAPS")("client").ToString.Trim("[]".ToCharArray()).Split("@")(1))
+                        Dim Address = McLibGet(OriginalName).Replace(".jar", "." & Json("data")("MOJMAPS")("client").ToString.Trim("[]".ToCharArray()).Split("@")(1))
                         Dim ClientMappings As JToken = RawJson("downloads")("client_mappings")
                         Libs.Add(New McLibToken With {
                                  .IsNatives = False, .LocalPath = Address, .OriginalName = OriginalName,
@@ -1647,7 +1647,7 @@ Retry:
         Sub()
             Try
                 Log("[Download] 刷新 Forge 推荐版本缓存开始")
-                Dim Result As String = NetRequestByClientRetry("https://bmclapi2.bangbang93.com/forge/promos")
+                Dim Result As String = NetRequestByClientRetry("https://bmclapi2.bangbang93.com/forge/promos", RequireJson:=True)
                 If Result.Length < 1000 Then Throw New Exception("获取的结果过短（" & Result & "）")
                 Dim ResultJson As JContainer = GetJson(Result)
                 '获取所有推荐版本列表
@@ -1803,7 +1803,7 @@ Retry:
             '重复任务检查
             For Each OngoingLoader In LoaderTaskbar.ToList()
                 If OngoingLoader.Name <> $"Fabric {Version} 安装器下载" Then Continue For
-                Hint("该版本正在下载中！", HintType.Critical)
+                Hint("该版本正在下载中！", HintType.Red)
                 Return
             Next
 
@@ -1986,28 +1986,28 @@ Retry:
     ''' 在加载器状态改变后显示一条提示。
     ''' 不会进行任何其他操作。
     ''' </summary>
-    Public Sub LoaderStateChangedHintOnly(Loader)
+    Public Sub LoaderStateChangedHintOnly(Loader As LoaderBase)
         Select Case Loader.State
             Case LoadState.Finished
-                Hint(Loader.Name & "成功！", HintType.Finish)
+                Hint(Loader.Name & "成功！", HintType.Green)
             Case LoadState.Failed
-                Hint(Loader.Name & "失败：" & GetExceptionSummary(Loader.Error), HintType.Critical)
+                Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Red)
             Case LoadState.Aborted
-                Hint(Loader.Name & "已取消！", HintType.Info)
+                Hint(Loader.Name & "已取消！", HintType.Blue)
         End Select
     End Sub
     ''' <summary>
     ''' 安装加载器状态改变后进行提示和重载文件夹列表的方法。
     ''' </summary>
-    Public Sub McInstallState(Loader)
+    Public Sub McInstallState(Loader As LoaderBase)
         Select Case Loader.State
             Case LoadState.Finished
                 WriteIni(PathMcFolder & "PCL.ini", "VersionCache", "") '清空缓存（合并安装会先生成文件夹，这会在刷新时误判为可以使用缓存）
-                Hint(Loader.Name & "成功！", HintType.Finish)
+                Hint(Loader.Name & "成功！", HintType.Green)
             Case LoadState.Failed
-                Hint(Loader.Name & "失败：" & GetExceptionSummary(Loader.Error), HintType.Critical)
+                Hint(Loader.Name & "失败：" & Loader.Error.GetBrief(), HintType.Red)
             Case LoadState.Aborted
-                Hint(Loader.Name & "已取消！", HintType.Info)
+                Hint(Loader.Name & "已取消！", HintType.Blue)
             Case LoadState.Loading
                 Return '不重新加载版本列表
         End Select
@@ -2108,7 +2108,7 @@ Retry:
 
         '重复版本检查
         If File.Exists($"{VersionFolder}{Request.TargetVersionName}.json") Then
-            Hint("版本 " & Request.TargetVersionName & " 已经存在！", HintType.Critical)
+            Hint("版本 " & Request.TargetVersionName & " 已经存在！", HintType.Red)
             Throw New CancelledException
         End If
 

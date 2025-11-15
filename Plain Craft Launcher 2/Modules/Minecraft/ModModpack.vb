@@ -31,7 +31,7 @@ Public Module ModModpack
         Try
             '字符校验
             Dim TargetFolder As String = $"{PathMcFolder}versions\{VersionName}\"
-            If TargetFolder.Contains("!") OrElse TargetFolder.Contains(";") Then Hint("游戏路径中不能含有感叹号或分号：" & TargetFolder, HintType.Critical) : Throw New CancelledException
+            If TargetFolder.Contains("!") OrElse TargetFolder.Contains(";") Then Hint("游戏路径中不能含有感叹号或分号：" & TargetFolder, HintType.Red) : Throw New CancelledException
             '获取整合包种类与关键 Json
             Dim PackType As Integer = -1
             Try
@@ -72,7 +72,7 @@ Public Module ModModpack
                     If FullNames(1) = "modpack.zip" OrElse FullNames(1) = "modpack.mrpack" Then PackType = 9 : Exit Try '带启动器的压缩包
                 Next
             Catch ex As Exception
-                If GetExceptionDetail(ex, True).Contains("Error.WinIOError") Then
+                If ex.GetDetail(True).Contains("Error.WinIOError") Then
                     Throw New Exception("打开整合包文件失败", ex)
                 ElseIf File.EndsWithF(".rar", True) Then
                     Throw New Exception("PCL 无法处理 rar 格式的压缩包，请在解压后重新压缩为 zip 格式再试", ex)
@@ -158,12 +158,22 @@ Retry:
         If File.Exists(OverridesIni) Then
             WriteIni(OverridesIni, "VersionArgumentIndie", 1) '开启版本隔离
             WriteIni(OverridesIni, "VersionArgumentIndieV2", True)
+            WriteIni(OverridesIni, "IsStar", False)
             CopyFile(OverridesIni, VersionIni) '覆写已有的 ini
         Else
             WriteIni(VersionIni, "VersionArgumentIndie", 1) '开启版本隔离
             WriteIni(VersionIni, "VersionArgumentIndieV2", True)
         End If
         IniClearCache(VersionIni) '重置缓存，避免被安装过程中写入的 ini 覆盖
+    End Sub
+    ''' <summary>
+    ''' 弹窗提示整合包中存在不兼容的加载器。
+    ''' 如果取消，则抛出 CancelledException。
+    ''' </summary>
+    ''' <exception cref="CancelledException" />
+    Private Sub NotifyIncompatibleLoader(LoaderName As String)
+        If MyMsgBox($"整合包中存在不兼容的加载器：{LoaderName}{vbCrLf}如果你知道如何手动安装它，可以先选择跳过，然后在整合包下载结束后手动安装。",
+            "不兼容的加载器", "取消", $"不安装 {LoaderName} 并继续") = 1 Then Throw New CancelledException
     End Sub
 
 #Region "不同类型整合包的安装方法"
@@ -210,7 +220,8 @@ Retry:
                 Log("[ModPack] 整合包 Fabric 版本：" & Id)
                 FabricVersion = Id.Replace("fabric-", "")
             Else
-                Log("[ModPack] 未知 Mod 加载器：" & Id)
+                'ElseIf Id.StartsWithF("quilt-") Then
+                NotifyIncompatibleLoader(Id)
             End If
         Next
         '解压
@@ -324,7 +335,7 @@ Retry:
                     File.Delete(Target)
                 End If
             Next
-            If File.Exists(FileAddress) AndAlso GetFileNameWithoutExtentionFromPath(FileAddress) = "modpack" Then
+            If File.Exists(FileAddress) AndAlso IO.Path.GetFileNameWithoutExtension(FileAddress) = "modpack" Then
                 Log("[ModPack] 删除安装整合包文件：" & FileAddress)
                 File.Delete(FileAddress)
             End If
@@ -333,7 +344,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = "CurseForge 整合包安装：" & VersionName & " "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
 
@@ -375,12 +386,9 @@ Retry:
                 Case "fabric-loader" 'eg. 0.14.14
                     FabricVersion = Entry.Value.ToString
                     Log("[ModPack] 整合包 Fabric 版本：" & FabricVersion)
-                Case "quilt-loader" 'eg. 1.0.0
-                    Hint("PCL 暂不支持安装需要 Quilt 的整合包！", HintType.Critical)
-                    Throw New CancelledException
                 Case Else
-                    Hint($"无法安装整合包，其中出现了未知的 Mod 加载器 {Entry.Value}！", HintType.Critical)
-                    Throw New CancelledException
+                    'Case "quilt-loader" 'eg. 1.0.0
+                    NotifyIncompatibleLoader(Entry.Name)
             End Select
         Next
         '获取版本名
@@ -468,7 +476,7 @@ Retry:
                     File.Delete(Target)
                 End If
             Next
-            If File.Exists(FileAddress) AndAlso GetFileNameWithoutExtentionFromPath(FileAddress) = "modpack" Then
+            If File.Exists(FileAddress) AndAlso IO.Path.GetFileNameWithoutExtension(FileAddress) = "modpack" Then
                 Log("[ModPack] 删除安装整合包文件：" & FileAddress)
                 File.Delete(FileAddress)
             End If
@@ -477,7 +485,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = $"Modrinth 整合包安装：{VersionName} "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
 
@@ -532,7 +540,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = "HMCL 整合包安装：" & VersionName & " "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
         '启动
@@ -631,8 +639,9 @@ Retry:
         '构造版本安装请求
         If PackJson("components") Is Nothing Then Throw New Exception("该 MMC 整合包未提供游戏版本信息，无法安装！")
         Dim Request As New McInstallRequest With {.TargetVersionName = VersionName, .TargetVersionFolder = $"{PathMcFolder}versions\{VersionName}\"}
-        For Each Component In PackJson("components")
-            Select Case If(Component("uid"), "").ToString
+        For Each Component As JObject In PackJson("components")
+            If Not Component.ContainsKey("uid") Then Continue For
+            Select Case Component("uid").ToString
                 Case "org.lwjgl"
                     Log("[ModPack] 已跳过 LWJGL 项")
                 Case "net.minecraft"
@@ -643,9 +652,9 @@ Retry:
                     Request.NeoForgeVersion = Component("version")
                 Case "net.fabricmc.fabric-loader"
                     Request.FabricVersion = Component("version")
-                Case "org.quiltmc.quilt-loader" 'eg. 1.0.0
-                    Hint("PCL 暂不支持安装需要 Quilt 的整合包！", HintType.Critical)
-                    Throw New CancelledException
+                Case Else
+                    'Case "org.quiltmc.quilt-loader" 'eg. 1.0.0
+                    NotifyIncompatibleLoader(Component("uid"))
             End Select
         Next
         '构造加载器
@@ -658,7 +667,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = "MMC 整合包安装：" & VersionName & " "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
 
@@ -716,7 +725,7 @@ Retry:
         Next
         If Not Addons.ContainsKey("game") Then Throw New Exception("该 MCBBS 整合包未提供游戏版本信息，无法安装！")
         If Addons.ContainsKey("quilt") Then
-            Hint("PCL 暂不支持安装需要 Quilt 的整合包！", HintType.Critical)
+            Hint("PCL 暂不支持安装需要 Quilt 的整合包！", HintType.Red)
             Throw New CancelledException
         End If
         Dim Request As New McInstallRequest With {
@@ -737,7 +746,7 @@ Retry:
         '重复任务检查
         Dim LoaderName As String = "MCBBS 整合包安装：" & VersionName & " "
         If LoaderTaskbar.Any(Function(l) l.Name = LoaderName) Then
-            Hint("该整合包正在安装中！", HintType.Critical)
+            Hint("该整合包正在安装中！", HintType.Red)
             Throw New CancelledException
         End If
 
@@ -757,7 +766,7 @@ Retry:
         MyMsgBox("接下来请选择一个空文件夹，它会被安装到这个文件夹里。", "安装", "继续", ForceWait:=True)
         Dim TargetFolder As String = SelectFolder("选择安装目标（必须是一个空文件夹）")
         If String.IsNullOrEmpty(TargetFolder) Then Throw New CancelledException
-        If Directory.GetFileSystemEntries(TargetFolder).Length > 0 Then Hint("请选择一个空文件夹作为安装目标！", HintType.Critical) : Throw New CancelledException
+        If Directory.GetFileSystemEntries(TargetFolder).Length > 0 Then Hint("请选择一个空文件夹作为安装目标！", HintType.Red) : Throw New CancelledException
         '解压
         Dim Loader As New LoaderCombo(Of String)("解压压缩包", {
             New LoaderTask(Of String, Integer)("解压压缩包",
@@ -786,7 +795,7 @@ Retry:
                     Log("[Modpack] 找到压缩包中附带的启动器：" & Launcher)
                     If MyMsgBox($"整合包里似乎自带了启动器，是否换用它继续安装？{vbCrLf}即将打开：{Launcher}", "换用整合包启动器？", "换用", "不换用") = 1 Then
                         OpenExplorer(TargetFolder)
-                        ShellOnly(Launcher, "--wait") '要求等待已有的 PCL 退出
+                        StartProcess(Launcher, "--wait") '要求等待已有的 PCL 退出
                         Log("[Modpack] 为换用整合包中的启动器启动，强制结束程序")
                         FrmMain.EndProgram(False)
                         Return
@@ -834,8 +843,8 @@ Retry:
         MyMsgBox("接下来请选择一个空文件夹，它会被安装到这个文件夹里。", "安装", "继续", ForceWait:=True)
         Dim TargetFolder As String = SelectFolder("选择安装目标（必须是一个空文件夹）")
         If String.IsNullOrEmpty(TargetFolder) Then Throw New CancelledException
-        If TargetFolder.Contains("!") OrElse TargetFolder.Contains(";") Then Hint("Minecraft 文件夹路径中不能含有感叹号或分号！", HintType.Critical) : Throw New CancelledException
-        If Directory.GetFileSystemEntries(TargetFolder).Length > 0 Then Hint("请选择一个空文件夹作为安装目标！", HintType.Critical) : Throw New CancelledException
+        If TargetFolder.Contains("!") OrElse TargetFolder.Contains(";") Then Hint("Minecraft 文件夹路径中不能含有感叹号或分号！", HintType.Red) : Throw New CancelledException
+        If Directory.GetFileSystemEntries(TargetFolder).Length > 0 Then Hint("请选择一个空文件夹作为安装目标！", HintType.Red) : Throw New CancelledException
         '解压
         Dim Loader As New LoaderCombo(Of String)("解压压缩包", {
             New LoaderTask(Of String, Integer)("解压压缩包",

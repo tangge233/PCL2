@@ -206,7 +206,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\Behaviors\ClipboardInterceptor.vb" />
-    <Compile Include="Controls\IMyRadio.vb" />
+    <Compile Include="Controls\Behaviors\Interfaces.vb" />
     <Compile Include="Controls\MyComboBox.vb" />
     <Compile Include="Controls\MyComboBoxItem.vb" />
     <Compile Include="Controls\MyCard.vb" />
@@ -282,17 +282,11 @@
     <Compile Include="Pages\PageDownload\Comp\PageDownloadMod.xaml.vb">
       <DependentUpon>PageDownloadMod.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\PageDownload\PageDownloadFabric.xaml.vb">
-      <DependentUpon>PageDownloadFabric.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\PageDownload\PageDownloadInstall.xaml.vb">
       <DependentUpon>PageDownloadInstall.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageDownload\Comp\PageDownloadCompDetail.xaml.vb">
       <DependentUpon>PageDownloadCompDetail.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageDownload\PageDownloadNeoForge.xaml.vb">
-      <DependentUpon>PageDownloadNeoForge.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageLaunch\MyMsgLogin.xaml.vb">
       <DependentUpon>MyMsgLogin.xaml</DependentUpon>
@@ -312,20 +306,11 @@
     <Compile Include="Pages\PageLaunch\PageLoginNideSkin.xaml.vb">
       <DependentUpon>PageLoginNideSkin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\PageLink\PageLinkFeedback.xaml.vb">
-      <DependentUpon>PageLinkFeedback.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageLink\PageLinkHiper.xaml.vb">
-      <DependentUpon>PageLinkHiper.xaml</DependentUpon>
+    <Compile Include="Pages\PageLink\PageLinkMain.xaml.vb">
+      <DependentUpon>PageLinkMain.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageOther\PageOtherHelpDetail.xaml.vb">
       <DependentUpon>PageOtherHelpDetail.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageLink\PageLinkIoi.xaml.vb">
-      <DependentUpon>PageLinkIoi.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageLink\PageLinkLeft.xaml.vb">
-      <DependentUpon>PageLinkLeft.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageVersion\PageVersionExport.xaml.vb">
       <DependentUpon>PageVersionExport.xaml</DependentUpon>
@@ -352,15 +337,6 @@
     <Compile Include="Modules\Minecraft\ModDownload.vb" />
     <Compile Include="Modules\Minecraft\ModLaunch.vb" />
     <Compile Include="Modules\Minecraft\ModMinecraft.vb" />
-    <Compile Include="Pages\PageDownload\PageDownloadForge.xaml.vb">
-      <DependentUpon>PageDownloadForge.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageDownload\PageDownloadLiteLoader.xaml.vb">
-      <DependentUpon>PageDownloadLiteLoader.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageDownload\PageDownloadOptiFine.xaml.vb">
-      <DependentUpon>PageDownloadOptiFine.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\PageOther\PageOtherTest.xaml.vb">
       <DependentUpon>PageOtherTest.xaml</DependentUpon>
     </Compile>
@@ -393,9 +369,6 @@
     </Compile>
     <Compile Include="Pages\PageDownload\PageDownloadLeft.xaml.vb">
       <DependentUpon>PageDownloadLeft.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\PageDownload\PageDownloadClient.xaml.vb">
-      <DependentUpon>PageDownloadClient.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\PageOther\PageOtherLeft.xaml.vb">
       <DependentUpon>PageOtherLeft.xaml</DependentUpon>
@@ -556,19 +529,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\PageDownload\PageDownloadFabric.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Pages\PageDownload\PageDownloadInstall.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\PageDownload\Comp\PageDownloadCompDetail.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageDownload\PageDownloadNeoForge.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -601,11 +566,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </None>
-    <Page Include="Pages\PageLink\PageLinkFeedback.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\PageLink\PageLinkHiper.xaml">
+    <Page Include="Pages\PageLink\PageLinkMain.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -613,27 +574,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\PageLink\PageLinkIoi.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageLink\PageLinkLeft.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Pages\PageVersion\PageVersionExport.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageDownload\PageDownloadForge.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageDownload\PageDownloadLiteLoader.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageDownload\PageDownloadOptiFine.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -678,10 +619,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\PageDownload\PageDownloadLeft.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\PageDownload\PageDownloadClient.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -996,6 +933,8 @@
   <ItemGroup>
     <None Include="Resources\System.Net.Http.Formatting.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\Heads\EasyTier.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

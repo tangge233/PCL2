@@ -85,7 +85,7 @@
             Setup.Reset("SystemSystemTelemetry")
 
             Log("[Setup] 已初始化启动器页设置")
-            Hint("已初始化启动器页设置！", HintType.Finish, False)
+            Hint("已初始化启动器页设置！", HintType.Green, False)
         Catch ex As Exception
             Log(ex, "初始化启动器页设置失败", LogLevel.Msgbox)
         End Try
@@ -136,7 +136,7 @@
 
     '识别码/解锁码替代入口
     Private Sub BtnSystemIdentify_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnSystemIdentify.Click
-        PageOtherAbout.CopyUniqueAddress()
+        PageOtherAbout.CopyIdentify()
     End Sub
     Private Sub BtnSystemUnlock_Click(sender As Object, e As MouseButtonEventArgs) Handles BtnSystemUnlock.Click
         DonateCodeInput()

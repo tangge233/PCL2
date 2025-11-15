@@ -110,11 +110,7 @@
         '修改登陆方式
         Select Case Setup.Get("LoginType")
             Case McLoginType.Legacy
-                If PageLinkHiper.HiperState = LoadState.Finished Then
-                    LabLaunchingMethod.Text = "联机离线登录"
-                Else
-                    LabLaunchingMethod.Text = "离线登录"
-                End If
+                LabLaunchingMethod.Text = "离线登录"
             Case McLoginType.Ms
                 LabLaunchingMethod.Text = "正版登录"
             Case McLoginType.Nide
@@ -392,14 +388,14 @@ UnknownType:
             Result = McSkinDownload(Result)
             If Data.IsAborted Then Throw New ThreadInterruptedException("当前任务已取消：" & UserName)
             Data.Output = Result
+        Catch ex As ThreadInterruptedException
+            Data.Output = ""
+            Return
         Catch ex As Exception
-            If ex.GetType.Name = "ThreadInterruptedException" Then
-                Data.Output = ""
-                Return
-            ElseIf GetExceptionSummary(ex).Contains("429") Then
+            If ex.GetBrief.Contains("(429)") Then
                 Data.Output = PathImage & "Skins/" & McSkinSex(McLoginLegacyUuid(UserName)) & ".png"
                 Log("[Minecraft] 获取正版皮肤失败（" & UserName & "）：获取皮肤太过频繁，请 5 分钟后再试！", LogLevel.Hint)
-            ElseIf GetExceptionSummary(ex).Contains("未设置自定义皮肤") Then
+            ElseIf ex.GetBrief.Contains("未设置自定义皮肤") Then
                 Data.Output = PathImage & "Skins/" & McSkinSex(McLoginLegacyUuid(UserName)) & ".png"
                 Log("[Minecraft] 用户未设置自定义皮肤，跳过皮肤加载")
             Else
@@ -462,11 +458,11 @@ UseDefault:
                         If Data.IsAborted Then Throw New ThreadInterruptedException("当前任务已取消：" & ID)
                         Data.Output = Result
                     End If
+                Catch ex As ThreadInterruptedException
+                    Data.Output = ""
+                    Return
                 Catch ex As Exception
-                    If ex.GetType.Name = "ThreadInterruptedException" Then
-                        Data.Output = ""
-                        Return
-                    ElseIf GetExceptionSummary(ex).Contains("429") Then
+                    If ex.GetBrief.Contains("(429)") Then
                         Data.Output = PathImage & "Skins/" & McSkinSex(McLoginLegacyUuid(ID)) & ".png"
                         Log("获取离线登录使用的正版皮肤失败（" & ID & "）：获取皮肤太过频繁，请 5 分钟后再试！")
                     Else
@@ -514,14 +510,14 @@ UseDefault:
             Result = McSkinDownload(Result)
             If Data.IsAborted Then Throw New ThreadInterruptedException("当前任务已取消：" & UserName)
             Data.Output = Result
+        Catch ex As ThreadInterruptedException
+            Data.Output = ""
+            Return
         Catch ex As Exception
-            If ex.GetType.Name = "ThreadInterruptedException" Then
-                Data.Output = ""
-                Return
-            ElseIf GetExceptionSummary(ex).Contains("429") Then
+            If ex.GetBrief.Contains("(429)") Then
                 Data.Output = PathImage & "Skins/Steve.png"
                 Log("[Minecraft] 获取统一通行证皮肤失败（" & UserName & "）：获取皮肤太过频繁，请 5 分钟后再试！", LogLevel.Hint)
-            ElseIf GetExceptionSummary(ex).Contains("未设置自定义皮肤") Then
+            ElseIf ex.GetBrief.Contains("未设置自定义皮肤") Then
                 Data.Output = PathImage & "Skins/Steve.png"
                 Log("[Minecraft] 用户未设置自定义皮肤，跳过皮肤加载")
             Else
@@ -550,26 +546,26 @@ Finish:
         RunInUi(Sub() If FrmLoginAuthSkin IsNot Nothing AndAlso FrmLoginAuthSkin.Skin IsNot Nothing Then FrmLoginAuthSkin.Skin.Clear())
         '获取 Url
         Dim UserName As String = Data.Input(0)
-        Dim Uuid As String = Data.Input(1)
+        Dim UUID As String = Data.Input(1)
         If UserName = "" Then
             Data.Output = PathImage & "Skins/Steve.png"
             Log("[Minecraft] 获取 Authlib-Injector 皮肤失败，ID 为空")
             GoTo Finish
         End If
         Try
-            Dim Result As String = McSkinGetAddress(Uuid, "Auth")
+            Dim Result As String = McSkinGetAddress(UUID, "Auth")
             If Data.IsAborted Then Throw New ThreadInterruptedException("当前任务已取消：" & UserName)
             Result = McSkinDownload(Result)
             If Data.IsAborted Then Throw New ThreadInterruptedException("当前任务已取消：" & UserName)
             Data.Output = Result
+        Catch ex As ThreadInterruptedException
+            Data.Output = ""
+            Return
         Catch ex As Exception
-            If ex.GetType.Name = "ThreadInterruptedException" Then
-                Data.Output = ""
-                Return
-            ElseIf GetExceptionSummary(ex).Contains("429") Then
+            If ex.GetBrief.Contains("(429)") Then
                 Data.Output = PathImage & "Skins/Steve.png"
                 Log("[Minecraft] 获取 Authlib-Injector 皮肤失败（" & UserName & "）：获取皮肤太过频繁，请 5 分钟后再试！", LogLevel.Hint)
-            ElseIf GetExceptionSummary(ex).Contains("未设置自定义皮肤") Then
+            ElseIf ex.GetBrief.Contains("未设置自定义皮肤") Then
                 Data.Output = PathImage & "Skins/Steve.png"
                 Log("[Minecraft] 用户未设置自定义皮肤，跳过皮肤加载")
             Else

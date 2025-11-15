@@ -347,7 +347,7 @@
                             Case 4475 : Tags.Add("冒险")
                             Case 4476 : Tags.Add("探索")
                             Case 4477 : Tags.Add("小游戏")
-                            Case 4471 : Tags.Add("科幻")
+                            Case 4474 : Tags.Add("科幻")
                             Case 4736 : Tags.Add("空岛")
                             Case 5128 : Tags.Add("原版改良")
                             Case 4487 : Tags.Add("FTB")
@@ -1161,9 +1161,9 @@ Retry:
             ElseIf [Error] IsNot Nothing Then
                 '有结果但是有错误
                 If CurseForgeFailed Then
-                    Storage.ErrorMessage = $"无法连接到 CurseForge，所以目前仅显示了来自 Modrinth 的内容，搜索结果可能不全。{vbCrLf}请稍后重试，或使用 VPN 以改善网络环境。"
+                    Storage.ErrorMessage = $"无法连接到 CurseForge，所以目前仅显示了来自 Modrinth 的内容，搜索结果可能不全。{vbCrLf}请稍后再试，或使用 VPN 改善网络环境。"
                 Else
-                    Storage.ErrorMessage = $"无法连接到 Modrinth，所以目前仅显示了来自 CurseForge 的内容，搜索结果可能不全。{vbCrLf}请稍后重试，或使用 VPN 以改善网络环境。"
+                    Storage.ErrorMessage = $"无法连接到 Modrinth，所以目前仅显示了来自 CurseForge 的内容，搜索结果可能不全。{vbCrLf}请稍后再试，或使用 VPN 改善网络环境。"
                 End If
             End If
 
@@ -1211,11 +1211,11 @@ Retry:
         Function(Project As CompProject) As Double
             Select Case Request.Type
                 Case CompType.Mod, CompType.ModPack
-                    Return If(Project.FromCurseForge, 1, 7)
+                    Return If(Project.FromCurseForge, 1, 5)
                 Case CompType.DataPack
                     Return If(Project.FromCurseForge, 10, 1)
                 Case CompType.ResourcePack, CompType.Shader
-                    Return If(Project.FromCurseForge, 1, 5)
+                    Return If(Project.FromCurseForge, 1, 4)
                 Case Else
                     Return 1
             End Select
@@ -1354,7 +1354,7 @@ Retry:
         ''' </summary>
         ''' <param name="LocalAddress">目标本地文件夹，或完整的文件路径。会自动判断类型。</param>
         Public Function ToNetFile(LocalAddress As String) As NetFile
-            Return New NetFile(DownloadUrls, LocalAddress & If(LocalAddress.EndsWithF("\"), FileName, ""), New FileChecker(Hash:=Hash), UseBrowserUserAgent:=True)
+            Return New NetFile(DownloadUrls, LocalAddress & If(LocalAddress.EndsWithF("\"), FileName, ""), New FileChecker(Hash:=Hash), SimulateBrowserHeaders:=True)
         End Function
 
         '实例化
@@ -1395,10 +1395,9 @@ Retry:
                     If Hash Is Nothing Then Hash = CType(Data("hashes"), JArray).ToList.FirstOrDefault(Function(s) s("algo").ToObject(Of Integer) = 2)?("value")
                     'DownloadAddress
                     Dim Url = Data("downloadUrl").ToString
-                    If Url = "" Then Url = $"https://media.forgecdn.net/files/{CInt(Id.ToString.Substring(0, 4))}/{CInt(Id.ToString.Substring(4))}/{FileName}"
-                    Url = Url.Replace(FileName, WebUtility.UrlEncode(FileName)) '对文件名进行编码
-                    DownloadUrls = HandleCurseForgeDownloadUrls(Url) '对脑残 CurseForge 的下载地址进行多种修正
-                    DownloadUrls.AddRange(DownloadUrls.Select(Function(u) DlSourceModGet(u)).ToList) '添加镜像源，这个写法是为了让镜像源排在后面
+                    If Url = "" Then Url = $"https://edge.forgecdn.net/files/{CInt(Id.ToString.Substring(0, 4))}/{CInt(Id.ToString.Substring(4))}/{FileName}"
+                    DownloadUrls = HandleCurseForgeDownloadUrls(Url.Replace(FileName, WebUtility.UrlEncode(FileName))) '对脑残 CurseForge 的下载地址进行多种修正
+                    DownloadUrls.Add(DlSourceModGet(Url)) '添加镜像源；注意 MCIM 源不支持 URL 编码后的文件名，必须传入 URL 编码前的文件名
                     DownloadUrls = DownloadUrls.Distinct.ToList '最终去重
                     'Dependencies
                     If Data.ContainsKey("dependencies") Then

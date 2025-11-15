@@ -24,7 +24,8 @@
         {"HintMoreAdvancedSetup", New SetupEntry(False, Source:=SetupSource.Registry)},
         {"HintIndieSetup", New SetupEntry(False, Source:=SetupSource.Registry)},
         {"HintExportConfig", New SetupEntry(False, Source:=SetupSource.Registry)},
-        {"SystemEula", New SetupEntry(False, Source:=SetupSource.Registry)},
+        {"SystemEula", New SetupEntry(False, Source:=SetupSource.Registry)}, '仅老版本兼容，现已换用 SystemEulaVersion
+        {"SystemEulaVersion", New SetupEntry(0, Source:=SetupSource.Registry)},
         {"SystemCount", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
         {"SystemLaunchCount", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
         {"SystemLastVersionReg", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
@@ -42,6 +43,7 @@
         {"SystemSystemUpdate", New SetupEntry(0)},
         {"SystemSystemActivity", New SetupEntry(0)},
         {"SystemSystemTelemetry", New SetupEntry(True, Source:=SetupSource.Registry)},
+        {"CacheConfig", New SetupEntry(0, Source:=SetupSource.Registry)},
         {"CacheExportConfig", New SetupEntry("", Source:=SetupSource.Registry)},
         {"CacheSavedPageUrl", New SetupEntry("", Source:=SetupSource.Registry)},
         {"CacheSavedPageVersion", New SetupEntry("", Source:=SetupSource.Registry)},
@@ -109,12 +111,11 @@
         {"LaunchAdvanceGraphicCard", New SetupEntry(True, Source:=SetupSource.Registry)},
         {"LaunchRamType", New SetupEntry(0)},
         {"LaunchRamCustom", New SetupEntry(15)},
-        {"LinkEula", New SetupEntry(False, Source:=SetupSource.Registry)},
-        {"LinkName", New SetupEntry("", Source:=SetupSource.Registry)},
-        {"LinkHiperCertLast", New SetupEntry("", Source:=SetupSource.Registry)},
-        {"LinkHiperCertTime", New SetupEntry("", Source:=SetupSource.Registry)},
-        {"LinkHiperCertWarn", New SetupEntry(True, Source:=SetupSource.Registry)},
-        {"LinkIoiVersion", New SetupEntry(0, Source:=SetupSource.Registry, Encoded:=True)},
+        {"LinkLastAutoJoinInviteCode", New SetupEntry("", Source:=SetupSource.Registry)},
+        {"LinkShareMode", New SetupEntry(True, Source:=SetupSource.Registry)},
+        {"LinkLatencyMode", New SetupEntry(0, Source:=SetupSource.Registry)},
+        {"LinkCustomPeer", New SetupEntry("")},
+        {"LinkEasyTierVersion", New SetupEntry(-1, Source:=SetupSource.Registry)},
         {"ToolHelpChinese", New SetupEntry(True, Source:=SetupSource.Registry)},
         {"ToolDownloadThread", New SetupEntry(63, Source:=SetupSource.Registry)},
         {"ToolDownloadSpeed", New SetupEntry(42, Source:=SetupSource.Registry)},
@@ -181,6 +182,7 @@
         {"VersionAdvanceRun", New SetupEntry("", Source:=SetupSource.Version)},
         {"VersionAdvanceRunWait", New SetupEntry(True, Source:=SetupSource.Version)},
         {"VersionAdvanceDisableJLW", New SetupEntry(False, Source:=SetupSource.Version)},
+        {"VersionAdvanceDisableModUpdate", New SetupEntry(False, Source:=SetupSource.Version)},
         {"VersionRamType", New SetupEntry(2, Source:=SetupSource.Version)},
         {"VersionRamCustom", New SetupEntry(15, Source:=SetupSource.Version)},
         {"VersionRamOptimize", New SetupEntry(0, Source:=SetupSource.Version)},
@@ -226,7 +228,7 @@
                 Me.Value = Value
                 Me.Source = Source
                 Me.Type = If(Value, New Object).GetType
-                Me.DefaultValueEncoded = If(Encoded, SecretEncrypt(Value, "PCL" & UniqueAddress), Value)
+                Me.DefaultValueEncoded = If(Encoded, SecretEncrypt(Value, "PCL" & Identify), Value)
             Catch ex As Exception
                 Log(ex, "初始化 SetupEntry 失败", LogLevel.Feedback) '#5095 的 fallback
             End Try
@@ -239,6 +241,14 @@
     ''' </summary>
     Public Sub [Set](Key As String, Value As Object, Optional ForceReload As Boolean = False, Optional Version As McVersion = Nothing)
         [Set](Key, Value, SetupDict(Key), ForceReload, Version)
+    End Sub
+    ''' <summary>
+    ''' 写入某个未经加密的设置项。
+    ''' 若该设置项经过了加密，则会抛出异常。
+    ''' </summary>
+    Public Sub SetSafe(Key As String, Value As Object, Optional ForceReload As Boolean = False, Optional Version As McVersion = Nothing)
+        If SetupDict(Key).Encoded Then Throw New InvalidOperationException("禁止写入加密设置项：" & Key)
+        [Set](Key, Version, ForceReload, Version)
     End Sub
     Private Sub [Set](Key As String, Value As Object, E As SetupEntry, ForceReload As Boolean, Version As McVersion)
         Try
@@ -257,7 +267,7 @@
             If E.Encoded Then
                 Try
                     If Value Is Nothing Then Value = ""
-                    Value = SecretEncrypt(Value, "PCL" & UniqueAddress)
+                    Value = SecretEncrypt(Value, "PCL" & Identify)
                 Catch ex As Exception
                     Log(ex, "加密设置失败：" & Key, LogLevel.Developer)
                 End Try
@@ -302,8 +312,16 @@
     ''' 获取某个设置项的值。
     ''' </summary>
     Public Function [Get](Key As String, Optional Version As McVersion = Nothing)
-        If Not SetupDict.ContainsKey(Key) Then Throw New KeyNotFoundException("未找到设置项：" & Key) With {.Source = Key}
+        If Not SetupDict.ContainsKey(Key) Then Throw New KeyNotFoundException("未找到设置项：" & Key)
         Return [Get](Key, SetupDict(Key), Version)
+    End Function
+    ''' <summary>
+    ''' 获取某个未经加密的设置项的值。
+    ''' 若该设置项经过了加密，则会抛出异常。
+    ''' </summary>
+    Public Function GetSafe(Key As String, Optional Version As McVersion = Nothing)
+        If SetupDict(Key).Encoded Then Throw New InvalidOperationException("禁止读取加密设置项：" & Key)
+        Return [Get](Key, Version)
     End Function
     Private Function [Get](Key As String, E As SetupEntry, Version As McVersion)
         '获取强制值
@@ -382,7 +400,7 @@
                     SourceValue = E.DefaultValue
                 Else
                     Try
-                        SourceValue = SecretDecrypt(SourceValue, "PCL" & UniqueAddress)
+                        SourceValue = SecretDecrypt(SourceValue, "PCL" & Identify)
                     Catch ex As Exception
                         Log(ex, "解密设置失败：" & Key, LogLevel.Developer)
                         SourceValue = E.DefaultValue
@@ -402,8 +420,6 @@
 #If BETA Then
         If Key = "UiLauncherTheme" Then Return "0"
 #End If
-        If Key = "UiHiddenPageLink" Then Return True
-        If Key = "UiHiddenSetupLink" Then Return True
         Return Nothing
     End Function
 
@@ -600,8 +616,7 @@
                 FrmSetupUI.HintCustom.Visibility = Visibility.Visible
                 FrmSetupUI.HintCustomWarn.Visibility = If(Setup.Get("HintCustomWarn"), Visibility.Collapsed, Visibility.Visible)
                 FrmSetupUI.HintCustom.Text = $"从 PCL 文件夹下的 Custom.xaml 读取主页内容。{vbCrLf}你可以手动编辑该文件，向主页添加文本、图片、常用网站、快捷启动等功能。"
-                FrmSetupUI.HintCustom.EventType = ""
-                FrmSetupUI.HintCustom.EventData = ""
+                CustomEventService.SetEventType(FrmSetupUI.HintCustom, CustomEvent.EventType.None)
             Case 2 '联网
                 FrmSetupUI.PanCustomPreset.Visibility = Visibility.Collapsed
                 FrmSetupUI.PanCustomLocal.Visibility = Visibility.Collapsed
@@ -609,8 +624,8 @@
                 FrmSetupUI.HintCustom.Visibility = Visibility.Visible
                 FrmSetupUI.HintCustomWarn.Visibility = If(Setup.Get("HintCustomWarn"), Visibility.Collapsed, Visibility.Visible)
                 FrmSetupUI.HintCustom.Text = $"从指定网址联网获取主页内容。服主也可以用于动态更新服务器公告。{vbCrLf}如果你制作了稳定运行的联网主页，可以点击这条提示投稿，若合格即可加入预设！"
-                FrmSetupUI.HintCustom.EventType = "打开网页"
-                FrmSetupUI.HintCustom.EventData = "https://github.com/Meloong-Git/PCL/discussions/2528"
+                CustomEventService.SetEventType(FrmSetupUI.HintCustom, CustomEvent.EventType.打开网页)
+                CustomEventService.SetEventData(FrmSetupUI.HintCustom, "https://github.com/Meloong-Git/PCL/discussions/2528")
             Case 3 '预设
                 FrmSetupUI.PanCustomPreset.Visibility = Visibility.Visible
                 FrmSetupUI.PanCustomLocal.Visibility = Visibility.Collapsed

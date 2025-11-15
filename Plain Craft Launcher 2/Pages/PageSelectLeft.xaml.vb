@@ -150,14 +150,14 @@
         Dim NewFolder As String = ""
         '检查是否有下载任务
         If HasDownloadingTask() Then
-            Hint("在下载任务进行时，无法添加游戏文件夹！", HintType.Critical)
+            Hint("在下载任务进行时，无法添加游戏文件夹！", HintType.Red)
             Return
         End If
         Try
             '获取输入
             NewFolder = SelectFolder()
             If NewFolder = "" Then Return
-            If NewFolder.Contains("!") OrElse NewFolder.Contains(";") Then Hint("Minecraft 文件夹路径中不能含有感叹号或分号！", HintType.Critical) : Return
+            If NewFolder.Contains("!") OrElse NewFolder.Contains(";") Then Hint("Minecraft 文件夹路径中不能含有感叹号或分号！", HintType.Red) : Return
             '要求输入显示名称
             Dim SplitedNames As String() = NewFolder.TrimEnd("\").Split("\")
             Dim DefaultName As String = If(SplitedNames.Last = ".minecraft", If(SplitedNames.Count >= 3, SplitedNames(SplitedNames.Count - 2), ""), SplitedNames.Last)
@@ -182,7 +182,7 @@
                 '检查文件夹权限
                 If Not CheckPermission(FolderPath) Then
                     If ShowHint Then
-                        Hint("添加文件夹失败：PCL 没有访问该文件夹的权限！", HintType.Critical)
+                        Hint("添加文件夹失败：PCL 没有访问该文件夹的权限！", HintType.Red)
                         Return
                     Else
                         Throw New Exception("PCL 没有访问文件夹的权限：" & FolderPath)
@@ -207,12 +207,12 @@
                     If Folder.Split(">")(1) = FolderPath Then
                         IsAdded = True
                         If Folder.Split(">")(0) = DisplayName Then
-                            If ShowHint Then Hint("此文件夹已在列表中！", HintType.Info)
+                            If ShowHint Then Hint("此文件夹已在列表中！", HintType.Blue)
                             Return
                         Else
                             Folders(i) = DisplayName & ">" & FolderPath
                             IsReplace = True
-                            If ShowHint Then Hint("文件夹名称已更新为 " & DisplayName & " ！", HintType.Finish)
+                            If ShowHint Then Hint("文件夹名称已更新为 " & DisplayName & " ！", HintType.Green)
                         End If
                         Exit For
                     End If
@@ -226,7 +226,7 @@
                 McFolderListLoader.Start(IsForceRestart:=True)
                 '提示
                 If IsReplace Then Return
-                If ShowHint Then Hint("文件夹 " & DisplayName & " 已添加！", HintType.Finish)
+                If ShowHint Then Hint("文件夹 " & DisplayName & " 已添加！", HintType.Green)
                 '检查是否为根目录整合包，自动关闭版本隔离
                 '1. 根目录中存在数个 Mod
                 Dim ModFolder As New DirectoryInfo(FolderPath & "mods\")
@@ -257,7 +257,7 @@
     Public Sub Create_Click()
         '检查是否有下载任务
         If HasDownloadingTask() Then
-            Hint("在下载任务进行时，无法创建游戏文件夹！", HintType.Critical)
+            Hint("在下载任务进行时，无法创建游戏文件夹！", HintType.Red)
             Return
         End If
         If Not Directory.Exists(Path & ".minecraft\") Then
@@ -265,7 +265,7 @@
             Directory.CreateDirectory(Path & ".minecraft\versions\")
             Setup.Set("LaunchFolderSelect", "$.minecraft\")
             McFolderLauncherProfilesJsonCreate(Path & ".minecraft\")
-            Hint("新建 .minecraft 文件夹成功！", HintType.Finish)
+            Hint("新建 .minecraft 文件夹成功！", HintType.Green)
         End If
         McFolderListLoader.Start(IsForceRestart:=True)
     End Sub
@@ -307,7 +307,7 @@
             Next
             '保存
             Setup.Set("LaunchFolders", If(Not Folders.Any(), "", Join(Folders.ToArray, "|")))
-            Hint(If(Folder.Type = McFolderType.Custom, "文件夹 " & Name & " 已从列表中移除！", "文件夹名称已复原！"), HintType.Finish)
+            Hint(If(Folder.Type = McFolderType.Custom, "文件夹 " & Name & " 已从列表中移除！", "文件夹名称已复原！"), HintType.Green)
             McFolderListLoader.Start(IsForceRestart:=True)
 
         Catch ex As Exception
@@ -336,10 +336,10 @@
         Sub()
             '删除文件夹
             Try
-                Hint("正在" & DeleteText & "文件夹 " & Folder.Name & "！", HintType.Info)
+                Hint("正在" & DeleteText & "文件夹 " & Folder.Name & "！", HintType.Blue)
                 DeleteDirectory(Folder.Path)
                 If DeleteText = "清空" Then Directory.CreateDirectory(Folder.Path)
-                Hint("已" & DeleteText & "文件夹 " & Folder.Name & "！", HintType.Finish)
+                Hint("已" & DeleteText & "文件夹 " & Folder.Name & "！", HintType.Green)
             Catch ex As Exception
                 Log(ex, DeleteText & "文件夹 " & Folder.Name & " 失败", LogLevel.Hint)
             Finally
@@ -389,7 +389,7 @@
             Next
             '如果没有添加过，则添加进去（因为修改了默认项的名称）
             If Not IsAdded Then Folders.Add(NewName & ">" & Folder.Path)
-            Hint("文件夹名称已更新为 " & NewName & " ！", HintType.Finish)
+            Hint("文件夹名称已更新为 " & NewName & " ！", HintType.Green)
             '保存
             Setup.Set("LaunchFolders", Join(Folders.ToArray, "|"))
             McFolderListLoader.Start(IsForceRestart:=True)
@@ -403,7 +403,7 @@
         If Not e.RaiseByMouse OrElse Not sender.Checked Then Return
         '检查是否有下载任务
         If HasDownloadingTask(True) Then
-            Hint("在下载任务进行时，无法切换游戏文件夹！", HintType.Critical)
+            Hint("在下载任务进行时，无法切换游戏文件夹！", HintType.Red)
             e.Handled = True
             Return
         End If

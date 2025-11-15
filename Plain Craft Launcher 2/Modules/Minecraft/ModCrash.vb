@@ -341,6 +341,7 @@ Extracted:
     ''' 导致崩溃的原因枚举。
     ''' </summary>
     Private Enum CrashReason
+        Java虚拟机参数有误
         Mod文件被解压
         MixinBootstrap缺失
         内存不足
@@ -484,10 +485,12 @@ Done:
         '崩溃报告分析，高优先级
         If LogCrash IsNot Nothing Then
             If LogCrash.Contains("Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass") Then AppendReason(CrashReason.Java版本过高)
+            If LogCrash.Contains("Failed loading config file ") Then AppendReason(CrashReason.Mod配置文件导致游戏崩溃, {TryAnalyzeModName(If(RegexSeek(LogCrash, "(?<=Failed loading config file .+ for modid )[^\n]+"), "").TrimEnd(vbCrLf)).First, If(RegexSeek(LogCrash, "(?<=Failed loading config file ).+(?= of type)"), "").TrimEnd(vbCrLf)}) '#7071
         End If
 
         '游戏日志分析
         If LogMc IsNot Nothing Then
+            If LogMc.Contains("Unrecognized option:") Then AppendReason(CrashReason.Java虚拟机参数有误)
             If LogMc.Contains("Found multiple arguments for option fml.forgeVersion, but you asked for only one") Then AppendReason(CrashReason.版本Json中存在多个Forge)
             If LogMc.Contains("The driver does not appear to support OpenGL") Then AppendReason(CrashReason.显卡不支持OpenGL)
             If LogMc.Contains("java.lang.ClassCastException: java.base/jdk") Then AppendReason(CrashReason.使用JDK)
@@ -516,7 +519,7 @@ Done:
             If LogMc.Contains("Maybe try a lower resolution resourcepack?") Then AppendReason(CrashReason.材质过大或显卡配置不足)
             If LogMc.Contains("java.lang.NoSuchMethodError: net.minecraft.world.server.ChunkManager$ProxyTicketManager.shouldForceTicks(J)Z") AndAlso LogMc.Contains("OptiFine") Then AppendReason(CrashReason.OptiFine导致无法加载世界)
             If LogMc.Contains("Unsupported class file major version") Then AppendReason(CrashReason.Java版本不兼容)
-            If LogMc.Contains("com.electronwill.nightconfig.core.io.ParsingException: Not enough data available") Then AppendReason(CrashReason.NightConfig的Bug)
+            If LogMc.Contains("com.electronwill.nightconfig.core.io.ParsingException: Not enough data available") AndAlso Not CrashReasons.ContainsKey(CrashReason.Mod配置文件导致游戏崩溃) Then AppendReason(CrashReason.NightConfig的Bug)
             If LogMc.Contains("Cannot find launch target fmlclient, unable to launch") Then AppendReason(CrashReason.Forge安装不完整)
             If LogMc.Contains("Invalid paths argument, contained no existing paths") AndAlso LogMc.Contains("libraries\net\minecraftforge\fmlcore") Then AppendReason(CrashReason.Forge安装不完整)
             If LogMc.Contains("Invalid module name: '' is not a Java identifier") Then AppendReason(CrashReason.Mod名称包含特殊字符)
@@ -539,8 +542,8 @@ Done:
             If LogMc.Contains("Found a duplicate mod") Then AppendReason(CrashReason.Mod重复安装, RegexSearch(If(RegexSeek(LogMc, "Found a duplicate mod[^\n]+"), ""), "[^\\/]+.jar", RegularExpressions.RegexOptions.IgnoreCase))
             If LogMc.Contains("Found duplicate mods") Then AppendReason(CrashReason.Mod重复安装, RegexSearch(LogMc, "(?<=Mod ID: ')\w+?(?=' from mod files:)").Distinct.ToList)
             If LogMc.Contains("ModResolutionException: Duplicate") Then AppendReason(CrashReason.Mod重复安装, RegexSearch(If(RegexSeek(LogMc, "ModResolutionException: Duplicate[^\n]+"), ""), "[^\\/]+.jar", RegularExpressions.RegexOptions.IgnoreCase))
-            If LogMc.Contains("Incompatible mods found!") Then '#5006
-                AppendReason(CrashReason.Mod互不兼容, If(RegexSeek(LogMc, "(?<=Incompatible mods found![\s\S]+: )[\s\S]+?(?=\tat )"), ""))
+            If LogMc.Contains("Incompatible mods found!") Then '#5006, #5115
+                AppendReason(CrashReason.Mod互不兼容, If(RegexSeek(LogMc, "(?<=Incompatible mods found![\s\S]+: )[\s\S]+?(?=\tat )"), "").BeforeFirst("更多信息：").Replace("Some of your mods are incompatible with the game or each other!", "").Trim((vbCrLf & " ").ToCharArray))
             End If
             If LogMc.Contains("Missing or unsupported mandatory dependencies:") Then
                 AppendReason(CrashReason.Mod缺少前置或MC版本错误,
@@ -656,7 +659,7 @@ Done:
             End If
             'Mod 解析错误（常见于 Fabric 前置校验失败）
             If LogMc.Contains("Mod resolution failed") Then AppendReason(CrashReason.Mod加载器报错)
-            'Mixin 失败可以导致大量 Mod 实例创建失败
+            'Mixin 失败可以导致大量 Mod 实例创建失败，因此需要放到低优先级中
             If LogMc.Contains("Failed to create mod instance.") Then AppendReason(CrashReason.Mod初始化失败, TryAnalyzeModName(If(RegexSeek(LogMc, "(?<=Failed to create mod instance. ModID: )[^,]+"), If(RegexSeek(LogMc, "(?<=Failed to create mod instance. ModId )[^\n]+(?= for )"), "")).TrimEnd(vbCrLf)))
             '注意：Fabric 的 Warnings were found! 不一定是崩溃原因，它可能是单纯的警报
         End If
@@ -715,7 +718,7 @@ NextStack:
                     "preinit", "preload", "machine", "reflect", "channel", "general", "handler", "content", "systems", "modules", "service",
                     "fastutil", "optifine", "internal", "platform", "override", "fabricmc", "neoforge",
                     "injection", "listeners", "scheduler", "minecraft", "universal", "multipart", "neoforged", "microsoft",
-                    "transformer", "transformers", "minecraftforge", "blockentity", "spongepowered", "electronwill"
+                    "transformer", "transformers", "minecraftforge", "blockentity", "spongepowered", "electronwill", "concurrent"
                    }.Contains(Word.ToLower) Then Continue For
                 PossibleWords.Add(Word.Trim)
             Next
@@ -868,11 +871,11 @@ NextStack:
             Sub()
                 '弹窗选择：查看日志
                 If File.Exists(DirectFile.Value.Key) Then
-                    ShellOnly(DirectFile.Value.Key)
+                    StartProcess(DirectFile.Value.Key)
                 Else
                     Dim FilePath As String = PathTemp & "Crash.txt"
                     WriteFile(FilePath, Join(DirectFile.Value.Value, vbCrLf))
-                    ShellOnly(FilePath)
+                    StartProcess(FilePath)
                 End If
             End Sub))
             Case 3
@@ -905,8 +908,7 @@ NextStack:
                         If File.Exists(OutputFile) Then
                             If FileEncoding Is Nothing Then FileEncoding = GetEncoding(ReadFileBytes(OutputFile))
                             Dim FileContent As String = ReadFile(OutputFile, FileEncoding)
-                            FileContent = FilterAccessToken(FileContent, If(FileName = "启动脚本.bat", "F", "*"))
-                            FileContent = FilterUserName(FileContent, "*")
+                            FileContent = FilterUserName(FilterAccessToken(FileContent, If(FileName = "启动脚本.bat", "F", "*")), "*")
                             WriteFile(TempFolder & "Report\" & FileName, FileContent, Encoding:=FileEncoding)
                             Log($"[Crash] 导出文件：{FileName}，编码：{FileEncoding.HeaderName}")
                         End If
@@ -914,7 +916,7 @@ NextStack:
                     '导出报告
                     Compression.ZipFile.CreateFromDirectory(TempFolder & "Report\", FileAddress)
                     DeleteDirectory(TempFolder & "Report\")
-                    Hint("错误报告已导出！", HintType.Finish)
+                    Hint("错误报告已导出！", HintType.Green)
                 Catch ex As Exception
                     Log(ex, "导出错误报告失败", LogLevel.Feedback)
                     Return
@@ -946,6 +948,8 @@ NextStack:
         For Each Reason In CrashReasons
             Dim Additional As List(Of String) = Reason.Value
             Select Case Reason.Key
+                Case CrashReason.Java虚拟机参数有误
+                    Results.Add("由于 Java 参数有误，导致游戏无法继续运行。\n请检查高级选项中的 Java 虚拟机参数和游戏参数设置是否有误。")
                 Case CrashReason.Mod文件被解压
                     Results.Add("由于 Mod 文件被解压了，导致游戏无法继续运行。\n直接把整个 Mod 文件放进 Mod 文件夹中即可，若解压就会导致游戏出错。\n\n请删除 Mod 文件夹中已被解压的 Mod，然后再启动游戏。")
                 Case CrashReason.内存不足
@@ -1026,9 +1030,17 @@ NextStack:
                     End If
                 Case CrashReason.特定实体导致崩溃
                     If Additional.Count = 1 Then
-                        Results.Add("游戏似乎因为实体 " & Additional.First & " 出现了问题。\n\n你可以创建一个新世界，并生成一个该实体，然后观察游戏的运行情况。\h")
+                        If Additional.First.Contains("minecraft:player") Then
+                            If Additional.First.Contains(" ") Then
+                                Results.Add($"游戏因为位于 {Additional.First.AfterFirst(" ")} 的玩家实体导致了崩溃。\h")
+                            Else
+                                Results.Add($"游戏因为玩家实体导致了崩溃。\h")
+                            End If
+                        Else
+                            Results.Add($"游戏因为实体 {Additional.First} 导致了崩溃。\h")
+                        End If
                     Else
-                        Results.Add("游戏似乎因为世界中的某些实体出现了问题。\n\n你可以创建一个新世界，并生成各种实体，然后观察游戏的运行情况。\h")
+                        Results.Add($"游戏因为下列实体导致了崩溃：{Additional.Join("、")}\h")
                     End If
                 Case CrashReason.OptiFine与Forge不兼容
                     Results.Add("由于 OptiFine 与当前版本的 Forge 不兼容，导致了游戏崩溃。\n\n请前往 OptiFine 官网（https://optifine.net/downloads）查看 OptiFine 所兼容的 Forge 版本，并严格按照对应版本重新安装游戏。")
