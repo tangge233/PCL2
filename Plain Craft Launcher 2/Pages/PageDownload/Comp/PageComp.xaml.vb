@@ -111,7 +111,7 @@ Public Class PageComp
         IsFirstLoaded = True
         CType(Parent, MyPageRight).PageLoaderInit(Load, PanLoad, PanContent, PanAlways, Loader, AddressOf Load_OnFinish, AddressOf LoaderInput)
         '将最高 Drop 加入筛选
-        If AllDrops?.Any AndAlso AllDrops.First > 250 Then
+        If AllDrops IsNot Nothing AndAlso AllDrops.First > 250 Then
             Dim HighestVersion As String = McVersion.DropToVersion(AllDrops.First)
             If CType(TextSearchVersion.Items(1), MyComboBoxItem).Content.ToString <> HighestVersion Then '0 是全部
                 TextSearchVersion.Items.Insert(1, New MyComboBoxItem With {.Content = HighestVersion})

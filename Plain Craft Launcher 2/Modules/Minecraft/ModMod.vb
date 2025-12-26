@@ -115,7 +115,7 @@ Public Module ModMod
             End Get
             Set(value As String)
                 If _Version IsNot Nothing AndAlso RegexCheck(_Version, "[0-9.\-]+") Then Return
-                If value?.ContainsF("version", True) Then value = "version" '需要修改的标识
+                If value IsNot Nothing AndAlso value.ContainsF("version", True) Then value = "version" '需要修改的标识
                 _Version = value
             End Set
         End Property

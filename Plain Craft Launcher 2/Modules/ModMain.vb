@@ -792,8 +792,7 @@ NextFile:
         '查看现有设置
         Using ReadOnlyKey = My.Computer.Registry.CurrentUser.OpenSubKey(REG_KEY, False)
             If ReadOnlyKey IsNot Nothing Then
-                Dim CurrentValue = ReadOnlyKey.GetValue(Executeable)
-                If REG_VALUE = CurrentValue?.ToString() Then
+                If REG_VALUE = ReadOnlyKey.GetValue(Executeable)?.ToString() Then
                     Log($"[System] 无需调整显卡设置：{Executeable}")
                     Return
                 End If

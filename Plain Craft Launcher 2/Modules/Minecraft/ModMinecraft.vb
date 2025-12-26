@@ -158,7 +158,7 @@ Public Module ModMinecraft
 
 #Region "版本处理"
 
-    Public Const McInstanceCacheVersion As Integer = 32
+    Public Const McInstanceCacheVersion As Integer = 33
 
     Private _McInstanceSelected As McInstance
     ''' <summary>
@@ -1013,10 +1013,10 @@ ExitDataLoad:
                 '字母编号，如 G2 中的 G（7）
                 Dim Result As Integer = Asc(OptiFine.ToUpper.First) - Asc("A"c) + 1
                 '末尾数字，如 C5 beta4 中的 5
-                Result *= Result * 100
+                Result *= 100
                 Result += Val(RegexSeek(Right(OptiFine, OptiFine.Length - 1), "[0-9]+"))
                 '测试标记（正式版为 99，Pre[x] 为 50+x，Beta[x] 为 x）
-                Result *= Result * 100
+                Result *= 100
                 If OptiFine.ContainsF("pre", True) Then Result += 50
                 If OptiFine.ContainsF("pre", True) OrElse OptiFine.ContainsF("beta", True) Then
                     If Val(Right(OptiFine, 1)) = 0 AndAlso Right(OptiFine, 1) <> "0" Then

@@ -152,14 +152,16 @@
 #Region "DlClientList | Minecraft 客户端 版本列表"
 
     ''' <summary>
-    ''' 所有正式版的 Minecraft Drop 序数，按从高到低排列。
-    ''' Nothing 代表从未完成过获取。
+    ''' 所有正式版的 Minecraft Drop 序数。
+    ''' 若从未完成过获取，返回 Nothing；否则必定存在元素，且从高到低排列。
     ''' </summary>
     Public Property AllDrops As List(Of Integer)
         Get
-            If _AllDrops Is Nothing Then _AllDrops = Setup.Get("CacheDrops").ToString.Split(","c).Select(Function(d) CInt(d)).ToList()
-            If Not _AllDrops.Any Then _AllDrops = Nothing
-            Return _AllDrops
+            If _AllDrops Is Nothing Then
+                _AllDrops = Setup.Get("CacheDrops").ToString.
+                    Split(",".ToCharArray, StringSplitOptions.RemoveEmptyEntries).Select(Function(d) CInt(Val(d))).ToList()
+            End If
+            Return If(_AllDrops.Any, _AllDrops, Nothing) '不要将 _AllDrops 再设为 Nothing，以防止反复获取设置尝试初始化
         End Get
         Set(value As List(Of Integer))
             _AllDrops = value

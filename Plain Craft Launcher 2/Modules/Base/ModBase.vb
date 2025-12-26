@@ -14,13 +14,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.12.0" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.12.0." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.12.1" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.12.1." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
     Public Const VersionCode As Integer = 372 'Release
 #Else
-    Public Const VersionCode As Integer = 377 'Snapshot
+    Public Const VersionCode As Integer = 378 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -589,8 +589,7 @@ Public Module ModBase
     ''' </summary>
     Public Function ReadReg(Key As String, Optional DefaultValue As String = "") As String
         Try
-            Dim SubKey = My.Computer.Registry.CurrentUser.OpenSubKey("Software\" & RegFolder, False)
-            Return If(SubKey?.GetValue(Key), DefaultValue)
+            Return If(My.Computer.Registry.CurrentUser.OpenSubKey("Software\" & RegFolder, False)?.GetValue(Key), DefaultValue)
         Catch ex As Exception
             Log(ex, "读取注册表出错：" & Key, LogLevel.Hint)
             Return DefaultValue

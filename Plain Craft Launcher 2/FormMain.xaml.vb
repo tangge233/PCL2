@@ -118,6 +118,12 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 378 Then 'Snapshot 2.12.1
+            If LastVersion >= 377 Then
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：在版本列表中存在 OptiFine 时可能无法加载版本列表"))
+                BugCount += 2
+            End If
+        End If
         If LastVersion < 377 Then 'Snapshot 2.12.0
             If LastVersion >= 373 Then
                 FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "删除：暂时隐藏联机入口……不过只是暂时关闭，它还会回来的！"))
@@ -125,8 +131,8 @@ Public Class FormMain
             FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "新增：适配新的 Minecraft 版本号系统与 Unobfuscated 版本"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：巨幅优化各个下载页面和 Mod 管理页面的性能"))
             FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：更换披风时会显示当前使用的披风"))
-            FeatureCount += 31
-            BugCount += 27
+            FeatureCount += 33
+            BugCount += 29
         End If
         If LastVersion < 375 Then 'Snapshot 2.11.2
             'If LastVersion >= 373 Then

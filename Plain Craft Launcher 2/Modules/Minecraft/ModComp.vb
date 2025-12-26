@@ -561,7 +561,7 @@
                     Dim EndName = McVersion.DropToVersion(EndDrop)
                     If StartDrop = EndDrop Then
                         Segments.Add(StartName)
-                    ElseIf AllDrops?.Any AndAlso StartDrop >= AllDrops.First Then
+                    ElseIf AllDrops IsNot Nothing AndAlso StartDrop >= AllDrops.First Then
                         If EndDrop < 100 Then
                             Segments.Clear()
                             Segments.Add("全版本")

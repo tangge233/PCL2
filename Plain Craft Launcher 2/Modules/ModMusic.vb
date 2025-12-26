@@ -261,6 +261,7 @@
 
     ''' <summary>
     ''' 当前正在播放的 NAudio.Wave.WaveOutEvent。
+    ''' 如果为它赋了类别，则会没有必要地加载 NAudio.dll。
     ''' </summary>
     Public MusicNAudio = Nothing
     ''' <summary>

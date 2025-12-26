@@ -175,10 +175,10 @@ Public Class CustomEvent
     Public Shared Sub Raise(Type As EventType, Arg As String)
         If Type = EventType.None Then Return
         Log($"[Control] 执行自定义事件：{Type}, {Arg}")
+        If Arg Is Nothing Then Arg = ""
+        Dim Args As String() = Arg.Split("|")
         Try
-            Dim Args As String() = If(Arg?.Split("|"), {""})
             Select Case Type
-
                 Case EventType.打开网页
                     Arg = Arg.Replace("\", "/")
                     If Not Arg.Contains("://") OrElse Arg.StartsWithF("file", True) Then '为了支持更多协议（#2200）

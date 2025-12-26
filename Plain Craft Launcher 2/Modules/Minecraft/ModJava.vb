@@ -730,7 +730,7 @@ Wait:
             TargetEntry = Components.Property(Loader.Input)
         Else '模糊匹配
             TargetEntry = Components.Properties.FirstOrDefault(
-                Function(c) c.Value?.ToArray.FirstOrDefault()?("version")("name").ToString.StartsWithF(Loader.Input))
+                Function(c) c.Value IsNot Nothing AndAlso c.Value.ToArray.FirstOrDefault()?("version")("name").ToString.StartsWithF(Loader.Input))
             If TargetEntry Is Nothing Then Throw New Exception($"未能找到所需的 Java {Loader.Input}")
         End If
         Dim TargetComponent = TargetEntry.Value.ToArray.FirstOrDefault

@@ -126,7 +126,8 @@
             Try
                 '下载
                 NetDownloadByLoader(
-                    If(FallbackSource?.StartsWithF("http") AndAlso Source <> FallbackSource, {Source, FallbackSource}, {Source}),
+                    If(FallbackSource IsNot Nothing AndAlso FallbackSource.StartsWithF("http") AndAlso Source <> FallbackSource,
+                        {Source, FallbackSource}, {Source}),
                     TempPath, SimulateBrowserHeaders:=True)
                 ActualSource = TempPath
                 If Not EnableCache Then File.Delete(TempPath)
