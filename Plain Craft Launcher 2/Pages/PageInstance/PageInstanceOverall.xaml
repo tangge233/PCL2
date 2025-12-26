@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:PCL" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:System="clr-namespace:System;assembly=mscorlib" 
-    mc:Ignorable="d" x:Class="PageVersionOverall"
+    mc:Ignorable="d" x:Class="PageInstanceOverall"
     PanScroll="PanBack" Grid.IsSharedSizeScope="True">
     <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" x:Name="PanBack">
         <StackPanel x:Name="PanMain" Margin="25,10">
@@ -25,7 +25,7 @@
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="图标" Margin="0,0,25,0" />
                         <local:MyComboBox Grid.Column="1" x:Name="ComboDisplayLogo">
                             <local:MyComboBoxItem Content="自动" IsSelected="True" Tag="" />
-                            <local:MyComboBoxItem Content="自定义..." x:Name="ItemDisplayLogoCustom" />
+                            <local:MyComboBoxItem Content="自定义..." x:Name="ItemDisplayLogoCustom" Tag="PCL\Logo.png" />
                             <local:MyComboBoxItem Content="圆石" Tag="pack://application:,,,/images/Blocks/CobbleStone.png" />
                             <local:MyComboBoxItem Content="命令方块" Tag="pack://application:,,,/images/Blocks/CommandBlock.png" />
                             <local:MyComboBoxItem Content="金块" Tag="pack://application:,,,/images/Blocks/GoldBlock.png" />

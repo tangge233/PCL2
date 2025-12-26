@@ -14,13 +14,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.11.2" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.11.2." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.12.0" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.12.0." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
     Public Const VersionCode As Integer = 372 'Release
 #Else
-    Public Const VersionCode As Integer = 375 'Snapshot
+    Public Const VersionCode As Integer = 377 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -1211,14 +1211,17 @@ Re:
     Public Class FileChecker
         ''' <summary>
         ''' 文件的准确大小。
+        ''' 不检查则为 -1。
         ''' </summary>
         Public ActualSize As Long = -1
         ''' <summary>
         ''' 文件的最小大小。
+        ''' 不检查则为 -1。
         ''' </summary>
         Public MinSize As Long = -1
         ''' <summary>
         ''' 文件的 MD5、SHA1 或 SHA256。会根据输入字符串的长度自动判断种类。
+        ''' 不检查则为 Nothing。
         ''' </summary>
         Public Hash As String = Nothing
         ''' <summary>
@@ -1226,7 +1229,8 @@ Re:
         ''' </summary>
         Public CanUseExistsFile As Boolean = True
         ''' <summary>
-        ''' 是否为 Json 文件。
+        ''' 是否要求为 JSON 文件。
+        ''' 即，开头结尾必须为 {} 或 []。
         ''' </summary>
         Public IsJson As Boolean = False
         Public Sub New(Optional MinSize As Long = -1, Optional ActualSize As Long = -1, Optional Hash As String = Nothing, Optional CanUseExistsFile As Boolean = True, Optional IsJson As Boolean = False)
@@ -1429,6 +1433,7 @@ RetryDir:
         If Ex Is Nothing Then Return "无可用错误信息！"
 
         '获取最底层的异常
+        Dim OuterEx As Exception = Ex
         Dim InnerEx As Exception = Ex
         Do Until InnerEx.InnerException Is Nothing
             InnerEx = InnerEx.InnerException
@@ -1452,7 +1457,7 @@ RetryDir:
         Loop
 
         '构造输出信息
-        Dim UsualReason As String = AnalyzeUsualReason(InnerEx, Ex, DescList)
+        Dim UsualReason As String = AnalyzeUsualReason(InnerEx, OuterEx, DescList)
         If UsualReason Is Nothing Then
             Return DescList.Join(vbCrLf)
         Else
@@ -1466,6 +1471,7 @@ RetryDir:
         If Ex Is Nothing Then Return "无可用错误信息！"
 
         '获取最底层的异常
+        Dim OuterEx As Exception = Ex
         Dim InnerEx As Exception = Ex
         Do Until InnerEx.InnerException Is Nothing
             InnerEx = InnerEx.InnerException
@@ -1481,7 +1487,7 @@ RetryDir:
         Dim Desc As String = Join(DescList, vbCrLf & "→ ")
 
         '构造输出信息
-        Dim UsualReason As String = AnalyzeUsualReason(InnerEx, Ex, DescList)
+        Dim UsualReason As String = AnalyzeUsualReason(InnerEx, OuterEx, DescList)
         If UsualReason IsNot Nothing Then
             Return UsualReason & "详细错误：" & DescList.First
         Else
@@ -1578,16 +1584,6 @@ RetryDir:
     Public Function StrFill(Str As String, Code As String, Length As Byte) As String
         If Str.Length > Length Then Return Mid(Str, 1, Length)
         Return Mid(Str.PadRight(Length, Code), Str.Length + 1) & Str
-    End Function
-    ''' <summary>
-    ''' 将一个小数显示为固定的小数点后位数形式，将向零取整。
-    ''' 如 12 保留 2 位则输出 12.00，而 95.678 保留 2 位则输出 95.67。
-    ''' </summary>
-    Public Function StrFillNum(Num As Double, Length As Integer) As String
-        Num = Math.Round(Num, Length, MidpointRounding.AwayFromZero)
-        StrFillNum = Num
-        If Not StrFillNum.Contains(".") Then Return (StrFillNum & ".").PadRight(StrFillNum.Length + 1 + Length, "0")
-        Return StrFillNum.PadRight(StrFillNum.Split(".")(0).Length + 1 + Length, "0")
     End Function
     ''' <summary>
     ''' 移除字符串首尾的标点符号、回车，以及括号中、冒号后的补充说明内容。
@@ -1964,7 +1960,7 @@ RetryDir:
                 Function(Source) Source.Key.Replace(" ", "").ContainsF(QueryPart, True)))
         Next
         '按照相似度进行排序
-        Entries = Entries.Sort(
+        Entries = Entries.SortByComparison(
         Function(Left, Right) As Boolean
             If Left.AbsoluteRight Xor Right.AbsoluteRight Then
                 Return Left.AbsoluteRight
@@ -2031,7 +2027,7 @@ RetryDir:
         Implements IDictionary(Of TKey, TValue)
         Implements IEnumerable(Of KeyValuePair(Of TKey, TValue))
 
-        Private ReadOnly SyncRoot As New Object
+        Public ReadOnly SyncRoot As New Object
         Private ReadOnly _Dictionary As New Dictionary(Of TKey, TValue)
 
         '构造函数
@@ -2229,6 +2225,19 @@ RetryDir:
         Return CultureInfo.CurrentCulture.Name.StartsWithF("zh-") OrElse CultureInfo.CurrentUICulture.Name.StartsWithF("zh-")
     End Function
 
+    ''' <summary>
+    ''' 判断对象是否为某个泛型类型的实例。
+    ''' </summary>
+    <Extension> Public Function IsInstanceOfGenericType(genericType As Type, obj As Object) As Boolean
+        If obj Is Nothing Then Return False
+        Dim t = obj.GetType()
+        While t IsNot Nothing
+            If t.IsGenericType AndAlso t.GetGenericTypeDefinition() Is genericType Then Return True
+            t = t.BaseType
+        End While
+        Return False
+    End Function
+
     Private Uuid As Integer = 1
     Private UuidLock As Object
     ''' <summary>
@@ -2256,7 +2265,7 @@ RetryDir:
         Next i
     End Function
     ''' <summary>
-    ''' 数组去重。
+    ''' 去重。
     ''' </summary>
     <Extension> Public Function Distinct(Of T)(Arr As ICollection(Of T), IsEqual As ComparisonBoolean(Of T)) As List(Of T)
         Dim ResultArray As New List(Of T)
@@ -2271,6 +2280,15 @@ NextElement:
     End Function
     <Extension> Public Function Any(Arr As UIElementCollection) As Boolean
         Return Arr?.Count > 0
+    End Function
+    ''' <summary>
+    ''' 对集合的每个元素执行指定操作。
+    ''' </summary>
+    <Extension> Public Function ForEach(Of T)(Collection As IEnumerable(Of T), Action As Action(Of T)) As IEnumerable(Of T)
+        For Each Item As T In Collection
+            Action(Item)
+        Next
+        Return Collection
     End Function
 
     ''' <summary>
@@ -2494,10 +2512,46 @@ NextElement:
     End Sub
 
     ''' <summary>
-    ''' 按照既定的函数进行选择排序。
-    ''' 传入两个对象，若第一个对象应该排在前面，则返回 True。
+    ''' 选择最大值对应的对象。
+    ''' 若没有元素则返回 Nothing。
     ''' </summary>
-    <Extension> Public Function Sort(Of T)(List As IList(Of T), SortRule As ComparisonBoolean(Of T)) As List(Of T)
+    <Extension> Public Function MaxOf(Of T, C As IComparable(Of C))(Source As IEnumerable(Of T), Selector As Func(Of T, C)) As T
+        Using Enumerator = Source.GetEnumerator()
+            If Not Enumerator.MoveNext() Then Return Nothing
+            Dim MaxItem As T = Enumerator.Current
+            Dim MaxValue As C = Selector(MaxItem)
+            While Enumerator.MoveNext()
+                Dim Value = Selector(Enumerator.Current)
+                If Value.CompareTo(MaxValue) <= 0 Then Continue While
+                MaxItem = Enumerator.Current
+                MaxValue = Value
+            End While
+            Return MaxItem
+        End Using
+    End Function
+    ''' <summary>
+    ''' 选择最小值对应的对象。
+    ''' 若没有元素则返回 Nothing。
+    ''' </summary>
+    <Extension> Public Function MinOf(Of T, C As IComparable(Of C))(List As IEnumerable(Of T), Selector As Func(Of T, C)) As T
+        Using Enumerator = List.GetEnumerator()
+            If Not Enumerator.MoveNext() Then Return Nothing
+            Dim MinItem As T = Enumerator.Current
+            Dim MinValue As C = Selector(MinItem)
+            While Enumerator.MoveNext()
+                Dim Value = Selector(Enumerator.Current)
+                If Value.CompareTo(MinValue) >= 0 Then Continue While
+                MinItem = Enumerator.Current
+                MinValue = Value
+            End While
+            Return MinItem
+        End Using
+    End Function
+    ''' <summary>
+    ''' 按照既定的函数进行选择排序。
+    ''' 返回第一个对象是否应该排在前面（a > b）。
+    ''' </summary>
+    <Extension> Public Function SortByComparison(Of T)(List As IList(Of T), SortRule As ComparisonBoolean(Of T)) As List(Of T)
         Dim NewList As New List(Of T)
         While List.Any
             Dim Highest = List(0)
@@ -2769,19 +2823,25 @@ Retry:
 
     ''' <summary>
     ''' 将 XML 转换为对应 UI 对象。
+    ''' 注意：性能较差，不应大量使用。
     ''' </summary>
     Public Function GetObjectFromXML(Str As XElement)
         Return GetObjectFromXML(Str.ToString)
     End Function
     ''' <summary>
     ''' 将 XML 转换为对应 UI 对象。
+    ''' 注意：性能较差，不应大量使用。
     ''' </summary>
     Public Function GetObjectFromXML(Str As String) As Object
         Str = Str. '兼容旧版自定义事件写法
             Replace("EventType=""", "local:CustomEventService.EventType=""").
             Replace("EventData=""", "local:CustomEventService.EventData=""").
+            Replace("EventType='", "local:CustomEventService.EventType='").
+            Replace("EventData='", "local:CustomEventService.EventData='").
             Replace("Property=""EventType""", "Property=""local:CustomEventService.EventType""").
-            Replace("Property=""EventData""", "Property=""local:CustomEventService.EventData""")
+            Replace("Property=""EventData""", "Property=""local:CustomEventService.EventData""").
+            Replace("Property='EventType'", "Property='local:CustomEventService.EventType'").
+            Replace("Property='EventData'", "Property='local:CustomEventService.EventData'")
         Using Stream As New MemoryStream(Encoding.UTF8.GetBytes(Str))
             '类型检查
             Using Reader As New XamlXmlReader(Stream)
@@ -3114,7 +3174,7 @@ Retry:
             "操作系统：" & My.Computer.Info.OSFullName & "（32 位：" & Is32BitSystem & "）" & vbCrLf &
             "剩余内存：" & Int(My.Computer.Info.AvailablePhysicalMemory / 1024 / 1024) & " M / " & Int(My.Computer.Info.TotalPhysicalMemory / 1024 / 1024) & " M" & vbCrLf &
             "DPI：" & DPI & "（" & Math.Round(DPI / 96, 2) * 100 & "%）" & vbCrLf &
-            "MC 文件夹：" & If(PathMcFolder, "Nothing") & vbCrLf &
+            "MC 文件夹：" & If(McFolderSelected, "Nothing") & vbCrLf &
             "文件位置：" & Path)
     End Sub
 

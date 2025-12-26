@@ -39,8 +39,6 @@
                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="自定义节点" Margin="0,0,25,0" />
                     <local:MyTextBox x:Name="TextCustomPeer" Tag="LinkCustomPeer" Grid.Column="1" MaxHeight="28" 
                         ToolTip="覆盖 PCL 所选择的节点，仅连接此处填写的节点。&#xa;如果你自己搭建了 EasyTier 节点，你可以用这个设置让 PCL 连接它。&#xa;&#xa;使用逗号分隔多个节点，例如：&#xa;tcp://public.easytier.cn:11010,tcp://public2.easytier.cn:54321&#xa;&#xa;房主和加入者必须连接到至少一个相同节点，才能互相连上。" />
-                    <local:MyCheckBox Text="老好人模式" x:Name="CheckShareMode" Grid.Row="1" Tag="LinkShareMode" Height="22" Visibility="Collapsed"
-                        ToolTip="启动联机后，用你的网络帮助其他玩家建立连接、降低延迟！&#xa;即使你不开启，开启了这个选项的其他玩家也会帮助你，不过，人人为我，我为人人嘛……" />
                     <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Left">
                         <local:MyButton MinWidth="140" Padding="13,5" Margin="0,0,20,0" HorizontalAlignment="Left"
                             Text=" 光荣地贡献节点！" ColorType="Highlight"
