@@ -430,7 +430,7 @@ Public Class PageLinkMain
         If ServerConfig Is Nothing Then Throw New Exception("无法从服务器获取配置")
         '检查是否已禁用联机功能
         Dim DisableReason = ServerConfig("Link")?("DisableReason2")?.ToString
-        If Not String.IsNullOrEmpty(DisableReason) Then Throw New Exception("$" & DisableReason)
+        If Not String.IsNullOrEmpty(DisableReason) Then Throw New Exception("$" & DisableReason) 'TODO: 可能不会显示错误原因？
         If CType(ServerConfig("Link"), JObject).ContainsKey("MinVersionCode") AndAlso
            VersionCode < ServerConfig("Link")("MinVersionCode").ToObject(Of Integer) Then
             Throw New Exception("$你的 PCL 版本太老了，请在更新 PCL 之后再联机！")
@@ -523,7 +523,7 @@ Public Class PageLinkMain
         Dim ListenersPort As Integer = FreePorts(2) '它会占用【当前、当前 +1、当前 +2】共三个端口
         '获取启动参数
         Dim Arguments As String = ServerConfig("Link")("Argument")
-        Arguments += $" --network-name={NetworkName} --network-secret={NetworkSecret} --listeners {ListenersPort} --rpc-portal {RPCPort}"
+        Arguments += $" --network-name={NetworkName} --network-secret={NetworkSecret} --listeners {ListenersPort} --rpc-portal {RPCPort} --private-mode true"
         Dim HostName = If(IsServerSide, "Server-", "Client-") & RadixConvert(Math.Abs(Identify.GetHashCode), 10, 36)
         If IsServerSide Then
             Arguments += $" -i 10.114.114.114 --hostname={HostName} --tcp-whitelist={ServerPort} --udp-whitelist={ServerPort}"
@@ -539,7 +539,6 @@ Public Class PageLinkMain
         For Each Peer As String In RawPeers
             Arguments += $" -p=""{Peer}"""
         Next
-        Arguments += " --private-mode true" '老好人模式现在莫得用：If Not Setup.Get("LinkShareMode") Then
         If Setup.Get("LinkLatencyMode") = 1 Then Arguments += " --latency-first"
         '启动进程
         ProcessStart(Arguments)

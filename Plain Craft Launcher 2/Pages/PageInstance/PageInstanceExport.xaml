@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:PCL" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:System="clr-namespace:System;assembly=mscorlib" 
-    mc:Ignorable="d" x:Class="PageVersionExport"
+    mc:Ignorable="d" x:Class="PageInstanceExport"
     PanScroll="PanBack">
     <Grid x:Name="PanAllBack">
         <Grid.Resources>
@@ -249,8 +249,8 @@
                                       Theme="Yellow" Margin="0,2,0,8" Visibility="{Binding Checked, ElementName=CheckAdvancedInclude, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         <local:MyCheckBox Text="打包资源文件，以避免在导入时下载" x:Name="CheckAdvancedInclude"
                                           ToolTip="将 Mod、资源包、光影包的文件直接放入整合包中，这样在导入时就无需联网下载它们。&#xa;建议仅在无法稳定连接 CurseForge 或 Modrinth 时才考虑勾选。" />
-                        <local:MyCheckBox Text="Modrinth 上传模式" x:Name="CheckAdvancedModrinth"
-                                          ToolTip="如果你想要打包上传到 Modrinth，勾选此项会生成完全符合 Modrinth 要求的整合包文件。&#xa;由于 Modrinth 要求，只能从 CurseForge 下载的资源将无法联网下载，会被直接放入整合包中。&#xa;此外，勾选后也不能在整合包中包含 PCL 启动器文件。" />
+                        <local:MyCheckBox Text="仅从 Modrinth 下载资源文件" x:Name="CheckAdvancedModrinth"
+                                          ToolTip="若资源未在 Modrinth 上托管，则将其原始文件直接放入整合包中。&#xa;如果你想将整合包上传到 Modrinth，这能帮助你分辨哪些文件未在 Modrinth 上托管。" />
                         <local:MyHint Theme="Blue" RelativeSetup="HintExportConfig" CanClose="True" Margin="0,20,0,2"
                                       Text="配置文件中含有更多高级选项，例如精准控制导出的文件、设置整合包存放位置等。&#xa;要修改这些选项，请先点击 “保存配置”，在编辑配置文件后再导入。" />
                         <Grid Height="35" Margin="0,12,0,0">

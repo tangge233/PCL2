@@ -44,8 +44,8 @@ Public Class PageLoginLegacy
     Public Shared Function IsVaild(LoginData As McLoginLegacy) As String
         If LoginData.UserName.Trim = "" Then Return "玩家名不能为空！"
         If LoginData.UserName.Contains("""") Then Return "玩家名不能包含英文引号！"
-        If McVersionCurrent IsNot Nothing AndAlso
-           (McVersionCurrent.Version.IsStandardVersion AndAlso McVersionCurrent.Version.McVersion >= New Version(1, 20, 3)) AndAlso
+        If McInstanceSelected IsNot Nothing AndAlso
+           McInstanceSelected.Version.Vaild AndAlso McInstanceSelected.Version.Vanilla >= New Version(20, 0, 3) AndAlso
            LoginData.UserName.Trim.Length > 16 Then
             Return "自 1.20.3 起，玩家名至多只能包含 16 个字符！"
         End If

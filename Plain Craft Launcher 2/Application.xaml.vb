@@ -198,7 +198,7 @@ WaitRetry:
     Private Declare Function SetDllDirectory Lib "kernel32" Alias "SetDllDirectoryA" (lpPathName As String) As Boolean
     Public Shared Function AssemblyResolve(sender As Object, Args As ResolveEventArgs) As Assembly
         '缓存
-        Static Prefixes As String() = {"NAudio", "Newtonsoft.Json", "Ookii.Dialogs.Wpf", "Imazen.WebP", "CacheCow.Common", "CacheCow.Client.FileStore", "CacheCow.Client", "System.Net.Http.Formatting"}
+        Static Prefixes As String() = {"NAudio", "Newtonsoft.Json", "Ookii.Dialogs.Wpf", "Imazen.WebP", "CacheCow.Common", "CacheCow.Client.FileStore", "CacheCow.Client", "System.Net.Http.Formatting", "System.ValueTuple"}
         Static Locks As New Dictionary(Of String, Object)(StringComparer.Ordinal)
         Static LoadedAssembly As New Dictionary(Of String, Assembly)(StringComparer.Ordinal)
         '查找对应的 DLL
