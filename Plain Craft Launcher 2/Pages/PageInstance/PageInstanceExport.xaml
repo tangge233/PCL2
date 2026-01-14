@@ -94,7 +94,7 @@
                                     <local:ExportOption 
                                 Title="整合包重要数据"
                                 Description="脚本文件、内置资源包、数据包等"
-                                Rules="addons/|multiblocked/|modpack-update-checker/|global_packs/|global_resource_packs/|global_data_packs/|optional_data_packs/|maps/|icon.png|mods-resourcepacks/|matmos/|resource_assorts/|resource_assorts.json|patchouli_books/|datapacks/|kubejs*/|!kubejs*/probe/|!kubejs*/exported/|!kubejs*/jsconfig.json|!kubejs*/README.txt|openloader/|worldshape/|resources/|scripts/|structures/|fontfiles/|oresources/|packmenu/|craftpresence/|pointblanks/|template*/|!template*/playerdata/|!template*/stats/"
+                                Rules="addons/|multiblocked/|modpack-update-checker/|global_packs/|global_resource_packs/|global_data_packs/|optional_data_packs/|moonlight-global-datapacks/|maps/|icon.png|mods-resourcepacks/|matmos/|resource_assorts/|resource_assorts.json|patchouli_books/|datapacks/|kubejs*/|!kubejs*/probe/|!kubejs*/exported/|!kubejs*/jsconfig.json|!kubejs*/README.txt|openloader/|worldshape/|resources/|scripts/|structures/|fontfiles/|oresources/|packmenu/|craftpresence/|pointblanks/|template*/|!template*/playerdata/|!template*/stats/"
                                 DefaultChecked="True" />
                                 </local:MyCheckBox.Tag>
                             </local:MyCheckBox>
@@ -111,6 +111,14 @@
                                     <local:ExportOption 
                                 Title="TaCZ 枪包"
                                 Rules="tacz/|config/tacz/custom/"
+                                DefaultChecked="True" />
+                                </local:MyCheckBox.Tag>
+                            </local:MyCheckBox>
+                            <local:MyCheckBox>
+                                <local:MyCheckBox.Tag>
+                                    <local:ExportOption 
+                                Title="已上传的沉浸画"
+                                Rules="immersive_paintings/"
                                 DefaultChecked="True" />
                                 </local:MyCheckBox.Tag>
                             </local:MyCheckBox>

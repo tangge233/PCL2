@@ -647,7 +647,7 @@ NextFile:
             DeleteDirectory(PathTemp & "Help")
             Directory.CreateDirectory(PathTemp & "Help")
             WriteFile(PathTemp & "Cache\Help.zip", GetResources("Help"))
-            ExtractFile(PathTemp & "Cache\Help.zip", PathTemp & "Help", Encoding.UTF8)
+            ExtractCompressedFile(PathTemp & "Cache\Help.zip", PathTemp & "Help")
             Setup.Set("SystemHelpVersion", VersionCode)
             Log("[Help] 已解压内置帮助文件，目前状态：" & File.Exists(PathTemp & "Help\启动器\备份设置.xaml"), LogLevel.Debug)
         End If

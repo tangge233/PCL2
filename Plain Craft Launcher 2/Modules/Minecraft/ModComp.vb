@@ -48,9 +48,9 @@
 
 #Region "CompDatabase | Mod 数据库"
 
-    Private _CompDatabase As List(Of CompDatabaseEntry) = Nothing
     Private ReadOnly Property CompDatabase As List(Of CompDatabaseEntry)
         Get
+            Static _CompDatabase As List(Of CompDatabaseEntry) = Nothing
             If _CompDatabase IsNot Nothing Then Return _CompDatabase
             '初始化数据库
             _CompDatabase = New List(Of CompDatabaseEntry)
@@ -881,7 +881,7 @@ NoSubtitle:
                 Case CompType.ResourcePack
                     Address += "&classId=12"
             End Select
-            Address += "&categoryId=" & If(Tag = "", "0", Tag.BeforeFirst("/"))
+            If Tag <> "" Then Address += "&categoryId=" & Tag.BeforeFirst("/")
             If ModLoader <> CompModLoaderType.Any Then Address += "&modLoaderType=" & CType(ModLoader, Integer)
             If Not String.IsNullOrEmpty(GameVersion) Then Address += "&gameVersion=" & GameVersion
             If Not String.IsNullOrEmpty(SearchText) Then Address += "&searchFilter=" & Net.WebUtility.UrlEncode(SearchText)
@@ -1355,6 +1355,10 @@ Retry:
         ''' </summary>
         Public ReadOnly Hash As String = Nothing
         ''' <summary>
+        ''' 文件大小。不可用时为 -1。
+        ''' </summary>
+        Public ReadOnly Size As Integer = -1
+        ''' <summary>
         ''' 该文件的所有依赖工程的原始 ID。
         ''' 这些 ID 可能没有加载，在加载后会添加到 Dependencies 中（主要是因为 Modrinth 返回的是字符串 ID 而非 Slug，导致 Project.Id 查询不到）。
         ''' </summary>
@@ -1368,7 +1372,7 @@ Retry:
         ''' </summary>
         ''' <param name="LocalAddress">目标本地文件夹，或完整的文件路径。会自动判断类型。</param>
         Public Function ToNetFile(LocalAddress As String) As NetFile
-            Return New NetFile(DownloadUrls, LocalAddress & If(LocalAddress.EndsWithF("\"), FileName, ""), New FileChecker(Hash:=Hash), SimulateBrowserHeaders:=True)
+            Return New NetFile(DownloadUrls, LocalAddress & If(LocalAddress.EndsWithF("\"), FileName, ""), New FileChecker(Hash:=Hash, ActualSize:=Size), SimulateBrowserHeaders:=True)
         End Function
 
         '实例化
@@ -1390,6 +1394,7 @@ Retry:
                 If Data.ContainsKey("FileName") Then FileName = Data("FileName").ToString
                 If Data.ContainsKey("DownloadUrls") Then DownloadUrls = Data("DownloadUrls").ToObject(Of List(Of String))
                 If Data.ContainsKey("ModLoaders") Then ModLoaders = Data("ModLoaders").ToObject(Of List(Of CompModLoaderType))
+                If Data.ContainsKey("Size") Then Size = Data("Size").ToObject(Of Integer)
                 If Data.ContainsKey("Hash") Then Hash = Data("Hash").ToString
                 If Data.ContainsKey("GameVersions") Then GameVersions = Data("GameVersions").ToObject(Of List(Of String))
                 If Data.ContainsKey("RawDependencies") Then RawDependencies = Data("RawDependencies").ToObject(Of List(Of String))
@@ -1407,6 +1412,7 @@ Retry:
                     Status = CType(Data("releaseType").ToObject(Of Integer), CompFileStatus)
                     DownloadCount = Data("downloadCount")
                     FileName = Data("fileName")
+                    Size = Data("fileLength")
                     Hash = CType(Data("hashes"), JArray).ToList.FirstOrDefault(Function(s) s("algo").ToObject(Of Integer) = 1)?("value")
                     If Hash Is Nothing Then Hash = CType(Data("hashes"), JArray).ToList.FirstOrDefault(Function(s) s("algo").ToObject(Of Integer) = 2)?("value")
                     'DownloadAddress
@@ -1453,6 +1459,7 @@ Retry:
                         Dim File As JToken = Data("files")(0)
                         FileName = File("filename")
                         DownloadUrls = New List(Of String) From {File("url"), DlSourceModGet(File("url"))}.Distinct.ToList '同时添加了镜像源
+                        Size = File("size")
                         Hash = File("hashes")("sha1")
                     End If
                     'ModLoaders
@@ -1531,6 +1538,7 @@ Retry:
             If FileName IsNot Nothing Then Json.Add("FileName", FileName)
             If DownloadUrls IsNot Nothing Then Json.Add("DownloadUrls", New JArray(DownloadUrls))
             If Hash IsNot Nothing Then Json.Add("Hash", Hash)
+            If Size >= 0 Then Json.Add("Size", Size)
             Json.Add("RawDependencies", New JArray(RawDependencies))
             Json.Add("Dependencies", New JArray(Dependencies))
             Return Json

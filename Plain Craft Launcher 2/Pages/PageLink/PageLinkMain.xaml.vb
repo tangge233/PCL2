@@ -484,7 +484,7 @@ Public Class PageLinkMain
         If File.Exists(PathEasyTier & "EasyTier.zip") Then
             '解压
             Dim ExtractPath As String = RequestTaskTempFolder()
-            ExtractFile(PathEasyTier & "EasyTier.zip", ExtractPath,
+            ExtractCompressedFile(PathEasyTier & "EasyTier.zip", ExtractPath,
                 ProgressIncrementHandler:=Sub(Progress) Task.Progress += Progress * 0.05)
             Dim ExtractedPath As String = New DirectoryInfo(ExtractPath).EnumerateDirectories.FirstOrDefault?.FullName
             Log("[Link] 联机模块解压时的临时路径：" & ExtractedPath)

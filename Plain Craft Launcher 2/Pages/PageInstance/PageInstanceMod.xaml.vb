@@ -71,7 +71,7 @@
     ''' <summary>
     ''' 已加载的 Mod UI 缓存，不确保按显示顺序排列。Key 为 Mod 的 RawFileName。
     ''' </summary>
-    Public ModItems As New Dictionary(Of String, MyLocalModItem)
+    Public ModItems As New SafeDictionary(Of String, MyLocalModItem)
     ''' <summary>
     ''' 将加载器结果的 Mod 列表加载为 UI。
     ''' </summary>
@@ -87,10 +87,12 @@
                 Return
             End If
             '修改缓存
-            ModItems.Clear()
-            For Each ModEntity As McMod In McModLoader.Output
-                ModItems(ModEntity.RawFileName) = McModListItem(ModEntity)
-            Next
+            SyncLock ModItems.SyncRoot
+                ModItems.Clear()
+                For Each ModEntity As McMod In McModLoader.Output
+                    ModItems(ModEntity.RawFileName) = McModListItem(ModEntity)
+                Next
+            End SyncLock
             '显示结果
             Filter = FilterType.All
             SearchBox.Text = "" '这会触发结果刷新，所以需要在 ModItems 更新之后，详见 #3124 的视频
@@ -151,11 +153,13 @@
         If ShowingMods.Any() Then
             PanList.Visibility = Visibility.Visible
             PanList.Children.Clear()
-            For Each TargetMod In ShowingMods
-                Dim Item As MyLocalModItem = ModItems(TargetMod.RawFileName)
-                Item.Checked = SelectedMods.Contains(TargetMod.RawFileName) '更新选中状态
-                PanList.Children.Add(Item)
-            Next
+            SyncLock ModItems.SyncRoot
+                For Each TargetMod In ShowingMods
+                    Dim Item As MyLocalModItem = ModItems(TargetMod.RawFileName)
+                    Item.Checked = SelectedMods.Contains(TargetMod.RawFileName) '更新选中状态
+                    PanList.Children.Add(Item)
+                Next
+            End SyncLock
         Else
             PanList.Visibility = Visibility.Collapsed
         End If
@@ -528,6 +532,7 @@ Install:
             If IndexOfUi = -1 Then Continue For '因为未知原因 Mod 的状态已经切换完了
             PanList.Children.RemoveAt(IndexOfUi)
             PanList.Children.Insert(IndexOfUi, NewItem)
+            NewItem.UpdateLayout() '#7861
         Next
         If IsSuccessful Then
             RefreshBars()
@@ -591,7 +596,7 @@ Install:
                     NewestReplaceName = Join(NewestSegs, "-")
                 End If
                 '添加到下载列表
-                Dim TempAddress As String = PathTemp & "DownloadedMods\" & Entry.FileName.Replace(CurrentReplaceName, NewestReplaceName)
+                Dim TempAddress As String = PathTemp & "mods\" & Entry.FileName.Replace(CurrentReplaceName, NewestReplaceName) '需要下载到 mods 文件夹，以便重复文件检查时识别
                 Dim RealAddress As String = GetPathFromFullPath(Entry.Path) & Entry.FileName.Replace(CurrentReplaceName, NewestReplaceName)
                 FileList.Add(File.ToNetFile(TempAddress))
                 FileCopyList(TempAddress) = RealAddress

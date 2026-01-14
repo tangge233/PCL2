@@ -52,7 +52,7 @@ Public Module ModNet
             Optional Encoding As Encoding = Nothing, Optional SimulateBrowserHeaders As Boolean = False) As String
         Dim RetryCount As Integer = 0
         Dim RetryException As Exception = Nothing
-        Dim StartTime As Long = GetTimeTick()
+        Dim StartTime As Long = GetTimeMs()
         Try
 Retry:
             Select Case RetryCount
@@ -62,7 +62,7 @@ Retry:
                     Thread.Sleep(500)
                     Return NetRequestByClient(Url, Method, Content, ContentType, Accept, 30000, Headers, RequireJson, Encoding, SimulateBrowserHeaders)
                 Case Else '快速重试
-                    If GetTimeTick() - StartTime > 5500 Then
+                    If GetTimeMs() - StartTime > 5500 Then
                         '若前两次加载耗费 5 秒以上，才进行重试
                         Thread.Sleep(500)
                         Return NetRequestByClient(Url, Method, Content, ContentType, Accept, 4000, Headers, RequireJson, Encoding, SimulateBrowserHeaders)
@@ -586,7 +586,7 @@ RequestFinished:
         ''' <summary>
         ''' 上次记速时的时间。
         ''' </summary>
-        Private SpeedLastTime As Long = GetTimeTick()
+        Private SpeedLastTime As Long = GetTimeMs()
         ''' <summary>
         ''' 上次记速时的已下载大小。
         ''' </summary>
@@ -596,8 +596,8 @@ RequestFinished:
         ''' </summary>
         Public ReadOnly Property Speed As Long
             Get
-                If GetTimeTick() - SpeedLastTime > 200 Then
-                    Dim DeltaTime As Long = GetTimeTick() - SpeedLastTime
+                If GetTimeMs() - SpeedLastTime > 200 Then
+                    Dim DeltaTime As Long = GetTimeMs() - SpeedLastTime
                     _Speed = (DownloadDone - SpeedLastDone) / (DeltaTime / 1000)
                     SpeedLastDone = DownloadDone
                     SpeedLastTime += DeltaTime
@@ -610,7 +610,7 @@ RequestFinished:
         ''' <summary>
         ''' 线程初始化时的时间。
         ''' </summary>
-        Public InitTime As Long = GetTimeTick()
+        Public InitTime As Long = GetTimeMs()
         ''' <summary>
         ''' 上次接受到有效数据的时间，-1 表示尚未有有效数据。
         ''' </summary>
@@ -773,7 +773,7 @@ RequestFinished:
         ''' <summary>
         ''' 上次记速时的时间。
         ''' </summary>
-        Private SpeedLastTime As Long = GetTimeTick()
+        Private SpeedLastTime As Long = GetTimeMs()
         ''' <summary>
         ''' 上次记速时的已下载大小。
         ''' </summary>
@@ -783,8 +783,8 @@ RequestFinished:
         ''' </summary>
         Public ReadOnly Property Speed As Long
             Get
-                If GetTimeTick() - SpeedLastTime > 200 Then
-                    Dim DeltaTime As Long = GetTimeTick() - SpeedLastTime
+                If GetTimeMs() - SpeedLastTime > 200 Then
+                    Dim DeltaTime As Long = GetTimeMs() - SpeedLastTime
                     _Speed = (DownloadDone - SpeedLastDone) / (DeltaTime / 1000)
                     SpeedLastDone = DownloadDone
                     SpeedLastTime += DeltaTime
@@ -1079,7 +1079,7 @@ NotSupportRange:
                     SyncLock NetTaskSpeedLimitLeftLock
                         If NetTaskSpeedLimitHigh > 0 Then NetTaskSpeedLimitLeft -= RealDataCount
                     End SyncLock
-                    Dim DeltaTime = GetTimeTick() - Th.LastReceiveTime
+                    Dim DeltaTime = GetTimeMs() - Th.LastReceiveTime
                     If DeltaTime > 1000000 Then DeltaTime = 1 '避免时间刻反转导致出现极大值
                     If RealDataCount > 0 Then
                         '有数据
@@ -1091,7 +1091,7 @@ NotSupportRange:
                             End SyncLock
                             SyncLock LockCount
                                 ConnectCount += 1
-                                ConnectTime += GetTimeTick() - Th.InitTime
+                                ConnectTime += GetTimeMs() - Th.InitTime
                             End SyncLock
                         End If
                         SyncLock LockCount
@@ -1113,7 +1113,7 @@ NotSupportRange:
                                     Th.Source.SingleThread Is Nothing Then '且并非单线程下载
                             Throw New TimeoutException("由于速度过慢断开链接，下载 " & RealDataCount & " B，消耗 " & DeltaTime & " ms。")
                         End If
-                        Th.LastReceiveTime = GetTimeTick()
+                        Th.LastReceiveTime = GetTimeMs()
                     ElseIf Th.LastReceiveTime > 0 AndAlso DeltaTime > Timeout Then
                         '无数据，且已超时
                         Throw New TimeoutException("操作超时，无数据。")
@@ -1346,6 +1346,7 @@ Retry:
                 If State >= NetState.Finished Then Return
                 If RaiseEx IsNot Nothing Then Ex.Add(RaiseEx)
                 '凉凉
+                Log($"[Download] {LocalName}：已失败，当前状态 {State}")
                 State = NetState.Interrupted
             End SyncLock
             AbortInternal()
@@ -1363,6 +1364,7 @@ Retry:
             '确认中断
             SyncLock LockState
                 If State >= NetState.Finished Then Return
+                Log($"[Download] {LocalName}：已中断，当前状态 {State}")
                 State = NetState.Interrupted
             End SyncLock
             AbortInternal()
@@ -1373,7 +1375,6 @@ Retry:
             SyncLock NetManager.LockRemain
                 NetManager.FileRemain -= 1
             End SyncLock
-            Log($"[Download] {LocalName}：已终止，当前状态 {State}")
         End Sub
 
         '状态改变接口
@@ -1584,14 +1585,8 @@ FinishExCatch:
                 For Each File As NetFile In Files
                     Dim Target As String = CheckExistingFile(FolderList, VersionFolders, File)
                     If File.State >= NetState.WaitingToDownload Then Return '中断
-                    If Target Is Nothing Then
-                        '未找到相同文件
-                        SyncLock LockState
-                            File.State = NetState.WaitingToDownload
-                            File.IsCopy = False
-                        End SyncLock
-                    Else
-                        '已找到相同文件
+                    '已找到相同文件
+                    If Target IsNot Nothing Then
                         File.IsCopy = True
                         Dim RetryCount As Integer = 0
 Retry:
@@ -1601,20 +1596,21 @@ Retry:
                                 CopyFile(Target, File.LocalPath)
                             End If
                             File.Finish(False)
+                            Continue For
                         Catch ex As Exception
                             RetryCount += 1
                             Log(ex, $"复制已存在的文件失败，第 {RetryCount} 次重试（{Target} → {File.LocalPath}）")
                             If RetryCount < 3 Then
-                                Thread.Sleep(200)
+                                Thread.Sleep(2000)
                                 GoTo Retry
                             End If
-                            '失败，回退到下载
-                            SyncLock LockState
-                                File.State = NetState.WaitingToDownload
-                                File.IsCopy = False
-                            End SyncLock
                         End Try
                     End If
+                    '回退到下载
+                    SyncLock LockState
+                        File.State = NetState.WaitingToDownload
+                        File.IsCopy = False
+                    End SyncLock
                 Next
             Catch ex As Exception
                 OnFail(New List(Of Exception) From {New Exception("下载已存在文件查找失败", ex)})
@@ -1639,6 +1635,7 @@ Retry:
             End If
             Dim Type = TypeIndexes.MaxOf(Function(kv) kv.Item2).FolderName.TrimStart("\"c)
             '根据类别进行查找
+            Static Sizes As New SafeDictionary(Of String, Long)
             Select Case Type
                 Case "assets\", "libraries\"
                     'assets/libraries：查找 MC 文件夹下的相同路径
@@ -1651,6 +1648,10 @@ Retry:
                     For Each VersionFolder In VersionFolders
                         For Each Candidate In Directory.GetFiles(VersionFolder,
                             "*." & GetFileNameFromPath(File.LocalPath).AfterLast(".").ToLower, SearchOption.TopDirectoryOnly)
+                            '快速进行大小校验
+                            If Not Sizes.ContainsKey(Candidate) Then Sizes(Candidate) = New FileInfo(Candidate).Length
+                            If File.Check.ActualSize <> Sizes(Candidate) Then Continue For
+                            'Hash 校验
                             If File.Check.Check(Candidate) Is Nothing Then Return Candidate
                         Next
                     Next
@@ -1662,7 +1663,6 @@ Retry:
                         If Not Directory.Exists(TargetFolder) Then Continue For
                         For Each Candidate In Directory.GetFiles(TargetFolder)
                             '快速进行大小校验
-                            Static Sizes As New SafeDictionary(Of String, Long)
                             If Not Sizes.ContainsKey(Candidate) Then Sizes(Candidate) = New FileInfo(Candidate).Length
                             If File.Check.ActualSize <> Sizes(Candidate) Then Continue For
                             'Hash 校验
@@ -1803,7 +1803,7 @@ Retry:
         ''' </summary>
         Private Sub RefreshStat()
             Try
-                Dim DeltaTime As Long = GetTimeTick() - RefreshStatLast
+                Dim DeltaTime As Long = GetTimeMs() - RefreshStatLast
                 If DeltaTime = 0 Then Return
                 RefreshStatLast += DeltaTime
 #Region "刷新整体速度"
@@ -1905,7 +1905,7 @@ Retry:
             RunInNewThread(
             Sub()
                 Try
-                    Dim NextTick As Long = GetTimeTick()
+                    Dim NextTick As Long = GetTimeMs()
                     While True
                         '增加限速余量
                         If NetTaskSpeedLimitHigh > 0 Then NetTaskSpeedLimitLeft = NetTaskSpeedLimitHigh / 10
@@ -1913,11 +1913,11 @@ Retry:
                         RefreshStat()
                         '等待 100 ms
                         NextTick += 100
-                        Dim SleepTime = NextTick - GetTimeTick()
+                        Dim SleepTime = NextTick - GetTimeMs()
                         If SleepTime > 0 Then
                             Thread.Sleep(SleepTime)
                         Else
-                            NextTick = GetTimeTick() '超时，直接追帧，不等待
+                            NextTick = GetTimeMs() '超时，直接追帧，不等待
                         End If
                     End While
                 Catch ex As Exception

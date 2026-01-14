@@ -465,9 +465,10 @@ NoUserJava:
         If Not Left.IsJre AndAlso Right.IsJre Then Return False
         '4. Java 大版本
         If Left.MajorVersion <> Right.MajorVersion Then
-            '                             Java  7   8   9  10  11  12 13 14 15  16  17  18  19  20  21  22  23...
-            Dim Weight = {0, 1, 2, 3, 4, 5, 6, 14, 30, 10, 12, 15, 13, 9, 8, 7, 11, 31, 29, 16, 17, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18}
-            Return Weight.ElementAtOrDefault(Left.MajorVersion) >= Weight.ElementAtOrDefault(Right.MajorVersion)
+            '                             Java  7   8   9  10  11  12 13 14 15  16  17  18  19  20
+            Dim Weight = {0, 1, 2, 3, 4, 5, 6, 14, 30, 10, 12, 15, 13, 9, 8, 7, 11, 31, 29, 16, 17} '更高的版本指定为 20，且越低越好
+            Return If(Left.MajorVersion > 20, 20 - Left.MajorVersion * 0.0001, Weight.ElementAtOrDefault(Left.MajorVersion)) >=
+                   If(Right.MajorVersion > 20, 20 - Right.MajorVersion * 0.0001, Weight.ElementAtOrDefault(Right.MajorVersion))
         End If
         '5. 最次级版本号更接近 51
         Return Math.Abs(Left.Version.Revision - 51) <= Math.Abs(Right.Version.Revision - 51)

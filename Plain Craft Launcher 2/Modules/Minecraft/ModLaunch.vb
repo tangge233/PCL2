@@ -544,7 +544,7 @@ NextInner:
         '检查是否已经登录完成
         If Not Data.IsForceRestarting AndAlso '不要求强行重启
            Input.AccessToken <> "" AndAlso '已经登录过了
-           (McLoginMsRefreshTime > 0 AndAlso GetTimeTick() - McLoginMsRefreshTime < 1000 * 60 * 10) Then '完成时间在 10 分钟内
+           (McLoginMsRefreshTime > 0 AndAlso GetTimeMs() - McLoginMsRefreshTime < 1000 * 60 * 10) Then '完成时间在 10 分钟内
             Data.Output = New McLoginResult With
                 {.AccessToken = Input.AccessToken, .Name = Input.UserName, .Uuid = Input.Uuid, .Type = "Microsoft", .ClientToken = Input.Uuid, .ProfileJson = Input.ProfileJson}
             GoTo SkipLogin
@@ -591,7 +591,7 @@ Relogin:
         Setup.Set("LoginMsJson", MsJson.ToString(Newtonsoft.Json.Formatting.None))
         Data.Output = New McLoginResult With {.AccessToken = AccessToken, .Name = Result(1), .Uuid = Result(0), .Type = "Microsoft", .ClientToken = Result(0), .ProfileJson = Result(2)}
         '结束
-        McLoginMsRefreshTime = GetTimeTick()
+        McLoginMsRefreshTime = GetTimeMs()
         McLaunchLog("微软登录完成")
 SkipLogin:
         Setup.Set("HintBuy", True) '关闭正版购买提示
@@ -1771,7 +1771,7 @@ NextInstance:
             If Not Native.IsNatives Then Continue For
             Dim Zip As ZipArchive
             Try
-                Zip = New ZipArchive(New FileStream(Native.LocalPath, FileMode.Open))
+                Zip = New ZipArchive(New FileStream(Native.LocalPath, FileMode.Open, FileAccess.Read, FileShare.Read))
             Catch ex As InvalidDataException
                 Log(ex, "打开 Natives 文件失败（" & Native.LocalPath & "）")
                 File.Delete(Native.LocalPath)

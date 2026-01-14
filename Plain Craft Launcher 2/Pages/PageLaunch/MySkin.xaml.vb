@@ -232,9 +232,7 @@ Retry:
                 Dim Uuid As String = McLoginMsLoader.Output.Uuid
                 Dim SkinData As JObject = GetJson(McLoginMsLoader.Output.ProfileJson)
                 '获取玩家的所有披风
-                Dim SelId As Integer? = Nothing
-                '获取玩家当前的披风
-                Dim CurId As Integer? = Nothing
+                Dim SelectedIndex As Integer? = Nothing
                 RunInUiWait(
                 Sub()
                     Try
@@ -248,25 +246,23 @@ Retry:
                             {"Mojang Office", "Mojang 办公室披风"}, {"Home", "家园披风"}, {"Menace", "入侵披风"}, {"Yearn", "渴望披风"},
                             {"Common", "普通披风"}, {"Pan", "薄煎饼披风"}, {"Founder's", "创始人披风"}, {"Copper", "铜披风"}, {"Zombie Horse", "僵尸马披风"}
                         }
-                        Dim SelectionControl As New List(Of IMyRadio) From {New MyRadioBox With {.Text = "无披风"}}
-                        Dim Id As Integer = 0
+                        Dim SelectionControl As New List(Of IMyRadio) From {
+                            New MyRadioBox With {.Text = "无披风", .Checked = Not SkinData("capes").Any(Function(c) c("state")?.ToString = "ACTIVE")}}
                         For Each Cape In SkinData("capes")
-                            Id += 1
                             Dim CapeName As String = Cape("alias").ToString
                             If CapeNames.ContainsKey(CapeName) Then CapeName = CapeNames(CapeName)
-                            If Cape("state")?.ToString = "ACTIVE" Then CurId = Id
                             SelectionControl.Add(New MyRadioBox With {.Text = CapeName, .Checked = Cape("state")?.ToString = "ACTIVE"})
                         Next
-                        SelId = MyMsgBoxSelect(SelectionControl, "选择披风", "确定", "取消")
+                        SelectedIndex = MyMsgBoxSelect(SelectionControl, "选择披风", "确定", "取消")
                     Catch ex As Exception
                         Log(ex, "获取玩家皮肤列表失败", LogLevel.Feedback)
                     End Try
                 End Sub)
-                If SelId Is Nothing Then Return
+                If SelectedIndex Is Nothing Then Return
                 '发送请求
                 Dim Result As String = NetRequestByClientRetry("https://api.minecraftservices.com/minecraft/profile/capes/active",
-                    If(SelId = 0, HttpMethod.Delete, HttpMethod.Put),
-                    Content:=If(SelId = 0, "", New JObject(New JProperty("capeId", SkinData("capes")(SelId - 1)("id"))).ToString(0)),
+                    If(SelectedIndex = 0, HttpMethod.Delete, HttpMethod.Put),
+                    Content:=If(SelectedIndex = 0, "", New JObject(New JProperty("capeId", SkinData("capes")(SelectedIndex - 1)("id"))).ToString(0)),
                     ContentType:="application/json",
                     Headers:={{"Authorization", "Bearer " & AccessToken}})
                 If Result.Contains("""errorMessage""") Then
@@ -274,11 +270,11 @@ Retry:
                     Return
                 Else
                     Hint("更改披风成功！", HintType.Green)
-                    '#7894，更换披风后需更新当前选择的披风
-                    SkinData("capes")(SelId - 1)("state") = "ACTIVE"
-                    If CurId IsNot Nothing Then
-                        SkinData("capes")(CurId - 1)("state") = "INACTIVE"
-                    End If
+                    '更新当前选择的披风
+                    For Each Cape In SkinData("capes")
+                        Cape("state") = "INACTIVE"
+                    Next
+                    If SelectedIndex > 0 Then SkinData("capes")(SelectedIndex - 1)("state") = "ACTIVE"
                     McLoginMsLoader.Output.ProfileJson = SkinData.ToString()
                 End If
             Catch ex As Exception

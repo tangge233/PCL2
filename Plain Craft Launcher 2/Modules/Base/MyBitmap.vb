@@ -72,7 +72,7 @@ Public Class MyBitmap
                 End If
             Else
                 '使用这种自己接管 FileStream 的方法加载才能解除文件占用
-                Using InputStream As New FileStream(FilePathOrResourceName, FileMode.Open)
+                Using InputStream As New FileStream(FilePathOrResourceName, FileMode.Open, FileAccess.Read, FileShare.Read)
                     '判断是否为 WebP 文件头
                     Dim Header(1) As Byte
                     InputStream.Read(Header, 0, 2)

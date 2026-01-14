@@ -1,7 +1,7 @@
 ﻿Imports System.IO.Compression
 
 Public Module ModMod
-    Private Const LocalModCacheVersion As Integer = 10
+    Private Const LocalModCacheVersion As Integer = 11
 
     Public Class McMod
 
@@ -137,7 +137,7 @@ Public Module ModMod
                 '基础可用性检查、打开 Jar 文件
                 If Path.Length < 2 Then Throw New FileNotFoundException("错误的 Mod 文件路径（" & If(Path, "null") & "）")
                 If Not File.Exists(Path) Then Throw New FileNotFoundException("未找到 Mod 文件（" & Path & "）")
-                Jar = New ZipArchive(New FileStream(Path, FileMode.Open))
+                Jar = New ZipArchive(New FileStream(Path, FileMode.Open, FileAccess.Read, FileShare.Read))
                 '信息获取
                 LoadMetadataFromJar(Jar)
             Catch ex As UnauthorizedAccessException
@@ -424,7 +424,7 @@ Finished:
         ''' </summary>
         Public ReadOnly Property CanUpdate As Boolean
             Get
-                Return Not Setup.Get("UiHiddenFunctionModUpdate") AndAlso Not Setup.Get("VersionAdvanceDisableModUpdate", Instance:=PageInstanceLeft.Instance) AndAlso ChangelogUrls.Any()
+                Return Not Setup.Get("UiHiddenFunctionModUpdate") AndAlso Not Setup.Get("VersionAdvanceDisableModUpdate", Instance:=PageInstanceLeft.Instance) AndAlso UpdateFile IsNot Nothing
             End Get
         End Property
 
@@ -604,7 +604,7 @@ Finished:
             For Each ModFile As FileInfo In ModFileList
                 If Loader.IsAborted Then Return
                 Dim ModEntry As New McMod(ModFile.FullName)
-                Dim DumpMod As McMod = ModList.FirstOrDefault(Function(m) m.RawFileName = ModEntry.RawFileName)
+                Dim DumpMod As McMod = ModList.FirstOrDefault(Function(m) m.RawFileName = ModEntry.RawFileName) '存在两个文件，名称相同，但一个启用一个禁用
                 If DumpMod IsNot Nothing Then
                     Dim DisabledMod As McMod = If(DumpMod.State = McMod.McModState.Disabled, DumpMod, ModEntry)
                     Log($"[Mod] 重复的 Mod 文件：{DumpMod.FileName} 与 {ModEntry.FileName}，已忽略 {DisabledMod.FileName}", LogLevel.Debug)
@@ -619,10 +619,7 @@ Finished:
             Log($"[Mod] 共发现 {ModList.Count} 个 Mod")
 
             '排序
-            ModList = ModList.SortByComparison(
-            Function(Left, Right) As Boolean
-                Return Not Right.FileName.CompareTo(Left.FileName)
-            End Function)
+            ModList = ModList.OrderBy(Function(m) m.FileName).ToList
 
             '回设
             If Loader.IsAborted Then Return

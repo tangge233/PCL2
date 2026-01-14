@@ -424,7 +424,7 @@ Public Class PageInstanceExport
         End If
         If PackPath Is Nothing Then
             Dim Extensions As New List(Of String)
-            If Not CheckAdvancedModrinth.Checked Then Extensions.Add("压缩文件(*.zip)|*.zip")
+            Extensions.Add("压缩文件(*.zip)|*.zip")
             If Not CheckOptionsPcl.Checked Then Extensions.Add("Modrinth 整合包文件(*.mrpack)|*.mrpack")
             PackPath = SelectSaveFile("选择导出位置",
                 PackName & If(String.IsNullOrEmpty(TextExportVersion.Text), "", " " & TextExportVersion.Text), Extensions.Join("|"))

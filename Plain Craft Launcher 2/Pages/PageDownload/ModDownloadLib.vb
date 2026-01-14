@@ -1329,7 +1329,7 @@ Retry:
                 Dim Installer As ZipArchive = Nothing
                 Try
                     '解压并获取、合并两个 Json 的信息
-                    Installer = New ZipArchive(New FileStream(InstallerAddress, FileMode.Open))
+                    Installer = New ZipArchive(New FileStream(InstallerAddress, FileMode.Open, FileAccess.Read, FileShare.Read))
                     Task.Progress = 0.2
                     Dim Json As JObject = GetJson(ReadFile(Installer.GetEntry("install_profile.json").Open))
                     Dim Json2 As JObject = GetJson(ReadFile(Installer.GetEntry("version.json").Open))
@@ -1417,7 +1417,7 @@ Retry:
                     '记录当前文件夹列表（在新建目标文件夹之前）
                     Dim OldList = New DirectoryInfo(McFolder & "versions\").EnumerateDirectories.Select(Function(i) i.FullName).ToList()
                     '解压并获取信息
-                    Installer = New ZipArchive(New FileStream(InstallerAddress, FileMode.Open))
+                    Installer = New ZipArchive(New FileStream(InstallerAddress, FileMode.Open, FileAccess.Read, FileShare.Read))
                     Dim Json As JObject = GetJson(ReadFile(Installer.GetEntry("install_profile.json").Open))
                     '新建目标版本文件夹
                     Directory.CreateDirectory(VersionFolder)
@@ -1484,7 +1484,7 @@ Retry:
                 Dim Installer As ZipArchive = Nothing
                 Try
                     '解压并获取信息
-                    Installer = New ZipArchive(New FileStream(InstallerAddress, FileMode.Open))
+                    Installer = New ZipArchive(New FileStream(InstallerAddress, FileMode.Open, FileAccess.Read, FileShare.Read))
                     Task.Progress = 0.2
                     Dim Json As JObject = GetJson(ReadFile(Installer.GetEntry("install_profile.json").Open))
                     Task.Progress = 0.4
@@ -1501,7 +1501,7 @@ Retry:
                         Task.Progress = 0.6
                         '解压支持库文件
                         Installer.Dispose()
-                        ExtractFile(InstallerAddress, InstallerAddress & "_unrar\")
+                        ExtractCompressedFile(InstallerAddress, InstallerAddress & "_unrar\")
                         CopyDirectory(InstallerAddress & "_unrar\maven\", McFolder & "libraries\")
                         DeleteDirectory(InstallerAddress & "_unrar\")
                     Else

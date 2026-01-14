@@ -14,13 +14,13 @@ Public Module ModBase
 #Region "声明"
 
     '下列版本信息由更新器自动修改
-    Public Const VersionBaseName As String = "2.12.1" '不含分支前缀的显示用版本名
-    Public Const VersionStandardCode As String = "2.12.1." & VersionBranchCode '标准格式的四段式版本号
+    Public Const VersionBaseName As String = "2.12.2" '不含分支前缀的显示用版本名
+    Public Const VersionStandardCode As String = "2.12.2." & VersionBranchCode '标准格式的四段式版本号
     Public Const CommitHash As String = "" 'Commit Hash，由 GitHub Workflow 自动替换
 #If BETA Then
-    Public Const VersionCode As Integer = 372 'Release
+    Public Const VersionCode As Integer = 379 'Release
 #Else
-    Public Const VersionCode As Integer = 378 'Snapshot
+    Public Const VersionCode As Integer = 380 'Snapshot
 #End If
     '自动生成的版本信息
     Public Const VersionDisplayName As String = VersionBranchName & " " & VersionBaseName
@@ -62,7 +62,7 @@ Public Module ModBase
     ''' <summary>
     ''' 程序的打开计时。
     ''' </summary>
-    Public ApplicationStartTick As Long = GetTimeTick()
+    Public ApplicationStartTick As Long = GetTimeMs()
     ''' <summary>
     ''' 程序打开时的时间。
     ''' </summary>
@@ -1284,27 +1284,31 @@ Re:
     ''' <summary>
     ''' 尝试根据后缀名判断文件种类并解压文件，支持 gz 与 zip，会尝试将 jar 以 zip 方式解压。
     ''' 会尝试创建，但不会清空目标文件夹。
+    ''' 会先使用 UTF-8 解压，失败后换用 GB18030 解压。
     ''' </summary>
-    Public Sub ExtractFile(CompressFilePath As String, DestDirectory As String, Optional Encode As Encoding = Nothing,
-                           Optional ProgressIncrementHandler As Action(Of Double) = Nothing)
+    Public Sub ExtractCompressedFile(CompressFilePath As String, DestDirectory As String, Optional ProgressIncrementHandler As Action(Of Double) = Nothing)
         Directory.CreateDirectory(DestDirectory)
+        '解压 gz（gz 不需要考虑编码）
         If CompressFilePath.EndsWithF(".gz", True) Then
-            '以 gz 方式解压
-            Dim stream As New GZipStream(New FileStream(CompressFilePath, FileMode.Open, FileAccess.ReadWrite), CompressionMode.Decompress)
-            Dim decompressedFile As New FileStream(DestDirectory & GetFileNameFromPath(CompressFilePath).ToLower.Replace(".tar", "").Replace(".gz", ""), FileMode.OpenOrCreate, FileAccess.Write)
-            Dim data As Integer = stream.ReadByte()
-            While data <> -1
-                decompressedFile.WriteByte(data)
-                data = stream.ReadByte()
-            End While
-            decompressedFile.Close()
-            stream.Close()
-        Else
-            '以 zip 方式解压
-            Using Archive = ZipFile.Open(CompressFilePath, ZipArchiveMode.Read, If(Encode, Encoding.GetEncoding("GB18030")))
-                Dim TotalCount As Long = Archive.Entries.Count
-                For Each Entry As ZipArchiveEntry In Archive.Entries
-                    If ProgressIncrementHandler IsNot Nothing AndAlso TotalCount > 0 Then ProgressIncrementHandler(1 / TotalCount)
+            Using stream As New GZipStream(New FileStream(CompressFilePath, FileMode.Open, FileAccess.Read, FileShare.Read), CompressionMode.Decompress)
+                Using decompressedFile As New FileStream(DestDirectory & GetFileNameFromPath(CompressFilePath).ToLower.Replace(".tar", "").Replace(".gz", ""),
+                                                         FileMode.OpenOrCreate, FileAccess.Write)
+                    Dim data As Integer = stream.ReadByte()
+                    While data <> -1
+                        decompressedFile.WriteByte(data)
+                        data = stream.ReadByte()
+                    End While
+                End Using
+            End Using
+            Return
+        End If
+        '解压 zip
+        Dim TryExtractZip =
+        Sub(Encoding As Encoding)
+            Using Archive = ZipFile.Open(CompressFilePath, ZipArchiveMode.Read, Encoding)
+                Dim EntryCount = Archive.Entries.Count
+                For Each Entry In Archive.Entries
+                    If ProgressIncrementHandler IsNot Nothing AndAlso EntryCount > 0 Then ProgressIncrementHandler(1 / EntryCount)
                     Dim DestinationFullPath As String = IO.Path.Combine(DestDirectory, Entry.FullName)
                     If Not IO.Path.GetFullPath(DestinationFullPath).StartsWithF(IO.Path.GetFullPath(DestDirectory), True) Then Continue For 'ZipSlip 漏洞修复
                     If DestinationFullPath.EndsWithF("\") OrElse DestinationFullPath.EndsWithF("/") Then Continue For '不创建空文件夹
@@ -1313,7 +1317,17 @@ Re:
                     Entry.ExtractToFile(DestinationFullPath.Replace(DestinationDirectory, ShortenPath(DestinationDirectory)), True) '#7329
                 Next
             End Using
-        End If
+        End Sub
+        Try
+            TryExtractZip(Encoding.UTF8)
+        Catch ex As Exception
+            Log(ex, $"首次解压尝试失败，将更换编码并重试（{CompressFilePath} → {DestDirectory}）")
+            Try
+                TryExtractZip(Encoding.GetEncoding("GB18030"))
+            Catch
+                Throw
+            End Try
+        End Try
     End Sub
 
     ''' <summary>
@@ -1609,6 +1623,7 @@ RetryDir:
     End Function
     ''' <summary>
     ''' 分割字符串。
+    ''' 若原始字符串为空，则返回 {""}。
     ''' </summary>
     <Extension> Public Function Split(FullStr As String, SplitStr As String) As String()
         If SplitStr.Length = 1 Then
@@ -2297,10 +2312,10 @@ NextElement:
         Return Date.Now.ToString("HH':'mm':'ss'.'fff")
     End Function
     ''' <summary>
-    ''' 获取系统运行时间（毫秒），保证为正 Long 且大于 1，但可能突变减小。
+    ''' 获取一个单调递增时间值（毫秒）。
     ''' </summary>
-    Public Function GetTimeTick() As Long
-        Return My.Computer.Clock.TickCount + 2147483651L
+    Public Function GetTimeMs() As Long
+        Return Stopwatch.GetTimestamp() \ (Stopwatch.Frequency \ 1000L)
     End Function
     ''' <summary>
     ''' 将时间间隔转换为类似“5 分 10 秒前”的易于阅读的形式。

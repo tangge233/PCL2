@@ -222,14 +222,14 @@
     ''' </summary>
     Public DlClientListMojangLoader As New LoaderTask(Of String, DlClientListResult)("DlClientList Mojang", AddressOf DlClientListMojangMain)
     Private Sub DlClientListMojangMain(Loader As LoaderTask(Of String, DlClientListResult))
-        Dim StartTime As Long = GetTimeTick()
+        Dim StartTime As Long = GetTimeMs()
         Dim Json As JObject = GetJson(NetRequestByClientRetry("https://launchermeta.mojang.com/mc/game/version_manifest.json", RequireJson:=True))
         Try
             Dim Versions As JArray = Json("versions")
             If Versions.Count < 200 Then Throw New Exception("获取到的版本列表长度不足（" & Json.ToString & "）")
             '确定官方源是否可用
             If Not DlPreferMojang Then
-                Dim DeltaTime = GetTimeTick() - StartTime
+                Dim DeltaTime = GetTimeMs() - StartTime
                 DlPreferMojang = DeltaTime < 4000
                 Log($"[Download] Mojang 官方源加载耗时：{DeltaTime}ms，{If(DlPreferMojang, "可优先使用官方源", "不优先使用官方源")}")
             End If
@@ -844,7 +844,7 @@
         Public Sub New(ApiName As String)
             IsNeoForge = True
             Me.ApiName = ApiName
-            IsBeta = ApiName.Contains("beta") OrElse ApiName.Contains("alpha")
+            IsBeta = ApiName.ContainsF("beta", True) OrElse ApiName.ContainsF("alpha", True)
             If ApiName.Contains("1.20.1") Then '1.20.1-47.1.99
                 VersionName = ApiName.Replace("1.20.1-", "")
                 Version = New Version("19." & VersionName)

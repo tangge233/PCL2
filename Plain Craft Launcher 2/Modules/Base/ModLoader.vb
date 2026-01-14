@@ -295,7 +295,7 @@
 
             If (State = LoadState.Loading OrElse State = LoadState.Finished) AndAlso '正在加载或已结束…
                (IgnoreReloadTimeout OrElse ReloadTimeout = -1 OrElse
-               LastFinishedTime = 0 OrElse GetTimeTick() - LastFinishedTime < ReloadTimeout) Then '…且没有超时…
+               LastFinishedTime = 0 OrElse GetTimeMs() - LastFinishedTime < ReloadTimeout) Then '…且没有超时…
                 Return False '…则不重试
             Else
                 Return True '否则需要重启
@@ -328,7 +328,7 @@
                     If ModeDebug AndAlso Not LogBlackList.Contains(Name) Then Log($"[Loader] 加载线程 {Name} ({Thread.CurrentThread.ManagedThreadId}) 已完成")
                     RaisePreviewFinish()
                     State = LoadState.Finished
-                    LastFinishedTime = GetTimeTick() '未中断，本次输出有效
+                    LastFinishedTime = GetTimeMs() '未中断，本次输出有效
                 Catch ex As CancelledException
                     If ModeDebug Then Log(ex, $"加载线程 {Name} ({Thread.CurrentThread.ManagedThreadId}) 已触发取消中断，已完成 {Math.Round(Progress * 100)}%")
                     If Not IsAborted Then State = LoadState.Aborted

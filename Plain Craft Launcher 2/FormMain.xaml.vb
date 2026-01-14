@@ -11,8 +11,18 @@ Public Class FormMain
         Dim FeatureList As New List(Of KeyValuePair(Of Integer, String))
         '统计更新日志条目
 #If BETA Then
+        If LastVersion < 379 Then 'Release 2.12.1
+            If LastVersion >= 376 Then
+                FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "删除：暂时隐藏联机入口……不过只是暂时关闭，它还会回来的！"))
+            End If
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(3, "新增：适配新的 Minecraft 版本号系统与 Unobfuscated 版本"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(2, "优化：巨幅优化各个下载页面和 Mod 管理页面的性能"))
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "优化：更换披风时会显示当前使用的披风"))
+            FeatureCount += 33
+            BugCount += 29
+        End If
         If LastVersion < 376 Then 'Release 2.11.2
-            FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "新增：联机功能！"))
+            'FeatureList.Add(New KeyValuePair(Of Integer, String)(5, "新增：联机功能！"))
             FeatureCount += 32
             BugCount += 21
         End If
@@ -118,6 +128,11 @@ Public Class FormMain
         '3：BUG+ IMP* FEAT-
         '2：BUG* IMP-
         '1：BUG-
+        If LastVersion < 380 Then 'Snapshot 2.12.2
+            FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：无法搜索 CurseForge 上的社区资源"))
+            FeatureCount += 3
+            BugCount += 13
+        End If
         If LastVersion < 378 Then 'Snapshot 2.12.1
             If LastVersion >= 377 Then
                 FeatureList.Add(New KeyValuePair(Of Integer, String)(1, "修复：在版本列表中存在 OptiFine 时可能无法加载版本列表"))
@@ -323,7 +338,7 @@ Public Class FormMain
     '窗口加载
     Private IsWindowLoadFinished As Boolean = False
     Public Sub New()
-        ApplicationStartTick = GetTimeTick()
+        ApplicationStartTick = GetTimeMs()
         '窗体参数初始化
         FrmMain = Me
         FrmLaunchLeft = New PageLaunchLeft
@@ -387,10 +402,10 @@ Public Class FormMain
         '尽早执行的加载池
         McFolderListLoader.Start(0) '为了让下载已存在文件检测可以正常运行，必须跑一次；为了让启动按钮尽快可用，需要尽早执行；为了与 PageLaunchLeft 联动，需要为 0 而不是 GetUuid
 
-        Log("[Start] 第二阶段加载用时：" & GetTimeTick() - ApplicationStartTick & " ms")
+        Log("[Start] 第二阶段加载用时：" & GetTimeMs() - ApplicationStartTick & " ms")
     End Sub
     Private Sub FormMain_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
-        ApplicationStartTick = GetTimeTick()
+        ApplicationStartTick = GetTimeMs()
         Handle = New Interop.WindowInteropHelper(Me).Handle
         '读取设置
         Setup.Load("UiBackgroundOpacity")
@@ -496,7 +511,7 @@ Public Class FormMain
             Telemetry("启动")
         End Sub, "初始化", ThreadPriority.Lowest)
 
-        Log("[Start] 第三阶段加载用时：" & GetTimeTick() - ApplicationStartTick & " ms")
+        Log("[Start] 第三阶段加载用时：" & GetTimeMs() - ApplicationStartTick & " ms")
     End Sub
     '根据打开次数触发的事件
     Private Sub RunCountSub()

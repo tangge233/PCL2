@@ -112,19 +112,14 @@ Public Module ModModpack
     Private Sub ExtractModpackFiles(InstallTemp As String, FileAddress As String, Loader As LoaderBase, ProgressIncrement As Double)
         '解压文件
         Dim RetryCount As Integer = 1
-        Dim Encode = Encoding.GetEncoding("GB18030")
         Dim InitialProgress = Loader.Progress
         Try
 Retry:
             Loader.Progress = InitialProgress
             DeleteDirectory(InstallTemp)
-            ExtractFile(FileAddress, InstallTemp, Encode, ProgressIncrementHandler:=Sub(Delta) Loader.Progress += Delta * ProgressIncrement)
+            ExtractCompressedFile(FileAddress, InstallTemp, ProgressIncrementHandler:=Sub(Delta) Loader.Progress += Delta * ProgressIncrement)
         Catch ex As Exception
             Log(ex, "第 " & RetryCount & " 次解压尝试失败")
-            If TypeOf ex Is ArgumentException Then
-                Encode = Encoding.UTF8
-                Log("[ModPack] 已切换压缩包解压编码为 UTF8")
-            End If
             '完全不知道为啥会出现文件正在被另一进程使用的问题，总之加个重试
             If RetryCount < 5 Then
                 Thread.Sleep(RetryCount * 2000)

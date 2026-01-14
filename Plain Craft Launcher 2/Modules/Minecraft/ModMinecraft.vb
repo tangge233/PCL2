@@ -426,8 +426,8 @@ Public Module ModMinecraft
                 End Try
 #End Region
 VersionSearchFinish:
-                _Version.VanillaName = _Version.VanillaName.Replace("_unobfuscated", "").Replace(" Unobfuscated", "")
                 '获取版本号
+                _Version.VanillaName = _Version.VanillaName.Replace("_unobfuscated", "").Replace(" Unobfuscated", "")
                 If _Version.VanillaName.StartsWithF("1.") Then
                     Dim Segments = _Version.VanillaName.Split(" _-.".ToCharArray)
                     _Version.Vanilla = New Version(
