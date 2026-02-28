@@ -11,6 +11,9 @@
     <s:String x:Key="LangDialogBtnContinue">继续</s:String>
     <s:String x:Key="LangComma">，</s:String>
     <s:String x:Key="LangColon">：</s:String>
+    <s:String x:Key="LangSeparator">、</s:String>
+    <s:String x:Key="LangConjunctiveCoordinator">和</s:String>
+    <s:String x:Key="LangDisjunctiveCoordinator">或</s:String>
     <s:String x:Key="LangSaveAs">选择保存位置</s:String>
     <s:String x:Key="LangSaveAsFile">文件</s:String>
     <s:String x:Key="LangReset">重置</s:String>

@@ -8,6 +8,9 @@
     <s:String x:Key="LangDialogBtnContinue">Continue</s:String>
     <s:String x:Key="LangComma">, </s:String>
     <s:String x:Key="LangColon">: </s:String>
+    <s:String x:Key="LangSeparator">, </s:String>
+    <s:String x:Key="LangConjunctiveCoordinator">and</s:String>
+    <s:String x:Key="LangDisjunctiveCoordinator">or</s:String>
     <s:String x:Key="LangSaveAs">Select Save Location</s:String>
     <s:String x:Key="LangSaveAsFile">File</s:String>
     <s:String x:Key="LangReset">重置</s:String>

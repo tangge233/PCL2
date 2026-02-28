@@ -8,6 +8,9 @@
     <s:String x:Key="LangDialogBtnContinue">続行</s:String>
     <s:String x:Key="LangComma">、</s:String>
     <s:String x:Key="LangColon">：</s:String>
+    <s:String x:Key="LangSeparator">、</s:String>
+    <s:String x:Key="LangConjunctiveCoordinator">及び</s:String>
+    <s:String x:Key="LangDisjunctiveCoordinator">又は</s:String>
     <s:String x:Key="LangSaveAs">保存先を選択してください</s:String>
     <s:String x:Key="LangSaveAsFile">文件</s:String>
     <s:String x:Key="LangReset">リセット</s:String>

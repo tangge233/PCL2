@@ -6,8 +6,11 @@
     <s:String x:Key="LangDialogBtnYes">예</s:String>
     <s:String x:Key="LangDialogBtnNo">아니오</s:String>
     <s:String x:Key="LangDialogBtnContinue">계속</s:String>
-    <s:String x:Key="LangComma">，</s:String>
-    <s:String x:Key="LangColon">：</s:String>
+    <s:String x:Key="LangComma">, </s:String>
+    <s:String x:Key="LangColon">: </s:String>
+    <s:String x:Key="LangSeparator">, </s:String>
+    <s:String x:Key="LangConjunctiveCoordinator">및</s:String>
+    <s:String x:Key="LangDisjunctiveCoordinator">또는</s:String>
     <s:String x:Key="LangSaveAs">저장 위치 선택</s:String>
     <s:String x:Key="LangSaveAsFile">文件</s:String>
     <s:String x:Key="LangReset">重置</s:String>

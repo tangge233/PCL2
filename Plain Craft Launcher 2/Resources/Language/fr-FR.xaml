@@ -6,8 +6,11 @@
     <s:String x:Key="LangDialogBtnYes">Oui</s:String>
     <s:String x:Key="LangDialogBtnNo">Non</s:String>
     <s:String x:Key="LangDialogBtnContinue">Continuer</s:String>
-    <s:String x:Key="LangComma">,</s:String>
-    <s:String x:Key="LangColon">:</s:String>
+    <s:String x:Key="LangComma">, </s:String>
+    <s:String x:Key="LangColon">: </s:String>
+    <s:String x:Key="LangSeparator">, </s:String>
+    <s:String x:Key="LangConjunctiveCoordinator">et</s:String>
+    <s:String x:Key="LangDisjunctiveCoordinator">ou</s:String>
     <s:String x:Key="LangSaveAs">Sélectionner l'emplacement d'enregistrement</s:String>
     <s:String x:Key="LangSaveAsFile">Fichier</s:String>
     <s:String x:Key="LangReset">重置</s:String>

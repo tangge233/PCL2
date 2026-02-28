@@ -8,6 +8,9 @@
     <s:String x:Key="LangDialogBtnContinue">Pokračovať</s:String>
     <s:String x:Key="LangComma">, </s:String>
     <s:String x:Key="LangColon">: </s:String>
+    <s:String x:Key="LangSeparator">, </s:String>
+    <s:String x:Key="LangConjunctiveCoordinator">a</s:String>
+    <s:String x:Key="LangDisjunctiveCoordinator">alebo</s:String>
     <s:String x:Key="LangSaveAs">Vyberte miesto na uloženie</s:String>
     <s:String x:Key="LangSaveAsFile">文件</s:String>
     <s:String x:Key="LangReset">重置</s:String>
