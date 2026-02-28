@@ -164,7 +164,7 @@ If you violate the rules, you may be kicked out of any relevant group!</s:String
     <s:String x:Key="LangDialogThemeUnlockGameFirstClueContent">You need to use your wisdom to find the next clue...
 Initial clue: </s:String>
     <s:String x:Key="LangDialogThemeUnlockGameFirstClueTitle">Decryption game</s:String>
-    <s:String x:Key="LangOtherHelp">Help center</s:String>
+    <s:String x:Key="LangOtherHelp">Help Center</s:String>
     <s:String x:Key="LangOtherAbout">About</s:String>
     <s:String x:Key="LangOtherTool">Utilities</s:String>
     <s:String x:Key="LangOtherMore">More</s:String>
@@ -283,7 +283,7 @@ If you have created a stable online homepage, you can click this tip to contribu
     <s:String x:Key="LangSetFuncHiddenSettingsLaunch">Miscellaneous</s:String>
     <s:String x:Key="LangSetFuncHiddenSettingsLink">Hosting</s:String>
     <s:String x:Key="LangSetFuncHiddenMoreSubPage">"More" subpages</s:String>
-    <s:String x:Key="LangSetFuncHiddenMoreHelp">Help center</s:String>
+    <s:String x:Key="LangSetFuncHiddenMoreHelp">Help Center</s:String>
     <s:String x:Key="LangSetFuncHiddenMoreAbout">Credits</s:String>
     <s:String x:Key="LangSetFuncHiddenMoreTool">Utilities</s:String>
     <s:String x:Key="LangSetFuncHiddenMoreFeedback">Feedback</s:String>
@@ -577,7 +577,7 @@ This page offers the NeoForge installer for download. After downloading, you nee
     <s:String x:Key="LangDownloadModpackTypeTech">Technology</s:String>
     <s:String x:Key="LangDownloadModpackTypeMagic">Magic</s:String>
     <s:String x:Key="LangDownloadModpackTypeAdventure">Adventure</s:String>
-    <s:String x:Key="LangDownloadModpackTypeCook">Kitchen Sink</s:String>
+    <s:String x:Key="LangDownloadModpackTypeSink">Kitchen Sink</s:String>
     <s:String x:Key="LangDownloadModpackTypeExplore">Exploration</s:String>
     <s:String x:Key="LangDownloadModpackTypeGame">Mini Games</s:String>
     <s:String x:Key="LangDownloadModpackTypeScienceFiction">Sci-Fi</s:String>
@@ -797,7 +797,7 @@ Original error message: </s:String>
     <s:String x:Key="LangPageLoginNideSkinLoading">Loading...</s:String>
     <s:String x:Key="LangPageLoginNideSkinChangePassword">Edit password</s:String>
     <s:String x:Key="LangPageLoginNideSkinLogout">Log out</s:String>
-    <s:String x:Key="LangPageOtherLeftHelp">Help center</s:String>
+    <s:String x:Key="LangPageOtherLeftHelp">Help Center</s:String>
     <s:String x:Key="LangPageOtherLeftRefresh">Refresh</s:String>
     <s:String x:Key="LangPageOtherLeftAbout">Credits</s:String>
     <s:String x:Key="LangPageOtherLeftTools">Utilities</s:String>
@@ -805,7 +805,7 @@ Original error message: </s:String>
     <s:String x:Key="LangPageOtherLeftVoteNew">Feature voting</s:String>
     <s:String x:Key="LangPageOtherHelpSearch">Search for helps</s:String>
     <s:String x:Key="LangPageOtherHelpLoading">Loading help list...</s:String>
-    <s:String x:Key="LangPageOtherHelpSimpleChineseOnly">Sorry, the help center is Simplified Chinese only.</s:String>
+    <s:String x:Key="LangPageOtherHelpSimpleChineseOnly">Sorry, the Help Center is Simplified Chinese only.</s:String>
     <s:String x:Key="LangPageOtherRefreshing">Refreshing...</s:String>
     <s:String x:Key="LangPageOtherDialogFeedbackContent">Please check the feedback list for similar issues before submitting new feedback to avoid duplicate submissions.</s:String>
     <s:String x:Key="LangPageOtherDialogFeedbackTitle">Feedback</s:String>
@@ -813,7 +813,6 @@ Original error message: </s:String>
     <s:String x:Key="LangPageOtherDialogFeedbackBtn2">Feedback list</s:String>
     <s:String x:Key="LangPageOtherDialogVoteContent">Do you want to open the new feature voting page?</s:String>
     <s:String x:Key="LangPageOtherDialogVoteTitle">Feature voting</s:String>
-    <s:String x:Key="LangPageOtherDialogVoteBtn1">Open</s:String>
     <s:String x:Key="LangPageOtherAboutAbout">About</s:String>
     <s:String x:Key="LangPageOtherAboutAboutAuthor">LTCat (龙腾猫跃)</s:String>
     <s:String x:Key="LangPageOtherAboutAboutAuthorSubtitle">The developer of Plain Craft Launcher!</s:String>
@@ -827,7 +826,7 @@ Original error message: </s:String>
     <s:String x:Key="LangPageOtherAboutThanksMCMod">Provided Chinese translation of mods and more related information!</s:String>
     <s:String x:Key="LangPageOtherAboutThanksMCModBtn">Website</s:String>
     <s:String x:Key="LangPageOtherAboutThanks00ll00">Provided Java Launch Wrapper and some important support!</s:String>
-    <s:String x:Key="LangPageOtherAboutThanksz0z0r4">Provided MCIM community resource mirrors and image hosting services for the help center!</s:String>
+    <s:String x:Key="LangPageOtherAboutThanksz0z0r4">Provided MCIM community resource mirrors and image hosting services for the Help Center!</s:String>
     <s:String x:Key="LangPageOtherAboutThanksz0z0r4Detail">MCIM Homepage</s:String>
     <s:String x:Key="LangPageOtherAboutThanksEasytier">Provided the Hosting module!</s:String>
     <s:String x:Key="LangPageOtherAboutThanksEasytierDetail">GitHub</s:String>
@@ -850,7 +849,8 @@ Original error message: </s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoAgreement">ToS &amp; Disclaimer</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoTelemetryTitle">Anonymous telemetry</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoTelemetryContent">When a download fails, PCL throws an error, or the game crashes, PCL will send anonymous telemetry to notify LTCat (“uh-oh, something went wrong”) so LTCat can fix bugs more effectively. (PCL does not upload or collect any personal information—none of the telemetry contains any.)
-You can disable telemetry under "Settings → Miscellaneous → Launcher", but then LTCat will not know which bugs you have encountered.</s:String>
+You can disable telemetry under "Settings → Miscellaneous → Launcher", but then LTCat will not know which bugs you have encountered.
+More: https://github.com/Meloong-Git/PCL/discussions/7036</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoPrivacyTitle">Privacy statement and personal information protection policy</s:String>
     <s:String x:Key="LangPageOtherAboutLawInfoPrivacyContent">Since PCL does not collect any personal information, there is essentially nothing to include here.
 This section is retained solely to inform you that PCL does not collect personal information.</s:String>
@@ -967,6 +967,8 @@ For example:
 It is best to put quotation marks (") around operations involving paths to avoid failures due to spaces in the path.
 When executing a command, the directory where the Command Prompt is located is the current .minecraft folder.</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsCommandStartWaitForCommand">Wait for complete</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsPreventUpdateMod">Disable mod updating</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsPreventUpdateModToolTip">Disable mod updating feature to prevent accidental misuse in modpacks.</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsIgnoreJavaCompatibility">Ignore Java compatibility warnings</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsIgnoreJavaCompatibilityToolTip">If you manually selected a Java which incompatible with the current instance, the compatibility warning dialog will be automatically skipped, and the manually chosen Java will be forcibly used.</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsDisableFileVerification">Disable file verification</s:String>
@@ -978,6 +980,7 @@ If this causes problems, such as being blocked by anti-cheat systems, you can di
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsGPUPerfence">Force Java to use high-performance GPU</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsGPUPerfenceToolTip">Automatically sets Java to use the high-performance GPU in Windows Settings → System → Display → Graphics.
 This ensures Minecraft runs on the dedicated GPU instead of the integrated one, significantly improving performance on systems with both.</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsMoreTips">More advanced options are available in the instance-specific settings.</s:String>
     <s:String x:Key="LangPageSetupLaunchGotoVersionSetting">Instance</s:String>
     <s:String x:Key="LangPageSetupLaunchReloadByError">There is an exception in the launch options and have been automatically reset.</s:String>
     <s:String x:Key="LangPageSetupLaunchReloadFail">An error occurred while reloading the launch options.</s:String>
@@ -1063,6 +1066,11 @@ If login fails with an error like "Could not establish trust relationship for th
     <s:String x:Key="LangPageSetupSystemSystemCacheFolderToolTip">Location of cache for downloaded files, skins stored by PCL, etc.
 Paths with spaces are not recommended.
 Leave blank for the default. A restart is required to apply the change.</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemTelemetry">Anonymous telemetry</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemTelemetryToolTip">When a download fails, PCL throws an error, or the game crashes, PCL will send anonymous telemetry to notify LTCat ("uh-oh, something went wrong") so LTCat can fix bugs more effectively.
+You can disable telemetry, but then LTCat will not know which bugs you have encountered.
+PCL does not upload or collect any personal information—none of the telemetry contains any.
+More: https://github.com/Meloong-Git/PCL/discussions/7036</s:String>
     <s:String x:Key="LangPageSetupSystemSystemCheckUpdate">Check for updates</s:String>
     <s:String x:Key="LangPageSetupSystemLang">Language</s:String>
     <s:String x:Key="LangPageSetupSystemLangLaunchLang">Language</s:String>
@@ -1342,7 +1350,7 @@ Do not enable this unless the relevant files are modified.</s:String>
     <s:String x:Key="LangModMainAprilFoolTipB">Have you seen the little white flag at the bottom-right?</s:String>
     <s:String x:Key="LangModMainAprilFoolTipC">Hmm... I suggest you just take a little click to the flag :)</s:String>
     <s:String x:Key="LangModMainAprilFoolTipD">The little white flag is always waiting for you...</s:String>
-    <s:String x:Key="LangModMainExceptionNoHelpFound">Available help is not found. You can hide the help center in "Settings → Personalization → Feature hiding" if it is not needed.</s:String>
+    <s:String x:Key="LangModMainExceptionNoHelpFound">Available help is not found. You can hide the Help Center in "Settings → Personalization → Feature hiding" if it is not needed.</s:String>
     <s:String x:Key="LangModMainExceptionNoFileFound">Help file not found: {0}.</s:String>
     <s:String x:Key="LangModMainExceptionNoTitleArgFound">Title item not found</s:String>
     <s:String x:Key="LangModMainExceptionNoXamlFileFound">Corresponding .xaml file for help entry .json not found. ({0})</s:String>

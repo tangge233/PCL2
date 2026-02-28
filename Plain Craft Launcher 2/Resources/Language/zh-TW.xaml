@@ -431,7 +431,7 @@
     <s:String x:Key="LangDownloadReleaseOn">發布於 {0}</s:String>
     <s:String x:Key="LangDownloadReleaseOnU">發布於 {0}</s:String>
     <s:String x:Key="LangDownloadForgeIncompatible">與 Forge 不相容</s:String>
-    <s:String x:Key="LangDownloadRecommendForge">相容 Forge {0}</s:String>
+    <s:String x:Key="LangDownloadRecommendForge">與 Forge {0} 相容</s:String>
     <s:String x:Key="LangDownloadShowAll">檢視全部版本</s:String>
     <s:String x:Key="LangDownloadSaveInstaller">儲存安裝器</s:String>
     <s:String x:Key="LangDownloadAll">全部版本</s:String>
@@ -474,7 +474,7 @@
     <s:String x:Key="LangDownloadInstallHintBackTip">點擊 Minecraft 項即可返回遊戲主版本選擇畫面！</s:String>
     <s:String x:Key="LangDownloadInstallClickToChose">可以新增</s:String>
     <s:String x:Key="LangDownloadInstallForgeIncompatible">與 Forge 不相容</s:String>
-    <s:String x:Key="LangDownloadInstallForgeCompatibleTargetVersion">僅相容特定版本的 Forge</s:String>
+    <s:String x:Key="LangDownloadInstallForgeCompatibleTargetVersion">僅與特定版本的 Forge 相容</s:String>
     <s:String x:Key="LangDownloadInstallFabricIncompatible">與 Fabric 不相容</s:String>
     <s:String x:Key="LangDownloadInstallOptiFineIncompatible">與 OptiFine 不相容</s:String>
     <s:String x:Key="LangDownloadInstallFabricNeed">需要 Fabric</s:String>
@@ -496,7 +496,7 @@
     <s:String x:Key="LangDownloadPageLeftAutoInstall">實例下載</s:String>
     <s:String x:Key="LangDownloadPageLeftResource">社群資源</s:String>
     <s:String x:Key="LangDownloadPageLeftMods">模組</s:String>
-    <s:String x:Key="LangDownloadPageLeftModsL"> Mod </s:String>
+    <s:String x:Key="LangDownloadPageLeftModsL">模組</s:String>
     <s:String x:Key="LangDownloadPageLeftModpack">模組包</s:String>
     <s:String x:Key="LangDownloadPageLeftModpackL">模組包</s:String>
     <s:String x:Key="LangDownloadPageLeftResourcepack">資源包</s:String>
@@ -558,7 +558,7 @@
     <s:String x:Key="LangDownloadModConnectModrinthFail">無法連線到 Modrinth，所以目前僅顯示了來自 CurseForge 的內容，結果可能不全。
 請嘗試使用 VPN 或 Proxy 以改善網路。</s:String>
     <s:String x:Key="LangDownloadNeoForgeDescTitle">NeoForge 簡介</s:String>
-    <s:String x:Key="LangDownloadNeoForgeDesc">NeoForge 是適用於 Minecraft 1.20.1 + 的 Mod 載入器。你需要先安裝 NeoForge，才能安裝各種 NeoForge Mod；它也相容部分 Forge Mod。
+    <s:String x:Key="LangDownloadNeoForgeDesc">NeoForge 是適用於 Minecraft 1.20.1 + 的模組載入器。你需要先安裝 NeoForge，才能安裝各種 NeoForge 模組；它也與部分 Forge 模組相容。
 本頁提供 NeoForge 安裝程式的下載連結。下載完成後，請手動開啟安裝程式以完成安裝。</s:String>
     <s:String x:Key="LangDownloadNeoForgeWebsite">開啟官網</s:String>
     <s:String x:Key="LangDownloadNeoForgeGettingList">正在取得 NeoForge 清單</s:String>
@@ -577,7 +577,7 @@
     <s:String x:Key="LangDownloadModpackTypeTech">科技</s:String>
     <s:String x:Key="LangDownloadModpackTypeMagic">魔法</s:String>
     <s:String x:Key="LangDownloadModpackTypeAdventure">冒險</s:String>
-    <s:String x:Key="LangDownloadModpackTypeCook">水槽包</s:String>
+    <s:String x:Key="LangDownloadModpackTypeSink">水槽包</s:String>
     <s:String x:Key="LangDownloadModpackTypeExplore">探索</s:String>
     <s:String x:Key="LangDownloadModpackTypeGame">小遊戲</s:String>
     <s:String x:Key="LangDownloadModpackTypeScienceFiction">科幻</s:String>
@@ -815,7 +815,6 @@
     <s:String x:Key="LangPageOtherDialogVoteContent">是否要開啟新功能投票網頁？
 若無法開啟該網頁，請嘗試使用 VPN 以改善網路連線狀況。</s:String>
     <s:String x:Key="LangPageOtherDialogVoteTitle">新功能投票</s:String>
-    <s:String x:Key="LangPageOtherDialogVoteBtn1">開啟</s:String>
     <s:String x:Key="LangPageOtherAboutAbout">關於</s:String>
     <s:String x:Key="LangPageOtherAboutAboutAuthor">龍騰貓躍（龙腾猫跃）</s:String>
     <s:String x:Key="LangPageOtherAboutAboutAuthorSubtitle">Plain Craft Launcher 的開發者！</s:String>
@@ -970,6 +969,8 @@
 涉及路徑的操作最好都打上雙引號，以避免路徑中的空格導致執行失敗。
 執行指令時，命令列所在的目錄是目前的 .minecraft 資料夾。</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsCommandStartWaitForCommand">等待指令執行完成後再繼續啟動</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsPreventUpdateMod">禁止更新模組</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsPreventUpdateModToolTip">禁止為此版本更新模組，以防止模組包玩家誤操作</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsIgnoreJavaCompatibility">忽略 Java 相容性警告</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsIgnoreJavaCompatibilityToolTip">如果手動選擇了與目前實例不相容的 Java，則自動跳過相容性警告彈出視窗，強制使用手動選擇的 Java。</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsDisableFileVerification">關閉檔案校驗</s:String>
@@ -981,6 +982,7 @@
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsGPUPerfence">要求 Java 使用高性能顯示卡</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsGPUPerfenceToolTip">自動在「Windows 設定 → 系統 → 螢幕 → 顯示卡」中將 Java 改為使用高效能顯示卡。
 如果電腦同時有整合顯示卡和獨立顯示卡，這能確保 Minecraft 使用獨立顯示卡進行繪製，以大幅提高效能。</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsMoreTips">實例獨立設定中還有更多進階選項可供調整。</s:String>
     <s:String x:Key="LangPageSetupLaunchGotoVersionSetting">實例獨立設定</s:String>
     <s:String x:Key="LangPageSetupLaunchReloadByError">啟動設定項存在異常，已被自動重設</s:String>
     <s:String x:Key="LangPageSetupLaunchReloadFail">重載啟動設定時出錯</s:String>
@@ -1067,6 +1069,11 @@
     <s:String x:Key="LangPageSetupSystemSystemCacheFolderToolTip">PCL 的下載、外觀等快取檔案的儲存位置。
 不推薦路徑中帶有空格。
 留空即為預設值，重啟 PCL 後生效。</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemTelemetry">匿名資料收集</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemTelemetryToolTip">當下載失敗、PCL 出錯、遊戲崩潰等事件時，PCL 會匿名上報情況，以通知龍貓「哦吼，出錯了」，讓龍貓能更好地修 Bug……
+你可以關閉上報，不過龍貓就不知道你遇到了什麼 Bug 了……
+PCL 不會上傳或收集任何個人資訊，包括上報的東西裡面也沒有！
+詳情：https://github.com/Meloong-Git/PCL/discussions/7036</s:String>
     <s:String x:Key="LangPageSetupSystemSystemCheckUpdate">檢查更新</s:String>
     <s:String x:Key="LangPageSetupSystemLang">語言</s:String>
     <s:String x:Key="LangPageSetupSystemLangLaunchLang">啟動器語言</s:String>
@@ -1617,7 +1624,7 @@ PCL 不支援其他亂七八糟的下載協議。</s:String>
     <s:String x:Key="LangModJavaExceptionVersionNotFound">未找到該 Java 的版本號</s:String>
     <s:String x:Key="LangModJavaExceptionGetDetailInfoFail">分析詳細資訊失敗，取得的版本為 {0}</s:String>
     <s:String x:Key="LangModJavaExceptionNeed64Bit">該 Java 為 32 位元版本，請安裝 64 位元的 Java</s:String>
-    <s:String x:Key="LangModJavaExceptionNeedJDK">由於高版本 JRE 對遊戲的相容性很差，因此不再允許使用。你可以使用對應版本的 JDK，而非 JRE！</s:String>
+    <s:String x:Key="LangModJavaExceptionNeedJDK">由於高版本 JRE 和遊戲的相容性很差，因此不再允許使用。你可以使用對應版本的 JDK，而非 JRE！</s:String>
     <s:String x:Key="LangModJavaExceptionCheckFail">檢查 Java 失敗（{0}）</s:String>
     <s:String x:Key="LangModJavaExceptionSearchAbort">Java 搜尋載入器已中斷</s:String>
     <s:String x:Key="LangModJavaMaxRequireVersion">最高與 Java {0} 相容</s:String>
@@ -1951,7 +1958,7 @@ PCL 不支援其他亂七八糟的下載協議。</s:String>
     <s:String x:Key="LangModCrashCrashReasonReasonAX">以下模組初始化失敗，導致遊戲出錯：
  - {0}
 
-您可以嘗試逐一停用上述 Mod，然後觀察遊戲是否還會崩潰。</s:String>
+您可以嘗試逐一停用上述模組，然後觀察遊戲是否還會崩潰。</s:String>
     <s:String x:Key="LangModCrashCrashReasonReasonAY">遊戲似乎因為方塊 {0} 出現了問題。
 
 你可以建立一個新世界，並觀察遊戲的執行情況：
@@ -2050,7 +2057,7 @@ PCL 不支援其他亂七八糟的下載協議。</s:String>
 {0}
 
 請根據上述資訊進行相應處理，若無法理解英文內容，建議使用翻譯軟體協助閱讀。</s:String>
-    <s:String x:Key="LangModCrashCrashReasonReasonCF">您安裝的 Mod 不相容，Mod 載入器可能已提供錯誤訊息。請根據錯誤報告中的日誌資訊進行相應處理。若您無法理解英文內容，可使用翻譯軟體協助閱讀。</s:String>
+    <s:String x:Key="LangModCrashCrashReasonReasonCF">您安裝的模組不相容，模組載入器可能已提供錯誤訊息。請根據錯誤報告中的日誌資訊進行相應處理。若您無法理解英文內容，可使用翻譯軟體協助閱讀。</s:String>
     <s:String x:Key="LangModCrashCrashReasonReasonFeedback">PCL 取得到了沒有詳細資訊的錯誤原因（{0}），請向 PCL 作者提交回報以取得詳情。</s:String>
     <s:String x:Key="LangModCrashCrashReasonDialogContentAdditional">此外，</s:String>
     <s:String x:Key="LangModCrashCrashReasonDialogContentViewLogTip">你可以檢視錯誤報告瞭解錯誤具體是如何發生的。</s:String>

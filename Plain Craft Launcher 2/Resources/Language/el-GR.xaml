@@ -575,7 +575,7 @@
     <s:String x:Key="LangDownloadModpackTypeTech">Τεχνολογία</s:String>
     <s:String x:Key="LangDownloadModpackTypeMagic">Magic</s:String>
     <s:String x:Key="LangDownloadModpackTypeAdventure">Περιπέτεια</s:String>
-    <s:String x:Key="LangDownloadModpackTypeCook">Νιπτήρας Κουζίνας</s:String>
+    <s:String x:Key="LangDownloadModpackTypeSink">Νιπτήρας Κουζίνας</s:String>
     <s:String x:Key="LangDownloadModpackTypeExplore">Εξερεύνηση</s:String>
     <s:String x:Key="LangDownloadModpackTypeGame">Μίνι Παιχνίδια</s:String>
     <s:String x:Key="LangDownloadModpackTypeScienceFiction">Sci-Fi</s:String>
@@ -811,7 +811,6 @@
     <s:String x:Key="LangPageOtherDialogFeedbackBtn2">Λίστα Σχολίων</s:String>
     <s:String x:Key="LangPageOtherDialogVoteContent">Θέλετε να ανοίξετε τη σελίδα ψηφοφορίας για τη νέα λειτουργία;</s:String>
     <s:String x:Key="LangPageOtherDialogVoteTitle">Συμβουλή</s:String>
-    <s:String x:Key="LangPageOtherDialogVoteBtn1">Άνοιγμα</s:String>
     <s:String x:Key="LangPageOtherAboutAbout">Περίπου</s:String>
     <s:String x:Key="LangPageOtherAboutAboutAuthor">LTCat (龙腾猫跃)</s:String>
     <s:String x:Key="LangPageOtherAboutAboutAuthorSubtitle">Ο προγραμματιστής του Plain Craft Launcher!</s:String>
@@ -964,6 +963,8 @@ Email για Αναφορά Παράνομης και Παράτυπης Συμ�
 Είναι καλύτερο να βάζετε εισαγωγικά (") γύρω από λειτουργίες που περιλαμβάνουν μονοπάτια για να αποφύγετε αστοχίες λόγω διαστημάτων στη διαδρομή.
 Κατά την εκτέλεση μιας εντολής, ο κατάλογος όπου βρίσκεται η Γραμμή εντολών είναι ο τρέχων φάκελος .minecraft.</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsCommandStartWaitForCommand">Περιμένετε να ολοκληρωθεί</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsPreventUpdateMod">禁止更新 Mod</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsPreventUpdateModToolTip">禁止为此版本更新 Mod，以防止整合包玩家误操作</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsIgnoreJavaCompatibility">Αγνοήστε τη Συμβατότητα Java</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsIgnoreJavaCompatibilityToolTip">Προειδοποίηση: Συνιστάται ιδιαίτερα η απενεργοποίηση των προειδοποιήσεων μεμονωμένα αντί καθολικά!
 Εάν η Java που δεν είναι συμβατή με την τρέχουσα έκδοση επιλεγεί χειροκίνητα στις ρυθμίσεις, τότε η προειδοποίηση συμβατότητας θα παραλειφθεί αυτόματα και θα αναγκαστεί να χρησιμοποιηθεί η επιλεγμένη Java.</s:String>
@@ -977,6 +978,7 @@ Email για Αναφορά Παράνομης και Παράτυπης Συμ�
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsGPUPerfence">要求 Java 使用高性能显卡</s:String>
     <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsGPUPerfenceToolTip">自动在 Windows 设置 → 系统 → 屏幕 → 显示卡 中将 Java 改为使用高性能显卡。
 如果电脑同时有集显和独显，这能确保 MC 使用独显进行渲染，以大幅提高性能。</s:String>
+    <s:String x:Key="LangPageSetupLaunchLaunchAdvanceOptionsMoreTips">版本独立设置中还有更多高级选项可供调整。</s:String>
     <s:String x:Key="LangPageSetupLaunchGotoVersionSetting">版本独立设置</s:String>
     <s:String x:Key="LangPageSetupLaunchReloadByError">Υπάρχει εξαίρεση στις επιλογές εκκίνησης και έχει γίνει αυτόματη επαναφορά.</s:String>
     <s:String x:Key="LangPageSetupLaunchReloadFail">Παρουσιάστηκε σφάλμα κατά την επαναφόρτωση των επιλογών εκκίνησης.</s:String>
@@ -1063,6 +1065,11 @@ Email για Αναφορά Παράνομης και Παράτυπης Συμ�
     <s:String x:Key="LangPageSetupSystemSystemCacheFolderToolTip">Τοποθεσία της προσωρινής μνήμης, όπως τα αρχεία λήψης και τα skins που αποθηκεύονται από το PCL.
 Δεν συνιστώνται θέσεις σε μονοπάτια.
 Αφήστε κενό ως προεπιλογή, απαιτείται επανεκκίνηση του προγράμματος εκκίνησης για εφαρμογή.</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemTelemetry">匿名数据收集</s:String>
+    <s:String x:Key="LangPageSetupSystemSystemTelemetryToolTip">当下载失败、PCL 出错、游戏崩溃等事件时，PCL 会匿名上报情况，以通知龙猫 “哦吼，出错了”，让龙猫能更好地修 Bug……
+你可以关闭上报，不过龙猫就不知道你遇到了什么 Bug 了……
+PCL 不会上传或收集任何个人信息，包括上报的东西里面也没有！
+详情：https://github.com/Meloong-Git/PCL/discussions/7036</s:String>
     <s:String x:Key="LangPageSetupSystemSystemCheckUpdate">Ελέγξτε για Ενημερώσεις</s:String>
     <s:String x:Key="LangPageSetupSystemLang">Γλώσσα</s:String>
     <s:String x:Key="LangPageSetupSystemLangLaunchLang">Γλώσσα</s:String>
